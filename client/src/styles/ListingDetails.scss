@@ -1,0 +1,883 @@
+@import "./variables.scss";
+@import "./breakpoints.scss";
+
+.listing-details {
+  padding: 40px;
+  height: 220px;
+  cursor: default;
+  // background-color: green;
+
+
+  @include xl {
+    padding: 40px 80px 120px;
+  }
+
+  @include lg {
+    padding: 40px 50px 120px;
+  }
+
+  @include sm {
+    padding: 40px 20px 120px;
+  }
+
+  .title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @include sm {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+
+    h1 {
+      @include sm {
+        font-size: 26px;
+      }
+    }
+
+    .save {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+
+      p {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0;
+      }
+    }
+  }
+
+  .photos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+
+    img {
+      max-width: 280px;
+    }
+  }
+
+  hr {
+    margin: 20px 0;
+  }
+
+  .profile {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+
+    img {
+      width: 60px;
+      height: 60px;
+      margin: 0;
+    }
+  }
+
+  p {
+    max-width: 800px;
+    margin-top: 20px;
+  }
+
+  .description {
+    display: flex;
+    justify-content: space-between;
+
+
+
+
+    .amenities {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-column-gap: 100px;
+      margin: 30px 0;
+      max-width: 700px;
+
+      @include sm {
+        grid-column-gap: 20px;
+      }
+
+      .facility {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+
+        &_icon {
+          font-size: 30px;
+        }
+
+        p {
+          margin: 0;
+        }
+      }
+    }
+
+
+  }
+}
+
+.basic {
+  width: 200px;
+  height: 100px;
+  margin: 50px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 30px;
+  padding: 15px;
+  border: 1px solid gray;
+  border-radius: 10px;
+  background-color: #eee;
+  box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.2);
+
+  p {
+    font-weight: bolder;
+  }
+
+  &_count {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 40px;
+  }
+}
+
+.totalPrice {
+  width: 100%;
+  // background-color: red;
+  margin: 10px auto;
+  text-align: center;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100%;
+  background-color: rgba(10, 100, 100, 0.1);
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+}
+
+
+/* -----------Directory---------------- */
+#directory {
+  width: 100%;
+  height: 100px;
+  /* background-color: red; */
+}
+
+.directories {
+  padding-top: 35px;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  /* background-color: blue; */
+
+}
+
+.directoryDivider {
+  margin-top: 8px;
+  width: 10px;
+  height: 10px;
+  background-color: rgba(0, 0, 255, 0.5);
+  border-radius: 50%;
+}
+
+.directories p {
+  font-weight: 500px;
+  font-size: larger;
+  margin-left: 15px;
+  margin-right: 10px;
+}
+
+.directories a {
+  text-decoration: none;
+  color: black;
+}
+
+/* -----------shopInfo---------------- */
+
+#shopInfo {
+  height: 300px;
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 30px;
+  // background-color: red;
+}
+
+.infoCard {
+  /* background-color: blue; */
+  margin: 0 auto;
+  width: 95%;
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.2);
+  cursor: default;
+}
+
+.shopPhoto_Description {
+  /* background-color: green; */
+  width: 70%;
+  display: flex;
+  flex-direction: row;
+  border-radius: 10px;
+}
+
+.shopProfileImage {
+  height: 300px;
+  width: 300px;
+  margin-right: 50px;
+  // background-color: red;
+}
+
+.shopProfileImage img {
+
+  width: 90%;
+  height: 90%;
+  margin: 5%;
+  border-radius: 10px;
+  object-fit: cover;
+
+}
+
+.shopDescription {
+  // background-color: red;
+  width: 60%;
+  height: 100%;
+
+}
+
+.shopDescriptionText {
+  padding: 0;
+  overflow-y: scroll;
+  height: 80%;
+  max-height: 300px;
+  margin: 0;
+  // background-color: #eee;
+  text-align: center;
+  justify-content: center;
+}
+
+.shopDescription p {
+
+  font-size: large;
+
+  text-align: center;
+}
+
+.ratingText {
+  position: relative;
+  bottom: 10px;
+}
+
+.shopAccessBtns {
+  height: 50px;
+  width: 97%;
+  display: flex;
+  flex-direction: row;
+  margin: 5px auto;
+  /* background-color: red; */
+  align-items: center;
+  justify-content: center;
+}
+
+.shopAccessBtns button {
+  margin: 3px;
+  height: 35px;
+  width: 170px;
+  border-radius: 7px;
+  border: 1px solid black;
+  color: #000;
+  font-size: larger;
+  position: relative;
+  background-color: #fff;
+}
+
+.shopAccessBtns button:hover {
+  border: 2px solid black;
+  cursor: pointer;
+}
+
+/* --------shopAbout------------ */
+
+.shopAbout {
+  width: 30%;
+  border-left: 1px solid black;
+}
+
+.aboutBlock {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  height: 25%;
+  margin-left: 15px;
+  margin-bottom: 0;
+  // background-color: red;
+}
+
+.aboutBlock .aboutIcon {
+  width: 100%;
+  height: 100%;
+  // background-color: orange;
+}
+
+.aboutBlock .aboutDesciption {
+  width: 80%;
+}
+
+
+.aboutBlock img {
+  width: 85%;
+  height: 85%;
+  margin: 8%;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.aboutBlock .aboutDesciption {
+  margin: 10px;
+}
+
+.aboutDesciption .title {
+  width: 100%;
+}
+
+.title h2 {
+  font-size: medium;
+  font-weight: bold;
+}
+
+.aboutDesciption .igPage {
+  width: 100%;
+}
+
+.igPage a {
+  font-size: medium;
+  text-decoration: none;
+  color: rgba(59, 59, 59, 0.8);
+}
+
+
+
+
+/* ------------profile---------------------- */
+#profile {
+  width: 100%;
+  height: 1100px;
+  position: relative;
+
+  /* background-color: red; */
+}
+
+.profileContent {
+  width: 100%;
+  // background-color: green;
+  height: 600px;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+}
+
+.profileDescription {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  background-color: blue;
+
+}
+
+.profileDescription h1 {
+  font-family: sans-serif;
+  font-size: x-large;
+  font-weight: 600;
+}
+
+.profileDescription h2 {
+  font-size: larger;
+  font-weight: 500;
+  font-family: sans-serif;
+}
+
+
+
+.verifiedProfile {
+  width: 100%;
+  background: linear-gradient(0deg, rgba(255, 255, 255, 1) 7%, rgba(255, 255, 255, 1) 63%, rgba(161, 164, 255, 1) 100%);
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  padding: 15px;
+  border-radius: 10px;
+  padding: 15px 30px 15px 30px;
+
+}
+
+.verifiedProfileHeader {
+  margin: 0 auto;
+  // background-color: red;
+}
+
+.verifiedProfileHeader h1 {
+  font-weight: bolder;
+  font-size: xx-large;
+  margin-bottom: 30px;
+  color: #000;
+}
+
+.verifiedProfileHeader2 {
+  margin: 0 auto 15px auto;
+}
+
+.separator {
+  width: 100%;
+  height: 1px;
+  background-color: gray;
+  margin: 10px 0;
+}
+
+.verifiedProfileData {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.verifiedDatum {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+}
+
+
+verifiedDatumTitle{
+  width: 50%;
+  // background-color: green;
+  border-right: 1px solid black;
+}
+
+.verifiedDatumData{
+  width: 50%;
+  // background-color: orange;
+}
+
+// -----------toggleShop-----------------------
+#toggleShop {
+  text-align: center;
+  padding: 20px 0;
+  // background-color: orange;
+}
+
+.toggleBtns {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  /* Space between buttons */
+}
+
+.header-btn {
+  padding: 10px 20px;
+  border: none;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.header-btn:hover {
+  background-color: #dcdcdc;
+}
+
+.toggleHeaderProducts {
+  border-bottom: 2px solid transparent;
+}
+
+.toggleHeaderBorder {
+  border-bottom: 2px solid #000;
+  /* Add active tab border color */
+}
+
+.toggleBar {
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+  /* The horizontal rule (bar) under the buttons */
+  margin-top: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+// --------------------------------------------------------------
+.tab {
+  padding: 20px 50px;
+  // background-color: red;
+}
+
+.tabb {
+  padding: 0 20px;
+  // background-color: green;
+  display: flex;
+  flex-direction: row;
+}
+
+.tabbU {
+  padding: 0 20px;
+  height: auto;
+  min-height: 300px;
+  width: 85%;
+  // background-color: yellow;
+  margin: 20px auto;
+  position: relative;
+}
+
+.tabb .descriptionText {
+  width: 50%;
+  padding: 30px;
+  // background-color: orange;
+}
+
+.tabb .bidInfo {
+  width: 50%;
+  height: 600px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.2);
+  margin-top: 30px;
+
+}
+
+.tabb .bidInfo button {
+  padding: 10px 15px;
+  background-color: #F8395A;
+  border: none;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+  color: white;
+  border-radius: 10px;
+  width: 100%;
+}
+
+@media only screen and (max-width: 600px) {
+  .navbar-toggler-icon {
+    height: 30px;
+    width: 30px;
+  }
+
+
+  #shopInfo {
+    height: auto;
+    // background-color: red;
+
+  }
+
+  .infoCard {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .shopDescription p {
+    // background-color: green;
+    width: 300px;
+  }
+
+  .shopAccessBtns {
+    margin: 5px auto 30px -50px;
+    padding: 0;
+  }
+
+  .shopAccessBtns button {
+    margin: 7px;
+    height: 35px;
+    width: 200px;
+    border-radius: 7px;
+    border: 1px solid black;
+    color: #000;
+    font-size: large;
+    position: relative;
+    font-weight: 600;
+  }
+
+  .shopPhoto_Description {
+    width: 100%;
+  }
+
+  #shopInfo {
+    min-height: 680px;
+  }
+
+  .shopAbout {
+    width: 97%;
+    border-left: 0;
+    margin: 0 auto;
+  }
+
+
+  .containerP .products-container {
+    height: 1300px;
+    /* background-color: red; */
+  }
+
+  .containerP .products-container .product {
+    width: 100%;
+    height: 400px;
+  }
+
+  .products-preview .preview {
+    width: 95%;
+  }
+
+  .previewImage {
+    width: 100%;
+    height: 40%;
+  }
+
+  .products-preview .preview img {
+    height: 100%;
+  }
+
+  .shopProfileImage {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    border: 1px solid #000;
+    background-color: #fff;
+    margin-top: 40px;
+    margin-left: 30px;
+  }
+
+  .shopProfileImage img {
+
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 50%;
+    object-fit: cover;
+
+  }
+
+  .tabb {
+
+    flex-direction: column;
+  }
+
+  .tabb .descriptionText {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .tabb .bidInfo {
+    width: 100%;
+  }
+
+  .tabb .bidInfo .totalPrice h2{
+    font-size: medium;
+  }
+
+  .tabbU {
+    padding: 0 20px;
+    width: 95%;
+  }
+
+  .listing-details {
+    height: 300px;
+  }
+
+  .tab {
+    padding: 20px 10px;
+  }
+}
+
+.verifiedProfileData .verifiedDatum h2{
+  font-size: medium;
+}
+
+.verifiedProfileData .verifiedDatum h3{
+  font-size: small;
+}
+
+
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+
+  .shopProfileImage {
+    height: 200px;
+    width: 200px;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .shopProfileImage {
+    margin-right: 0px;
+  }
+
+  .tabb {
+
+    flex-direction: column;
+  }
+
+  .tabb .descriptionText {
+    width: 100%;
+
+  }
+
+  .tabb .bidInfo {
+    width: 100%;
+  }
+
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 798px) {
+  .shopProfileImage {
+    margin-right: -20px;
+  }
+
+  .tabb {
+
+    flex-direction: column;
+  }
+
+  .tabb .descriptionText {
+    width: 100%;
+
+  }
+
+  .tabb .bidInfo {
+    width: 100%;
+  }
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 1024px) {
+  .tabb {
+
+    flex-direction: row;
+  }
+
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {}
+
+
+.updates {
+  // background-color : red;
+  padding: 10px;
+  border-radius: 10px;
+  height: auto;
+  min-height: 300px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.update-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.update-itemm {
+  display: flex;
+  flex-direction: row;
+  height: 120px;
+  width: 100%;
+
+  margin: 30px auto;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 7px;
+  box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.2);
+
+
+}
+
+.update-itemm:hover {
+  box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.5);
+}
+
+.update-icon {
+  width: 20%;
+  min-width: 100px;
+  height: 100%;
+  // background-color: green;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+}
+
+.update-iconz {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  /* fallback color */
+}
+
+
+.update-description {
+  width: 80%;
+  // background-color: orange;
+  padding: 1%;
+  display: flex;
+  flex-direction: column;
+}
+
+.update-descriptionTitle {
+  height: 50%;
+  // background-color: blue;
+  padding: 2%;
+}
+
+.update-descriptionTitle h3 {
+  // background-color: blue;
+  margin-top: 10px;
+}
+
+.update-descriptionP {
+  height: 50%;
+  // background-color: green;
+  padding-left: 2%;
+}
+
+.update-descriptionP p {
+  margin-bottom: 10px;
+}
+
+.floating-add-btn {
+  position: absolute;
+  right: 130px;
+  bottom: 30px;
+  border: none;
+}
+
+.floating-add-btn:hover {
+  cursor: pointer;
+  box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.2);
+}

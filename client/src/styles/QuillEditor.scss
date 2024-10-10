@@ -1,0 +1,54 @@
+.ql-snow .ql-picker.ql-size .ql-picker-label::before,
+          .ql-snow .ql-picker.ql-size .ql-picker-item::before {
+            content: attr(data-value) !important;
+          }
+          .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="small"]::before,
+          .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="small"]::before {
+            content: 'Small' !important;
+          }
+          .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="normal"]::before,
+          .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="normal"]::before {
+            content: 'Normal' !important;
+          }
+          .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="large"]::before,
+          .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="large"]::before {
+            content: 'Large' !important;
+          }
+          .ql-snow .ql-picker.ql-size .ql-picker-label[data-value="huge"]::before,
+          .ql-snow .ql-picker.ql-size .ql-picker-item[data-value="huge"]::before {
+            content: 'Huge' !important;
+          }
+          .ql-snow .ql-picker.ql-size .ql-picker-label,
+          .ql-snow .ql-picker.ql-size .ql-picker-item {
+            font-size: 12px;
+          }
+          .ql-editor {
+            font-size: 16px;
+          }
+          .ql-editor .ql-size-small {
+            font-size: 0.75em;
+          }
+          .ql-editor .ql-size-large {
+            font-size: 1.5em;
+          }
+          .ql-editor .ql-size-huge {
+            font-size: 2.5em;
+          }
+          /* Optionally, adjust the width of the dropdowns if needed */
+.ql-snow .ql-picker.ql-font,
+.ql-snow .ql-picker.ql-size {
+  width: 150px; /* Adjust this value as needed */
+}
+
+/* Target the font dropdown */
+.ql-snow .ql-picker.ql-font .ql-picker-label,
+.ql-snow .ql-picker.ql-font .ql-picker-item {
+  font-size: large; /* Adjust this value as needed */
+}
+
+/* Target the size dropdown */
+.ql-snow .ql-picker.ql-size .ql-picker-label,
+.ql-snow .ql-picker.ql-size .ql-picker-item {
+  font-size: large; /* Adjust this value as needed */
+
+}

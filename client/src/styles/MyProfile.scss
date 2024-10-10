@@ -1,0 +1,334 @@
+/* -----------shopInfo---------------- */
+
+#shopInfo{
+    height: 300px;
+    width: 100%;
+    border-radius: 10px;
+    margin-top: 30px;
+  }
+  
+  .infoCards{
+    /* background-color: blue; */
+    margin: 0 auto;
+    width: 70%;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.2);
+
+  }
+  
+  .shopPhoto_Descriptions{
+    /* background-color: green; */
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    // background-color: red;
+    border-radius: 10px;
+  }
+  
+  .shopProfileImages{
+    height: 100%;
+    width: 60%;
+    // background-color: green;
+  }
+  
+  .shopProfileImages .shopimg{
+    width: 100%;
+    height: 100%;
+    padding: 10px ;
+
+  }
+  .shopProfileImages img{
+  
+    width: 70%;
+    height: 100%;
+
+    border-radius: 10px;
+    object-fit: cover;
+
+  
+  }
+  
+  .shopDescription{
+    // background-color: red;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .shopDescription p{
+    margin-top: 35px;
+    padding: 20px;
+    font-size: large;
+    white-space: normal;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .ratingText{
+    position: relative;
+    bottom: 10px;
+  }
+  
+  .shopAccessBtns{
+    height: 50px;
+    width: 97%;
+    display: flex;
+    flex-direction: row;
+    margin: 5px auto;
+    /* background-color: red; */
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .shopAccessBtns button{
+    margin: 3px;
+  height: 35px;
+  width: 170px;
+  border-radius: 7px;
+  border: 1px solid black;
+  color: #000;
+  font-size: larger;
+  position: relative;
+    background-color: #fff;
+  }
+  
+  .shopAccessBtns button:hover{
+  border: 2px solid black;
+  cursor: pointer;
+  }
+  
+    /* --------shopAbout------------ */
+  
+  .shopAbout{
+    width: 40%;
+    border-left: 1px solid black;
+  }
+  
+  .aboutBlock{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    height: 25%;
+    margin-left: 15px;
+    margin-bottom: 0;
+    // background-color: red;
+  }
+  
+  .aboutBlock .aboutIcon{
+    width: 20%;
+    height: 100%;
+    // background-color: orange;
+  }
+  
+  .aboutBlock .aboutDesciption{
+    width: 80%;
+  }
+  
+  
+  .aboutBlock img{
+    width: 85%;
+    height: 85%;
+    margin: 8%;
+    border-radius: 7px;
+    object-fit:cover;
+  }
+  
+  .aboutBlock .aboutDesciption{
+    margin: 10px;
+  }
+  
+  .aboutDesciption .title{
+    width: 100%;
+  }
+  
+  .title h2{
+    font-size: medium;
+    font-weight: bold;
+  }
+  
+  .aboutDesciption .igPage{
+    width: 100%;
+  }
+  
+  .igPage a{
+    font-size: medium;
+    text-decoration: none;
+    color: rgba(59, 59, 59, 0.8);
+  }
+
+ 
+  /* ------------profile---------------------- */
+#profile{
+    width: 90%;
+    height: 1100px;
+    position: relative;
+    margin: 0 auto;
+    /* background-color: red; */
+  }
+  
+  .profileContent{
+    width: 100%;
+    // background-color: green;
+    height: 600px;
+    margin: 0 ;
+    padding: 0;
+    position: absolute;
+  }
+  
+  .profileDescription{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    background-color: blue; 
+  
+  }
+  
+  .profileDescription h1{
+    font-family: sans-serif;
+    font-size:x-large;
+    font-weight: 600;
+  }
+  
+  .profileDescription h2{
+    font-size: larger;
+    font-weight: 500;
+    font-family: sans-serif;
+  }
+  
+  .profileRate{
+    display: flex;
+    flex-direction: row;
+    /* background-color: blue; */
+    margin: 5px 10px;
+  }
+  
+  .accType{
+    background-color: orange;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+  }
+  
+  .accType img{
+    margin-left: 10px;
+    height: 25px;
+    width: 25px;
+  }
+  
+  .categories{
+    // background-color: red;
+    width: 100%;
+  }
+  
+  .profileRateItem{
+    margin: 5px 15px 5px 0;
+  }
+  
+  .totalScore{
+    font-size: small;
+  }
+  
+  .profileScore{
+    color: orange;
+    font-weight: 600;
+  }
+  
+  .profileRate button{
+    margin: -5px;
+  height: 35px;
+  width: 97px;
+  border-radius: 20px;
+  border: 1px solid black;
+  color: #000;
+  font-size: 15px;
+  position: relative;
+  }
+  
+  .profileRate button:hover{
+    background-color: rgba(0, 0, 255, 0.2);
+  border: 2px solid black;
+  }
+  
+  .verifiedProfile{
+    width: 100%;
+    background: linear-gradient(0deg, rgba(255,255,255,1) 7%, rgba(255,255,255,1) 63%, rgba(161,164,255,1) 100%);
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    padding: 15px;
+    border-radius: 10px;
+    padding: 15px 30px 15px 30px;
+    
+  }
+  
+  .verifiedProfileHeader{
+
+    margin: 10px auto;
+  }
+  
+  .verifiedProfileHeader h1{
+    font-weight: 600;
+  }
+  
+  .verifiedProfileHeader2{
+    margin: 0 auto 15px auto;
+  }
+  
+  .separator{
+    width: 100%;
+    height: 1px;
+    background-color: gray;
+    margin: 10px 0;
+  }
+  
+  .verifiedProfileData{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .verifiedDatum{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .verifiedDatum h2{
+    font-size: x-large;
+  }
+
+  @media only screen and (max-width: 600px) {
+    #profile{
+      height: 500px;
+    }
+    .shopPhoto_Descriptions{
+        flex-direction: column;
+        // background-color: red;
+    }
+
+    .shopProfileImages{
+        width: 100%;
+        // background-color: green;
+    }
+    .shopProfileImages img{
+  
+        width: 100%;
+    }
+    .shopimg{
+        width: 100%;
+    }
+
+    .shopAbout{
+        width: 100%;
+        border-left: none;
+      }
+  }

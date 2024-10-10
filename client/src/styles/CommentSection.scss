@@ -1,0 +1,98 @@
+.comment-sect {
+  margin-top: 2rem;
+  background-color: #eee;
+
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+
+
+  .comments-list {
+    .comment {
+      border: 1px solid #e0e0e0;
+      padding: 1rem;
+      margin-bottom: 1rem;
+
+      .comment-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        img {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          margin-right: 0.5rem;
+        }
+
+        .comment-author {
+          font-weight: bold;
+          margin-right: 0.5rem;
+        }
+
+        .comment-time {
+          color: #666;
+          font-size: 0.8rem;
+        }
+      }
+
+      .comment-content {
+        margin-bottom: 0.5rem;
+      }
+
+      .replies {
+        margin-top: 1rem;
+        padding-left: 1rem;
+
+        .reply {
+          border-left: 2px solid #e0e0e0;
+          padding-left: 1rem;
+          
+        }
+      }
+
+      button {
+        padding: 5px 10px;
+        background-color: #F8395A;
+        border: none;
+        font-size: large;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s ease;
+        color: white;
+        border-radius: 10px;
+        width: 30%;
+        margin: 5px 10px 10px 0;
+      }
+
+      button:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+form {
+  margin-bottom: 1rem;
+
+  textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+}

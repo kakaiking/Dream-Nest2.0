@@ -1,0 +1,116 @@
+@import "./variables.scss";
+@import "./breakpoints.scss";
+
+.category-listt{
+  width: 100%;
+}
+
+.category-list {
+  width: 90%;
+  margin: 0 auto;
+  text-align: center;
+  // background-color: red;
+  padding: 50px 80px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 60px;
+
+  @include sm {
+    padding: 50px 20px;
+  }
+
+  .category {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: $darkgrey;
+    cursor: pointer;
+
+    &_icon {
+      font-size: 30px;
+    }
+
+    p {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    &:hover {
+      color: $pinkred;
+    }
+  }
+
+  .selected {
+    color: $pinkred;
+  }
+}
+
+.listings {
+  padding: 0 60px 120px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  // background-color: green;
+  width: 100%;
+
+
+  @include lg {
+    padding: 0 20px 120px;
+  }
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+  .category-list{
+    flex-wrap: nowrap;
+    gap: 20px;
+    width: 70%;
+  }
+  .category {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: $darkgrey;
+    cursor: pointer;
+
+    &_icon {
+      font-size: 10px;
+    }
+
+    p {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    &:hover {
+      color: $pinkred;
+    }
+  }
+
+  .selected {
+    color: $pinkred;
+  }
+
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+  
+}

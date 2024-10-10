@@ -1,0 +1,57 @@
+.supportDocs {
+    margin: 20px;
+    padding-bottom: 50px;
+}
+
+.doc-cards {
+    display: flex;
+
+    width: 100%;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+    /* Space between the cards */
+    // background-color: green;
+}
+
+.doc-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 120px;
+    /* Adjust the width as needed */
+    text-align: center;
+    background-color: #f9f9f9;
+    transition: transform 0.3s ease;
+}
+
+.doc-card:hover {
+    transform: scale(1.05);
+    /* Slight hover effect */
+}
+
+.doc-icon {
+    font-size: 40px;
+    /* Adjust the size of the icon */
+}
+
+.doc-name {
+    margin-top: 10px;
+    font-size: 14px;
+    word-break: break-word;
+    /* To handle long file names */
+}
+
+.comment-section{
+    width: 100%;
+    height: auto;
+}
+
+.comment-sectionn{
+    width: 90%;
+    margin: 0 auto;
+}
