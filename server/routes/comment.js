@@ -4,6 +4,23 @@ const Comment = require('../models/Comment');
 const Update = require('../models/Update');
 const authMiddleware = require('../middleware/auth');
 
+// Get all comments
+router.get('/', async (req, res) => {
+  try {
+    const comments = await Comment.find()
+      .populate('user', 'firstName lastName profileImagePath')
+      .populate({
+        path: 'replies',
+        populate: { path: 'user', select: 'firstName lastName profileImagePath' }
+      })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(comments);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching comments', error: err.message });
+  }
+});
+
 // Create a new comment
 router.post('/', authMiddleware, async (req, res) => {
   try {

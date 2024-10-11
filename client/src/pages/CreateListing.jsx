@@ -117,7 +117,7 @@ const CreateListing = () => {
       <Navbar />
 
       <div className="create-listing">
-        <h1>Publish Your Place</h1>
+        <h1>Create A Listing</h1>
         <form onSubmit={handlePost}>
           <div className="create-listing_step1">
             <h2>Step 1: Tell Us About Your Funding Project</h2>

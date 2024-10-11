@@ -16,6 +16,17 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// Get all property listings
+router.get('/all', async (req, res) => {
+  try {
+    const listings = await Listing.find(); // Fetch all listings from the database
+    res.json(listings);
+  } catch (error) {
+    console.error('Error fetching listings:', error);
+    res.status(500).json({ message: 'Failed to fetch listings' });
+  }
+});
+
 /* CREATE LISTING */
 router.post("/create", upload.array("listingPhotos"), async (req, res) => {
   try {

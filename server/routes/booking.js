@@ -2,6 +2,17 @@ const router = require("express").Router()
 
 const Booking = require("../models/Booking")
 
+// Get all bookings
+router.get('/', async (req, res) => {
+  try {
+    const bookings = await Booking.find(); // Fetch all bookings from the database
+    res.json(bookings);
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    res.status(500).json({ message: 'Failed to fetch bookings' });
+  }
+});
+
 /* CREATE BOOKING */
 router.post("/create", async (req, res) => {
   try {

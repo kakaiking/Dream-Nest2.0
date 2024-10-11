@@ -29,6 +29,7 @@ const Listings = () => {
       const data = await response.json();
       dispatch(setListings({ listings: data }));
       setLoading(false);
+      console.log(data)
     } catch (err) {
       console.log("Fetch Listings Failed", err.message);
     }

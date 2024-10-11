@@ -17,6 +17,17 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// Get all updates (new route)
+router.get('/', async (req, res) => {
+  try {
+    const updates = await Update.find().populate('listing');
+    res.status(200).json(updates);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Failed to fetch updates", error: err.message });
+  }
+});
+
 // Create a new update
 router.post("/create", authMiddleware, upload.array('supportingDocuments', 5), async (req, res) => {
   try {

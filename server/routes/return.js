@@ -4,6 +4,19 @@ const Return = require('../models/Return');
 const Listing = require('../models/Listing');
 const User = require('../models/User');
 
+// Get all returns
+router.get('/', async (req, res) => {
+  try {
+    const returns = await Return.find()
+      .populate('listing')
+      .populate('host') // Optional: if you want to populate the host information
+      .sort({ createdAt: -1 });
+    res.status(200).json(returns);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 // Submit a return
 router.post('/submit', async (req, res) => {

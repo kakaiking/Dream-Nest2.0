@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
+import {jwtDecode} from "jwt-decode";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
+import AdminPage from "./pages/AdminPage"; // for admin-specific content
 import CreateListing from "./pages/CreateListing";
 import ListingDetails from "./pages/ListingDetails";
 import TripList from "./pages/TripList";
@@ -17,8 +19,15 @@ import CreateUpdate from "./components/CreateUpdate";
 import UpdateDetails from "./components/UpdateDetails";
 import FileReturnsPage from "./pages/FileReturnsPage";
 import ReturnLogs from "./pages/ReturnLogs";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+
 
 function App() {
+  // Simulate getting the JWT token from local storage or a Redux store
+  const token = useSelector((state) => state.token);
+  const user = token ? jwtDecode(token) : null;
+  const isAdmin = user && user.isAdmin;
   return (
     <div>
       <BrowserRouter>
@@ -26,6 +35,8 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
+          {/* Admin Route - Only accessible by the admin */}
+          <Route path="/admin" element={isAdmin ? <AdminPage /> : <Navigate to="/" />} />
           <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/properties/:listingId" element={<ListingDetails />} />
           <Route path="/update/:updateId" element={<UpdateDetails />} />

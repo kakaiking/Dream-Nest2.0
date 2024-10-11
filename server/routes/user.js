@@ -7,6 +7,17 @@ const Booking = require("../models/Booking")
 const User = require("../models/User")
 const Listing = require("../models/Listing")
 
+// Get all users
+router.get('/', async (req, res) => {
+  try {
+    const users = await User.find(); // Fetch all users from the database
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Failed to fetch users' });
+  }
+});
+
 // GET USER'S DETAILS
 router.get("/:userId/details", async (req, res) => {
   try {

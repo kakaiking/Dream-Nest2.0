@@ -1,10 +1,6 @@
 import { useState } from "react";
 import "../styles/ListingCard.scss";
-import {
-  ArrowForwardIos,
-  ArrowBackIosNew,
-  Favorite,
-} from "@mui/icons-material";
+import { ArrowForwardIos, ArrowBackIosNew, Favorite } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setWishList } from "../redux/state";
@@ -30,13 +26,19 @@ const ListingCard = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  /* ADD TO WISHLIST */
+  // Fetch current user from Redux state
   const user = useSelector((state) => state.user);
   const wishList = user?.wishList || [];
 
   const isLiked = wishList?.find((item) => item?._id === listingId);
 
+  /* ADD TO WISHLIST */
   const patchWishList = async () => {
+    if (!user) {
+      // Redirect to login if the user is not logged in
+      navigate('/login');
+      return;
+    }
     if (user?._id !== creator._id) {
       const response = await fetch(
         `http://localhost:3001/users/${user?._id}/${listingId}`,
@@ -49,8 +51,6 @@ const ListingCard = ({
       );
       const data = await response.json();
       dispatch(setWishList(data.wishList));
-    } else {
-      return;
     }
   };
 
@@ -58,11 +58,11 @@ const ListingCard = ({
   const getBackgroundGradient = () => {
     switch (category) {
       case "Fund Manager":
-        return "linear-gradient(330deg, #c33764, #1d2671)";
+        return "linear-gradient(to left, #6441a5, #2a0855)";
       case "Enterprise":
-        return "linear-gradient(330deg, #43cea2, #185a9d)";
+        return "linear-gradient(to left, #c33764, #500040)";
       case "Non-Profit":
-        return "linear-gradient(330deg, #ff9966, #ff5e62)";
+        return "linear-gradient(to right, #004000, #0f9b0f)";
       default:
         return "linear-gradient(330deg, #c33764, #1d2671)"; // Default gradient
     }
@@ -72,12 +72,17 @@ const ListingCard = ({
     <div
       className="listing-card"
       onClick={() => {
+        // Restrict non-logged-in users
+        if (!user) {
+          navigate('/login');
+          return;
+        }
         navigate(`/properties/${listingId}`);
       }}
     >
       <div className="slider-container">
         <div className="slider" style={{ background: getBackgroundGradient() }}>
-          {/* <img src="../assets/target.jpg" alt="project pic`" /> */}
+          {/* <img src="../assets/target.jpg" alt="project pic" /> */}
         </div>
       </div>
 
@@ -113,10 +118,10 @@ const ListingCard = ({
       <button
         className="favorite"
         onClick={(e) => {
-          e.stopPropagation();
-          patchWishList();
+          e.stopPropagation(); // Prevent parent div's onClick from triggering
+          patchWishList(); // Add to wish list only if the user is logged in
         }}
-        disabled={!user}
+        disabled={!user} // Disable button if user is not logged in
       >
         {isLiked ? (
           <Favorite sx={{ color: "red" }} />

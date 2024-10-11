@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  height: 100vh; /* Set container to full viewport height */
+}
+
+.offCanvas {
+  height: 100%; /* Off-canvas height to full */
+  width: 25%; /* Set a fixed width for off-canvas */
+  min-width: 150px;
+  background-color: #f4f4f4; /* Adjust as needed */
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+  flex-grow: 1; /* Take the remaining space */
+  padding: 20px;
+  height: 100%; /* Content height to full */
+  width: 70%;
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.content-inner {
+  height: 100%; /* Inner content to full */
+  overflow-y: auto; /* Enable vertical scrolling if needed */
+}
+
+.list-item {
+  margin-bottom: 10px;
+}
+
+.error {
+  color: red;
+}
+
+.button-container{
+    display: flex;
+    flex-direction: column;
+}

@@ -28,14 +28,14 @@ const ReturnLogs = () => {
     <>
     <Navbar />
     <div>
-      <h1>Return Logs</h1>
+      <h1 style={{margin: "40px"}}>Return Logs</h1>
       {returnLogs.length > 0 ? (
-        <table className='table'>
+        <table className='table' style={{width: '80%'}}>
           <thead>
             <tr>
               <th className="text-center">No</th>
               <th className="text-center">Project Name</th>
-              <th className="text-center">Amount (1.2% of target)</th>
+              <th className="text-center">Paid Amount</th>
               <th className="text-center">Payment Method</th>
               <th className="text-center">Date</th>
               <th className="text-center">Time</th>

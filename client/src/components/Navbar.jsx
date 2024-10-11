@@ -6,21 +6,20 @@ import { useSelector, useDispatch } from "react-redux";
 import "../styles/Navbar.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { setLogout } from "../redux/state";
+import {jwtDecode} from "jwt-decode";
 
 
 const Navbar = () => {
   const [dropdownMenu, setDropdownMenu] = useState(false);
-
   const user = useSelector((state) => state.user);
-  const listings = useSelector((state) => state.listings);
-
-  
-
   const dispatch = useDispatch();
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
-  const [search, setSearch] = useState("")
-
-  const navigate = useNavigate()
+  // Check if user is admin
+  const token = useSelector((state) => state.token);
+  const decodedUser = token ? jwtDecode(token) : null;
+  const isAdmin = decodedUser && decodedUser.isAdmin;
 
   return (
     <div className="navbar">
@@ -39,7 +38,9 @@ const Navbar = () => {
         <IconButton disabled={search === ""}>
           <Search
             sx={{ color: variables.pinkred }}
-            onClick={() => { navigate(`/properties/search/${search}`) }}
+            onClick={() => {
+              navigate(`/properties/search/${search}`);
+            }}
           />
         </IconButton>
       </div>
@@ -83,20 +84,28 @@ const Navbar = () => {
 
         {dropdownMenu && user && (
           <div className="navbar_right_accountmenu">
+            
+            {isAdmin && (
+              <>
+                <Link to="/admin">Admin Dashboard</Link>
+              </>
+            )}
+
             <Link to={`/${user._id}/trips`}>My Bids</Link>
             <Link to={`/${user._id}/reservations`}>My Project Updates</Link>
             <Link to={`/${user._id}/properties`}>My Hosted Projects</Link>
             <Link to={`/${user._id}/wishList`}>Wish List</Link>
             <Link to={`/${user._id}/details`}>My Profile</Link>
-            <Link to="/create-listing">Host A Project</Link> <hr />
-            <Link to={`/${user._id}/fileReturns`}>File returns</Link>
+            <Link to="/create-listing">Host A Project</Link> 
+            <hr />
+            <Link to={`/${user._id}/fileReturns`}>File Returns</Link>
             <Link to={`/${user._id}/return-logs`}>Returns Logs</Link>
 
-            
             <Link
               to="/login"
               onClick={() => {
                 dispatch(setLogout());
+                localStorage.removeItem("token"); // Clear token on logout
               }}
             >
               Log Out

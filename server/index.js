@@ -15,7 +15,6 @@ const bookingRoutes = require("./routes/booking.js");
 const userRoutes = require("./routes/user.js");
 const updateRoutes = require("./routes/update.js");
 const commentRoutes = require("./routes/comment.js");
-const mpesaRoutes = require('./routes/mpesa.js');
 const returnRoutes = require("./routes/return.js");
 
 
@@ -35,7 +34,6 @@ app.use("/users", userRoutes);
 app.use("/updates", updateRoutes);
 app.use("/comments", commentRoutes);
 app.use("/returns", returnRoutes);
-app.use("/mpesa", mpesaRoutes);
 
 // Function to get access token
 const getAccessToken = async () => {
