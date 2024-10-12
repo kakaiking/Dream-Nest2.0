@@ -50,7 +50,11 @@ const ReturnLogs = () => {
                   ksh. {((log.dueAmount) || (log.listing.target * 0.012)).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 </td>
                 <td className='border-slate-700 text-center'>{log.paymentMethod}</td>
-                <td className='border-slate-700 text-center'>{log.paymentDate}</td>
+                <td className='border-slate-700 text-center'>{new Date(log.paymentDate).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                  })}</td>
                 <td className='border-slate-700 text-center'>{log.paymentTime}</td>
               </tr>
             ))}
