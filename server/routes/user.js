@@ -35,6 +35,46 @@ router.get("/:userId/details", async (req, res) => {
   }
 });
 
+/* VERIFY USER */
+router.patch("/:userId/verify", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { verified: "verified" },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({ message: "User verified successfully", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error verifying user", error: error.message });
+  }
+});
+
+/* REJECT USER */
+router.patch("/:userId/reject", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { verified: "rejected" },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({ message: "User rejected successfully", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error rejecting user", error: error.message });
+  }
+});
+
 // // Update user details including profile photo
 // router.put("/:userId/edit", upload.single('profileImage'), async (req, res) => {
 //   try {

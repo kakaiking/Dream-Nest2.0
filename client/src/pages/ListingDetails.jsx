@@ -71,7 +71,7 @@ const ListingDetails = () => {
 
   useEffect(() => {
     setCustomerEmail(user.email);
-    setCustomerName(`${user.firstName} ${user.lastName}`);
+    setCustomerName(`${user.firmName} `);
   }, []);
 
   /* BOOKING CALENDAR */

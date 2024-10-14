@@ -19,6 +19,7 @@ import CreateUpdate from "./components/CreateUpdate";
 import UpdateDetails from "./components/UpdateDetails";
 import FileReturnsPage from "./pages/FileReturnsPage";
 import ReturnLogs from "./pages/ReturnLogs";
+import UserDetails from './pages/UserDetails';
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
@@ -37,6 +38,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           {/* Admin Route - Only accessible by the admin */}
           <Route path="/admin" element={isAdmin ? <AdminPage /> : <Navigate to="/" />} />
+          <Route path="/user-details/:id" element={<UserDetails />} />
           <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/properties/:listingId" element={<ListingDetails />} />
           <Route path="/update/:updateId" element={<UpdateDetails />} />

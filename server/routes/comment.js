@@ -8,10 +8,10 @@ const authMiddleware = require('../middleware/auth');
 router.get('/', async (req, res) => {
   try {
     const comments = await Comment.find()
-      .populate('user', 'firstName lastName profileImagePath')
+      .populate('user', 'firmName profileImagePath')
       .populate({
         path: 'replies',
-        populate: { path: 'user', select: 'firstName lastName profileImagePath' }
+        populate: { path: 'user', select: 'firmName profileImagePath' }
       })
       .sort({ createdAt: -1 });
 
@@ -45,10 +45,10 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 
     const populatedComment = await Comment.findById(savedComment._id)
-      .populate('user', 'firstName lastName profileImagePath')
+      .populate('user', 'firmName profileImagePath')
       .populate({
         path: 'replies',
-        populate: { path: 'user', select: 'firstName lastName profileImagePath' }
+        populate: { path: 'user', select: 'firmName profileImagePath' }
       });
 
     res.status(201).json(populatedComment);
@@ -62,10 +62,10 @@ router.get('/update/:updateId', async (req, res) => {
   try {
     const { updateId } = req.params;
     const comments = await Comment.find({ update: updateId, parentComment: null })
-      .populate('user', 'firstName lastName profileImagePath')
+      .populate('user', 'firmName profileImagePath')
       .populate({
         path: 'replies',
-        populate: { path: 'user', select: 'firstName lastName profileImagePath' }
+        populate: { path: 'user', select: 'firmName profileImagePath' }
       })
       .sort({ createdAt: -1 });
 

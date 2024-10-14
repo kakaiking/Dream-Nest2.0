@@ -1,12 +1,8 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
   {
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
+    owners: {
       type: String,
       required: true,
     },
@@ -17,7 +13,6 @@ const UserSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: Number,
-      default: '',      
       unique: true,
     },
     password: {
@@ -26,30 +21,43 @@ const UserSchema = new mongoose.Schema(
     },
     firmName: {
       type: String,
-      default: '',
+      default: "",
     },
     yearStarted: {
       type: Number,
-      default: '',
+      default: "",
     },
     cmaLicenseNumber: {
       type: Number,
-      default: '',
+      default: "",
     },
     assetsUnderManagement: {
       type: Number,
     },
     physical: {
       type: String,
-      default: '',
+      default: "",
     },
     website: {
       type: String,
-      default: '',
+      default: "",
     },
     profileImagePath: {
       type: String,
       default: "",
+    },
+    kraPinPath: {
+      type: String,
+      default: "",
+    },
+    businessCertificatePath: {
+      type: String,
+      default: "",
+    },
+    verified: {
+      type: String,
+      enum: ["notVerified", "verified", "rejected"],
+      default: "notVerified",
     },
     tripList: {
       type: Array,
@@ -66,10 +74,10 @@ const UserSchema = new mongoose.Schema(
     reservationList: {
       type: Array,
       default: [],
-    }
+    },
   },
   { timestamps: true }
-)
+);
 
-const User = mongoose.model("User", UserSchema)
-module.exports = User
+const User = mongoose.model("User", UserSchema);
+module.exports = User;

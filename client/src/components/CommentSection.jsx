@@ -96,7 +96,7 @@ const CommentSection = ({ updateId }) => {
             <div key={comment._id} className="comment" style={{ backgroundColor: '#fff' }}>
               <div className="comment-header">
                 <img src='../assets/user.png' alt="User avatar" />
-                <span className="comment-author">{`${comment.user.firstName} ${comment.user.lastName}`}</span>
+                <span className="comment-author">{`${comment.user.firmName}`}</span>
                 <span className="comment-time">{timeAgo(comment.createdAt)}</span>
               </div>
               <p className="comment-content">{comment.content}</p>
@@ -140,7 +140,7 @@ const CommentSection = ({ updateId }) => {
                     <div key={reply._id} className="reply" style={{ backgroundColor: '#fff', marginTop: "15px" }}>
                       <div className="comment-header">
                         <img src='../assets/user.png' alt="User avatar" />
-                        <span className="comment-author">{`${reply.user.firstName} ${reply.user.lastName}`}</span>
+                        <span className="comment-author">{`${reply.user.firmName}`}</span>
                         <span className="comment-time">{timeAgo(reply.createdAt)}</span>
                       </div>
                       <p className="comment-content">{reply.content}</p>

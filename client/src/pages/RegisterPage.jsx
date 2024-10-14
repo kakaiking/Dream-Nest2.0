@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"
 import "../styles/Register.scss";
+import { LuUpload } from "react-icons/lu";
+
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    owners: "",
     email: "",
     password: "",
     confirmPassword: "",
     profileImage: null,
+    kraPin: null,
+    businessCertificate: null,
     firmName: "",
     yearStarted: "",
     cmaLicenseNumber: "",
@@ -23,58 +26,48 @@ const RegisterPage = () => {
     const { name, value, files } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
-      [name]: name === "profileImage" ? files[0] : value,
+      [name]: files ? files[0] : value,
     });
   };
-  console.log(formData)
 
-  const [passwordMatch, setPasswordMatch] = useState(true)
+  const [passwordMatch, setPasswordMatch] = useState(true);
 
   useEffect(() => {
-    setPasswordMatch(formData.password === formData.confirmPassword || formData.confirmPassword === "")
-  }, [formData.password, formData.confirmPassword])
+    setPasswordMatch(formData.password === formData.confirmPassword || formData.confirmPassword === "");
+  }, [formData.password, formData.confirmPassword]);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      const register_form = new FormData()
-
-      for (var key in formData) {
-        register_form.append(key, formData[key])
+      const registerForm = new FormData();
+      for (let key in formData) {
+        registerForm.append(key, formData[key]);
       }
 
       const response = await fetch("http://localhost:3001/auth/register", {
         method: "POST",
-        body: register_form
-      })
+        body: registerForm,
+      });
 
       if (response.ok) {
-        navigate("/login")
+        navigate("/login");
       }
     } catch (err) {
-      console.log("Registration failed", err.message)
+      console.log("Registration failed", err.message);
     }
-  }
+  };
 
   return (
     <div className="register">
       <div className="register_content">
         <form className="register_content_form" onSubmit={handleSubmit}>
           <input
-            placeholder="First Name"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-          />
-          <input
-            placeholder="Last Name"
-            name="lastName"
-            value={formData.lastName}
+            placeholder="Owners"
+            name="owners"
+            value={formData.owners}
             onChange={handleChange}
             required
           />
@@ -118,7 +111,7 @@ const RegisterPage = () => {
           />
           <label htmlFor="image">
             <img src="/assets/addImage.png" alt="add profile pic" />
-            <p>Upload Your Photo</p>
+            <p>Upload a Profile Photo</p>
           </label>
 
           {formData.profileImage && (
@@ -137,6 +130,18 @@ const RegisterPage = () => {
             onChange={handleChange}
             required
           />
+          <label htmlFor="krapin">
+          <LuUpload  />
+            Upload your KRA Pin
+          </label>
+          <input id='krapin' type="file" name="kraPin" placeholder="KRA Pin" onChange={handleChange} required />
+
+          <label htmlFor="businessCert">
+          <LuUpload  />
+            Upload your Business Certificate
+          </label>
+          <input id='businessCert' type="file" name="businessCertificate" placeholder="Business Certificate" onChange={handleChange} required />
+
           <input
             placeholder="Year Started"
             name="yearStarted"
@@ -166,15 +171,15 @@ const RegisterPage = () => {
             onChange={handleChange}
             type="number"
           />
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Address (P.O BOX 25749-00603, Nairobi)"
             name="physical"
             value={formData.physical}
             onChange={handleChange}
           />
-          <input 
-            type="number" 
+          <input
+            type="number"
             placeholder="Phone Number"
             name="phoneNumber"
             value={formData.phoneNumber}

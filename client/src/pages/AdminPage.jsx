@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import '../styles/AdminPage.scss'; // Import the CSS file
 import Navbar from '../components/Navbar';
 
@@ -10,37 +11,39 @@ const AdminPage = () => {
   const [comments, setComments] = useState([]);
   const [updates, setUpdates] = useState([]);
   const [activeView, setActiveView] = useState('users');
+  
+  const navigate = useNavigate(); // Create a navigate function for navigation
 
   const fetchData = async () => {
     try {
       const [usersResponse, bookingsResponse, propertiesResponse, returnsResponse, commentsResponse, updatesResponse] = await Promise.all([
-        fetch("http://localhost:3001/users"),
-        fetch("http://localhost:3001/bookings"),
-        fetch("http://localhost:3001/properties"),
-        fetch("http://localhost:3001/returns"),
-        fetch("http://localhost:3001/comments"),
-        fetch("http://localhost:3001/updates"),
+        fetch('http://localhost:3001/users'),
+        fetch('http://localhost:3001/bookings'),
+        fetch('http://localhost:3001/properties'),
+        fetch('http://localhost:3001/returns'),
+        fetch('http://localhost:3001/comments'),
+        fetch('http://localhost:3001/updates'),
       ]);
 
-      if (!usersResponse.ok || !bookingsResponse.ok || !propertiesResponse.ok || !returnsResponse.ok || !commentsResponse.ok || !updatesResponse.ok) {
-        throw new Error("One or more requests failed");
+      if (
+        !usersResponse.ok ||
+        !bookingsResponse.ok ||
+        !propertiesResponse.ok ||
+        !returnsResponse.ok ||
+        !commentsResponse.ok ||
+        !updatesResponse.ok
+      ) {
+        throw new Error('One or more requests failed');
       }
 
-      const usersData = await usersResponse.json();
-      const bookingsData = await bookingsResponse.json();
-      const propertiesData = await propertiesResponse.json();
-      const returnsData = await returnsResponse.json();
-      const commentsData = await commentsResponse.json();
-      const updatesData = await updatesResponse.json();
-
-      setUsers(usersData);
-      setBookings(bookingsData);
-      setProperties(propertiesData);
-      setReturns(returnsData);
-      setComments(commentsData);
-      setUpdates(updatesData);
+      setUsers(await usersResponse.json());
+      setBookings(await bookingsResponse.json());
+      setProperties(await propertiesResponse.json());
+      setReturns(await returnsResponse.json());
+      setComments(await commentsResponse.json());
+      setUpdates(await updatesResponse.json());
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
     }
   };
 
@@ -48,24 +51,79 @@ const AdminPage = () => {
     fetchData();
   }, []);
 
+  const updateUserStatus = async (userId, status) => {
+    try {
+      const response = await fetch(`http://localhost:3001/users/${userId}/verify`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ verified: status }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update user status');
+      }
+
+      const updatedUser = await response.json();
+      setUsers(prevUsers =>
+        prevUsers.map(user => (user._id === userId ? updatedUser : user))
+      );
+    } catch (error) {
+      console.error('Error updating user status:', error);
+    }
+  };
+
+  
+
+  const renderUsers = () => (
+    <ul className="user-cards">
+      {users.map(user => (
+        <li key={user._id} className="user-card" onClick={() => handleUserClick(user)} style={{marginBottom: '40px'}}>
+          <img src={`http://localhost:3001/${user.profileImagePath.replace("public", "")}`} alt={`${user.firmName} Profile`} className="user-image" />
+          <div className="user-info">
+            <h3>{user.firmName}</h3>
+            <p>{user.email}</p>
+          </div>
+          {/* Expandable user details */}
+          <div className="user-details">
+            <strong>Owners:</strong> {user.owners} <br />
+            <strong>Phone Number:</strong> {user.phoneNumber} <br />
+            <strong>Password:</strong> {user.password} <br />
+            <strong>Year Started:</strong> {user.yearStarted} <br />
+            <strong>CMA License Number:</strong> {user.cmaLicenseNumber} <br />
+            <strong>Assets Under Management:</strong> {user.assetsUnderManagement} <br />
+            <strong>Physical Address:</strong> {user.physical} <br />
+            <strong>Website:</strong> {user.website} <br />
+            <strong>KRA PIN Path:</strong> {user.kraPinPath} <br />
+            <strong>Business Certificate Path:</strong> {user.businessCertificatePath} <br />
+            <strong>Status:</strong> {user.verified} <br />
+            <strong>Created At:</strong> {new Date(user.createdAt).toLocaleString()} <br />
+            <strong>Updated At:</strong> {new Date(user.updatedAt).toLocaleString()} <br />
+            <button
+              className="button"
+              onClick={() => updateUserStatus(user._id, 'verified')}
+              disabled={user.verified === 'verified'}
+            >
+              Verify
+            </button>
+            <button
+              className="button reject-button"
+              onClick={() => updateUserStatus(user._id, 'rejected')}
+              disabled={user.verified === 'rejected'}
+            >
+              Reject
+            </button>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+
   const renderContent = () => {
     switch (activeView) {
       case 'users':
-        return users.length > 0 ? (
-          <ul>
-            {users.map(user => (
-              <li key={user._id} className="list-item">
-                <strong>Name:</strong> {user.firstName} {user.lastName} <br />
-                <strong>Email:</strong> {user.email} <br />
-                <strong>Phone:</strong> {user.phoneNumber} <br />
-                <strong>Firm:</strong> {user.firmName}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="error">No users found</p>
-        );
-
+        return users.length > 0 ? renderUsers() : <p className="error">No users found</p>;
       case 'bookings':
         return bookings.length > 0 ? (
           <ul>
@@ -82,7 +140,6 @@ const AdminPage = () => {
         ) : (
           <p className="error">No bookings found</p>
         );
-
       case 'properties':
         return properties.length > 0 ? (
           <ul>
@@ -98,14 +155,13 @@ const AdminPage = () => {
         ) : (
           <p className="error">No properties found</p>
         );
-
       case 'returns':
         return returns.length > 0 ? (
           <ul>
             {returns.map(returnItem => (
               <li key={returnItem._id} className="list-item">
                 <strong>Listing:</strong> {returnItem.listing.title} <br />
-                <strong>Host:</strong> {returnItem.host.firstName} {returnItem.host.lastName} <br />
+                <strong>Host:</strong> {returnItem.host.firmName} <br />
                 <strong>Payment Method:</strong> {returnItem.paymentMethod} <br />
                 <strong>Amount Paid:</strong> KES {returnItem.amountPaid} <br />
                 <strong>Status:</strong> {returnItem.status}
@@ -115,13 +171,12 @@ const AdminPage = () => {
         ) : (
           <p className="error">No returns found</p>
         );
-
       case 'comments':
         return comments.length > 0 ? (
           <ul>
             {comments.map(comment => (
               <li key={comment._id} className="list-item">
-                <strong>User:</strong> {comment.user.firstName} {comment.user.lastName} <br />
+                <strong>User:</strong> {comment.user.firmName} <br />
                 <strong>Comment:</strong> {comment.content} <br />
                 <strong>Replies:</strong> {comment.replies.length}
               </li>
@@ -130,7 +185,6 @@ const AdminPage = () => {
         ) : (
           <p className="error">No comments found</p>
         );
-
       case 'updates':
         return updates.length > 0 ? (
           <ul>
@@ -145,35 +199,33 @@ const AdminPage = () => {
         ) : (
           <p className="error">No updates found</p>
         );
-
       default:
-
         return null;
     }
   };
 
   return (
     <>
-    <Navbar />
-    <div className="container">
-      {/* Offcanvas section */}
-      <div className="offCanvas">
-        <h3 style={{ marginBottom: '20px' }}>Options</h3>
-        <div className="button-container">
-          <button onClick={() => setActiveView('users')} className="button">Users</button>
-          <button onClick={() => setActiveView('bookings')} className="button">Bookings</button>
-          <button onClick={() => setActiveView('properties')} className="button">Properties</button>
-          <button onClick={() => setActiveView('returns')} className="button">Returns</button>
-          <button onClick={() => setActiveView('comments')} className="button">Comments</button>
-          <button onClick={() => setActiveView('updates')} className="button">Updates</button>
+      <Navbar />
+      <div className="container">
+        {/* Offcanvas section */}
+        <div className="offCanvas">
+          <h3 style={{ marginBottom: '20px' }}>Options</h3>
+          <div className="button-container">
+            <button onClick={() => setActiveView('users')} className="button">Users</button>
+            <button onClick={() => setActiveView('bookings')} className="button">Bookings</button>
+            <button onClick={() => setActiveView('properties')} className="button">Properties</button>
+            <button onClick={() => setActiveView('returns')} className="button">Returns</button>
+            <button onClick={() => setActiveView('comments')} className="button">Comments</button>
+            <button onClick={() => setActiveView('updates')} className="button">Updates</button>
+          </div>
+        </div>
+        {/* Content section */}
+        <div className="content">
+          <h2 style={{ marginBottom: '20px' }}>{activeView.charAt(0).toUpperCase() + activeView.slice(1)}</h2>
+          {renderContent()}
         </div>
       </div>
-      {/* Content section */}
-      <div className="content">
-        <h2 style={{ marginBottom: '20px' }}>{activeView.charAt(0).toUpperCase() + activeView.slice(1)}</h2>
-        {renderContent()}
-      </div>
-    </div>
     </>
   );
 };
