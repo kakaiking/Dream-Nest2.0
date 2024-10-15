@@ -38,7 +38,6 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           {/* Admin Route - Only accessible by the admin */}
           <Route path="/admin" element={isAdmin ? <AdminPage /> : <Navigate to="/" />} />
-          <Route path="/user-details/:id" element={<UserDetails />} />
           <Route path="/create-listing" element={<CreateListing />} />
           <Route path="/properties/:listingId" element={<ListingDetails />} />
           <Route path="/update/:updateId" element={<UpdateDetails />} />

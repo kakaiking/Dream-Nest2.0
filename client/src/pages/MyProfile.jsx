@@ -1,233 +1,246 @@
-import React, { useEffect, useState } from 'react';
-import '../styles/AdminPage.scss'; // Import the CSS file
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import Loader from '../components/Loader';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import "../styles/MyProfile.scss"
+import { useParams, Link } from 'react-router-dom';
+import { setProfileDetails, setPropertyList } from '../redux/state';
+import ListingCard from '../components/ListingCard';
+import { FaPeoplePulling } from "react-icons/fa6";
+import { FaBuildingColumns } from "react-icons/fa6";
+import { IoIosMail } from "react-icons/io";
+import { LuPhone } from "react-icons/lu";
 
-const AdminPage = () => {
-  const [users, setUsers] = useState([]);
-  const [bookings, setBookings] = useState([]);
-  const [properties, setProperties] = useState([]);
-  const [returns, setReturns] = useState([]);
-  const [comments, setComments] = useState([]);
-  const [updates, setUpdates] = useState([]);
-  const [activeView, setActiveView] = useState('users');
 
-  const fetchData = async () => {
-    try {
-      const [usersResponse, bookingsResponse, propertiesResponse, returnsResponse, commentsResponse, updatesResponse] = await Promise.all([
-        fetch('http://localhost:3001/users'),
-        fetch('http://localhost:3001/bookings'),
-        fetch('http://localhost:3001/properties'),
-        fetch('http://localhost:3001/returns'),
-        fetch('http://localhost:3001/comments'),
-        fetch('http://localhost:3001/updates'),
-      ]);
 
-      if (
-        !usersResponse.ok ||
-        !bookingsResponse.ok ||
-        !propertiesResponse.ok ||
-        !returnsResponse.ok ||
-        !commentsResponse.ok ||
-        !updatesResponse.ok
-      ) {
-        throw new Error('One or more requests failed');
-      }
 
-      setUsers(await usersResponse.json());
-      setBookings(await bookingsResponse.json());
-      setProperties(await propertiesResponse.json());
-      setReturns(await returnsResponse.json());
-      setComments(await commentsResponse.json());
-      setUpdates(await updatesResponse.json());
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+const MyProfile = () => {
+    const [user, setUser] = useState({});
+    const [propertyList, setPropertyList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const { userId } = useParams();
+    const dispatch = useDispatch();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
 
-  const updateUserStatus = async (userId, status) => {
-    try {
-      const response = await fetch(`http://localhost:3001/users/${userId}/verify`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ verified: status }),
-      });
+    const getUserDetails = async () => {
+        try {
+            console.log('Fetching details for ID:', userId);
+            const response = await fetch(`http://localhost:3001/users/${userId}/details`, {
+                method: 'GET',
+            });
 
-      if (!response.ok) {
-        throw new Error('Failed to update user status');
-      }
+            if (response.ok) {
+                const data = await response.json();
+                dispatch(setProfileDetails(data));
+                setUser(data);
+                setPropertyList(data.propertyList || []);
+                console.log(data);
+                console.log(propertyList);
+            } else {
+                console.error('Error fetching user details:', response.status);
+            }
 
-      const updatedUser = await response.json();
-      setUsers(prevUsers =>
-        prevUsers.map(user => (user._id === userId ? updatedUser : user))
-      );
-    } catch (error) {
-      console.error('Error updating user status:', error);
-    }
-  };
-
-  const renderUsers = () => (
-    <ul>
-      {users.map(user => (
-        <li key={user._id} className="list-item">
-          <strong>Owners:</strong> {user.owners} <br />
-          <strong>Email:</strong> {user.email} <br />
-          <strong>Phone Number:</strong> {user.phoneNumber} <br />
-          <strong>Password:</strong> {user.password} <br />
-          <strong>Firm Name:</strong> {user.firmName} <br />
-          <strong>Year Started:</strong> {user.yearStarted} <br />
-          <strong>CMA License Number:</strong> {user.cmaLicenseNumber} <br />
-          <strong>Assets Under Management:</strong> {user.assetsUnderManagement} <br />
-          <strong>Physical Address:</strong> {user.physical} <br />
-          <strong>Website:</strong> {user.website} <br />
-          <strong>Profile Image Path:</strong> {user.profileImagePath} <br />
-          <strong>KRA PIN Path:</strong> {user.kraPinPath} <br />
-          <strong>Business Certificate Path:</strong> {user.businessCertificatePath} <br />
-          <strong>Status:</strong> {user.verified} <br />
-          <strong>Trip List:</strong> {user.tripList?.length || 0} items <br />
-          <strong>Wish List:</strong> {user.wishList?.length || 0} items <br />
-          <strong>Property List:</strong> {user.propertyList?.length || 0} items <br />
-          <strong>Reservation List:</strong> {user.reservationList?.length || 0} items <br />
-          <strong>Created At:</strong> {new Date(user.createdAt).toLocaleString()} <br />
-          <strong>Updated At:</strong> {new Date(user.updatedAt).toLocaleString()} <br />
-          <button
-            className="button"
-            onClick={() => updateUserStatus(user._id, 'verified')}
-            disabled={user.verified === 'verified'}
-          >
-            Verify
-          </button>
-          <button
-            className="button reject-button"
-            onClick={() => updateUserStatus(user._id, 'rejected')}
-            disabled={user.verified === 'rejected'}
-          >
-            Reject
-          </button>
-        </li>
-      ))}
-    </ul>
-  );
-  
-
-  const renderContent = () => {
-    switch (activeView) {
-      case 'users':
-        return users.length > 0 ? renderUsers() : <p className="error">No users found</p>;
-      case 'bookings':
-        return bookings.length > 0 ? (
-          <ul>
-            {bookings.map(booking => (
-              <li key={booking._id} className="list-item">
-                <strong>Customer:</strong> {booking.customerName} <br />
-                <strong>Email:</strong> {booking.customerEmail} <br />
-                <strong>Listing:</strong> {booking.listingTitle} <br />
-                <strong>Total Price:</strong> KES {booking.totalPrice} <br />
-                <strong>Status:</strong> {booking.status}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="error">No bookings found</p>
-        );
-        case 'properties':
-          return properties.length > 0 ? (
-            <ul>
-              {properties.map(property => (
-                <li key={property._id} className="list-item">
-                  <strong>Title:</strong> {property.title} <br />
-                  <strong>Category:</strong> {property.category} <br />
-                  <strong>Type:</strong> {property.type} <br />
-                  <strong>Status:</strong> {property.status}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="error">No properties found</p>
-          );
-  
-        case 'returns':
-          return returns.length > 0 ? (
-            <ul>
-              {returns.map(returnItem => (
-                <li key={returnItem._id} className="list-item">
-                  <strong>Listing:</strong> {returnItem.listing.title} <br />
-                  <strong>Host:</strong> {returnItem.host.firmName} <br />
-                  <strong>Payment Method:</strong> {returnItem.paymentMethod} <br />
-                  <strong>Amount Paid:</strong> KES {returnItem.amountPaid} <br />
-                  <strong>Status:</strong> {returnItem.status}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="error">No returns found</p>
-          );
-  
-        case 'comments':
-          return comments.length > 0 ? (
-            <ul>
-              {comments.map(comment => (
-                <li key={comment._id} className="list-item">
-                  <strong>User:</strong> {comment.user.firmName} <br />
-                  <strong>Comment:</strong> {comment.content} <br />
-                  <strong>Replies:</strong> {comment.replies.length}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="error">No comments found</p>
-          );
-  
-        case 'updates':
-          return updates.length > 0 ? (
-            <ul>
-              {updates.map(update => (
-                <li key={update._id} className="list-item">
-                  <strong>Title:</strong> {update.title} <br />
-                  <strong>Description:</strong> {update.description} <br />
-                  <strong>Listing:</strong> {update.listing.title}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="error">No updates found</p>
-          );
-  
-        default:
-  
-          return null;
-      }
+            setLoading(false);
+        } catch (error) {
+            console.error('Fetch user details failed:', error);
+            setLoading(false);
+        }
     };
-  
+
+
+
+    useEffect(() => {
+        getUserDetails();
+    }, [userId]);
+
+    const [activeTab, setActiveTab] = useState('one');
+
+
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+    };
     return (
-      <>
-      <Navbar />
-      <div className="container">
-        {/* Offcanvas section */}
-        <div className="offCanvas">
-          <h3 style={{ marginBottom: '20px' }}>Options</h3>
-          <div className="button-container">
-            <button onClick={() => setActiveView('users')} className="button">Users</button>
-            <button onClick={() => setActiveView('bookings')} className="button">Bookings</button>
-            <button onClick={() => setActiveView('properties')} className="button">Properties</button>
-            <button onClick={() => setActiveView('returns')} className="button">Returns</button>
-            <button onClick={() => setActiveView('comments')} className="button">Comments</button>
-            <button onClick={() => setActiveView('updates')} className="button">Updates</button>
-          </div>
+        <div>{loading ? (
+            <Loader /> // Replace with your loading spinner or message
+        ) : (
+            <div>
+                <Navbar /> 
+
+                {/* <!-- Shop Info --> */}
+                <section id="shopInfo">
+                    <div className="infoCards">
+                        <div className="shopPhoto_Descriptions">
+                            <div className="shopProfileImages">
+                                <div className="shopimg">
+                                    <img src={`http://localhost:3001/${user.profileImagePath.replace("public", "")}`} alt="profile photo" />
+                                </div>
+                                {/* <p>{user.profileImagePath}</p> */}
+                            </div>
+
+                            <div className="shopAbout">
+                                <div className="aboutBlock">
+                                    <div className="aboutIcon">
+                                    <FaPeoplePulling style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }}/>
+                                    </div>
+
+                                    <div className="aboutDesciption">
+                                        <div className="title">
+                                            <h2>Owner</h2>
+                                        </div>
+
+                                        <div className="igPage">
+                                            <a href="">{user.firstName} {user.lastName}</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="aboutBlock">
+                                    <div className="aboutIcon">
+                                    <FaBuildingColumns style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }}/>
+                                    </div>
+
+                                    <div className="aboutDesciption">
+                                        <div className="title">
+                                            <h2>Firm Name</h2>
+                                        </div>
+
+                                        <div className="igPage">
+                                            <a href="">{user.firmName}</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="aboutBlock">
+                                    <div className="aboutIcon">
+                                    <IoIosMail style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }}/>
+                                    </div>
+
+                                    <div className="aboutDesciption">
+                                        <div className="title">
+                                            <h2>Email</h2>
+                                        </div>
+
+                                        <div className="igPage">
+                                            <a href="">{user.email}</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div className="aboutBlock">
+                                    <div className="aboutIcon">
+                                    <LuPhone style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }}/>
+                                    </div>
+
+                                    <div className="aboutDesciption">
+                                        <div className="title">
+                                            <h2>Phone Number</h2>
+                                        </div>
+
+                                        <div className="igPage">
+                                            <a href="">{user.phoneNumber}</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div className={`tab`} style={{marginTop: '30px'}}>
+                    {/* Profile Tab */}
+                    <section id="profile" > {/* Changed hidden to inline style */}
+                        <div className="profileContent">
+                            <div className="verifiedProfile">
+                                <div className="verifiedProfileHeader">
+                                    <h1>{user.verified}</h1>
+                                </div>
+                                
+                                <div className="verifiedProfileData">
+                                    <div className="verifiedDatum">
+                                        <div className="verifiedDatumTitle">
+                                            <h2 className="country">Company / Firm Name</h2>
+                                        </div>
+                                        <div className="verifiedDatumData">
+                                            <h3 className="countryName">{user.firmName}</h3>
+                                        </div>
+                                    </div>
+                                    <div className="separator"></div>
+
+                                    <div className="verifiedDatum">
+                                        <div className="verifiedDatumTitle">
+                                            <h2 className="country">Been A Fund Manager Since:</h2>
+                                        </div>
+                                        <div className="verifiedDatumData">
+                                            <h3 className="countryName">{user.yearStarted}</h3>
+                                        </div>
+                                    </div>
+                                    <div className="separator"></div>
+
+                                    <div className="verifiedDatum">
+                                        <div className="verifiedDatumTitle">
+                                            <h2 className="country">CMA License Number:</h2>
+                                        </div>
+                                        <div className="verifiedDatumData">
+                                            <h3 className="countryName">{user.cmaLicenseNumber}</h3>
+                                        </div>
+                                    </div>
+                                    <div className="separator"></div>
+
+                                    <div className="verifiedDatum">
+                                        <div className="verifiedDatumTitle">
+                                            <h2 className="country">LinkedIn Profile / Professional Website:</h2>
+                                        </div>
+                                        <div className="verifiedDatumData">
+                                            <h3 className="countryName">{user.website}</h3>
+                                        </div>
+                                    </div>
+                                    <div className="separator"></div>
+
+                                    <div className="verifiedDatum">
+                                        <div className="verifiedDatumTitle">
+                                            <h2 className="country"> Hosted Funding Projects:</h2>
+                                        </div>
+                                        <div className="verifiedDatumData">
+                                            <h3 className="countryName">{user.propertyList.length}</h3>
+                                        </div>
+                                    </div>
+                                    <div className="separator"></div>
+
+
+                                    <div className="verifiedDatum">
+                                        <div className="verifiedDatumTitle">
+                                            <h2 className="country">Assets Under Management:</h2>
+                                        </div>
+                                        <div className="verifiedDatumData">
+                                            <h3 className="countryName">{user.assetsUnderManagement}</h3>
+                                        </div>
+                                    </div>
+                                    <div className="separator"></div>
+
+                                    <div className="verifiedDatum">
+                                        <div className="verifiedDatumTitle">
+                                            <h2 className="country">Physical Address:</h2>
+                                        </div>
+                                        <div className="verifiedDatumData">
+                                            <h3 className="countryName">{user.physical}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+
+                {/* <p>Hello, {user.firstName || 'User'}!</p> Display a fallback if firstName is not available */}
+                <Footer /> {/* Assuming you have a Footer component */}
+            </div>
+        )}
         </div>
-        {/* Content section */}
-        <div className="content">
-          <h2 style={{ marginBottom: '20px' }}>{activeView.charAt(0).toUpperCase() + activeView.slice(1)}</h2>
-          {renderContent()}
-        </div>
-      </div>
-      </>
     );
-  };
-  
-  export default AdminPage;  
+};
+
+export default MyProfile;

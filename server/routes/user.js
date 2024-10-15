@@ -35,45 +35,36 @@ router.get("/:userId/details", async (req, res) => {
   }
 });
 
-/* VERIFY USER */
-router.patch("/:userId/verify", async (req, res) => {
+router.patch('/:userId/:action', async (req, res) => {
+  const { userId, action } = req.params;
+
   try {
-    const { userId } = req.params;
+    const user = await User.findById(userId);
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { verified: "verified" },
-      { new: true }
-    );
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    // Update user status based on action
+    if (action === 'verified') {
+      user.verified = 'verified';
+    } else if (action === 'rejected') {
+      user.verified = 'rejected';
+    } else if (action === 'notVerified') {
+      user.verified = 'notVerified'; // Assuming you want to set it back to pending
+    } else {
+      return res.status(400).send({ message: 'Invalid action' });
+    }
 
-    res.status(200).json({ message: "User verified successfully", user });
+    await user.save();
+    res.send({ user });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error verifying user", error: error.message });
+    console.error('Error updating user status:', error);
+    res.status(500).send({ message: 'Server error', error: error.message });
   }
 });
 
-/* REJECT USER */
-router.patch("/:userId/reject", async (req, res) => {
-  try {
-    const { userId } = req.params;
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { verified: "rejected" },
-      { new: true }
-    );
-
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    res.status(200).json({ message: "User rejected successfully", user });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error rejecting user", error: error.message });
-  }
-});
 
 // // Update user details including profile photo
 // router.put("/:userId/edit", upload.single('profileImage'), async (req, res) => {

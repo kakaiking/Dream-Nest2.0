@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { useNavigate } from 'react-router-dom';
 import '../styles/AdminPage.scss'; // Import the CSS file
 import Navbar from '../components/Navbar';
 
@@ -11,8 +11,8 @@ const AdminPage = () => {
   const [comments, setComments] = useState([]);
   const [updates, setUpdates] = useState([]);
   const [activeView, setActiveView] = useState('users');
-  
-  const navigate = useNavigate(); // Create a navigate function for navigation
+
+  const navigate = useNavigate(); // For navigation
 
   const fetchData = async () => {
     try {
@@ -51,59 +51,85 @@ const AdminPage = () => {
     fetchData();
   }, []);
 
-  const updateUserStatus = async (userId, status) => {
+  const updateUserStatus = async (userId, action) => {
     try {
-      const response = await fetch(`http://localhost:3001/users/${userId}/verify`, {
+      const response = await fetch(`http://localhost:3001/users/${userId}/${action}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ verified: status }),
+        headers: { 'Content-Type': 'application/json' },
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update user status');
-      }
+      if (!response.ok) throw new Error('Failed to update user status');
 
       const updatedUser = await response.json();
       setUsers(prevUsers =>
-        prevUsers.map(user => (user._id === userId ? updatedUser : user))
+        prevUsers.map(user => (user._id === userId ? updatedUser.user : user))
       );
     } catch (error) {
       console.error('Error updating user status:', error);
     }
   };
 
-  
+  // Helper function to remove 'public' from the path
+  const getDocumentPath = (path) => path?.replace(/^\/?public/, '') || '';
 
-  const renderUsers = () => (
-    <ul className="user-cards">
-      {users.map(user => (
-        <li key={user._id} className="user-card" onClick={() => handleUserClick(user)} style={{marginBottom: '40px'}}>
-          <img src={`http://localhost:3001/${user.profileImagePath.replace("public", "")}`} alt={`${user.firmName} Profile`} className="user-image" />
-          <div className="user-info">
-            <h3>{user.firmName}</h3>
-            <p>{user.email}</p>
+  const renderUsers = () =>
+    users.map(user => (
+      <div key={user._id} className="user-card" style={{ marginBottom: '40px' }}>
+        <img
+          src={`http://localhost:3001/${getDocumentPath(user.profileImagePath)}`}
+          alt={`${user.firmName} Profile`}
+          className="user-image"
+        />
+        <div className="user-info">
+          <h3>User: {user.firmName}</h3>
+          <h3>Email: {user.email}</h3>
+        </div> <br />
+        <div className="user-details">
+          <strong>Owner(s):</strong> {user.owners} <br />
+          <strong>Phone Number:</strong> {user.phoneNumber} <br />
+          <strong>Year Started:</strong> {user.yearStarted} <br />
+          <strong>CMA License Number:</strong> {user.cmaLicenseNumber} <br />
+          <strong>Assets Under Management:</strong> {user.assetsUnderManagement} <br />
+          <strong>Physical Address:</strong> {user.physical} <br />
+          <strong>Website:</strong> {user.website} <br />
+
+          <div className="supportDocs">
+            <div className="supportTitle" style={{ width: '65%', margin: '0 auto 20px auto', textAlign: 'center' }}>
+              <h3><u>User Documents:</u></h3>
+            </div>
+            <div className="doc-cards">
+              <div className="doc-card">
+                <a
+                  href={`http://localhost:3001${getDocumentPath(user.kraPinPath)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="doc-icon">📄</div>
+                  <div className="doc-name">KRA PIN</div>
+                </a>
+              </div>
+              <div className="doc-card">
+                <a
+                  href={`http://localhost:3001${getDocumentPath(user.businessCertificatePath)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="doc-icon">📄</div>
+                  <div className="doc-name">Business Certificate</div>
+                </a>
+              </div>
+            </div>
           </div>
-          {/* Expandable user details */}
-          <div className="user-details">
-            <strong>Owners:</strong> {user.owners} <br />
-            <strong>Phone Number:</strong> {user.phoneNumber} <br />
-            <strong>Password:</strong> {user.password} <br />
-            <strong>Year Started:</strong> {user.yearStarted} <br />
-            <strong>CMA License Number:</strong> {user.cmaLicenseNumber} <br />
-            <strong>Assets Under Management:</strong> {user.assetsUnderManagement} <br />
-            <strong>Physical Address:</strong> {user.physical} <br />
-            <strong>Website:</strong> {user.website} <br />
-            <strong>KRA PIN Path:</strong> {user.kraPinPath} <br />
-            <strong>Business Certificate Path:</strong> {user.businessCertificatePath} <br />
-            <strong>Status:</strong> {user.verified} <br />
-            <strong>Created At:</strong> {new Date(user.createdAt).toLocaleString()} <br />
-            <strong>Updated At:</strong> {new Date(user.updatedAt).toLocaleString()} <br />
+
+          <strong>Status:</strong> {user.verified} <br />
+          <strong>Created At:</strong> {new Date(user.createdAt).toLocaleString()} <br />
+          <strong>Updated At:</strong> {new Date(user.updatedAt).toLocaleString()} <br />
+          <div className="userBtns" style={{marginTop: '10px'}}>
             <button
               className="button"
               onClick={() => updateUserStatus(user._id, 'verified')}
               disabled={user.verified === 'verified'}
+              style={{ marginRight: '10px', marginBottom: '10px' }}
             >
               Verify
             </button>
@@ -114,115 +140,83 @@ const AdminPage = () => {
             >
               Reject
             </button>
+            <button
+              className="button revert-button"
+              onClick={() => updateUserStatus(user._id, 'notVerified')}
+              disabled={user.verified === 'notVerified'}
+              style={{marginTop: '10px'}}
+            >
+              Revert Verification
+            </button>
           </div>
-        </li>
-      ))}
-    </ul>
-  );
+        </div>
+      </div>
+    ));
 
   const renderContent = () => {
-    switch (activeView) {
-      case 'users':
-        return users.length > 0 ? renderUsers() : <p className="error">No users found</p>;
-      case 'bookings':
-        return bookings.length > 0 ? (
-          <ul>
-            {bookings.map(booking => (
-              <li key={booking._id} className="list-item">
-                <strong>Customer:</strong> {booking.customerName} <br />
-                <strong>Email:</strong> {booking.customerEmail} <br />
-                <strong>Listing:</strong> {booking.listingTitle} <br />
-                <strong>Total Price:</strong> KES {booking.totalPrice} <br />
-                <strong>Status:</strong> {booking.status}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="error">No bookings found</p>
-        );
-      case 'properties':
-        return properties.length > 0 ? (
-          <ul>
-            {properties.map(property => (
-              <li key={property._id} className="list-item">
-                <strong>Title:</strong> {property.title} <br />
-                <strong>Category:</strong> {property.category} <br />
-                <strong>Type:</strong> {property.type} <br />
-                <strong>Status:</strong> {property.status}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="error">No properties found</p>
-        );
-      case 'returns':
-        return returns.length > 0 ? (
-          <ul>
-            {returns.map(returnItem => (
-              <li key={returnItem._id} className="list-item">
-                <strong>Listing:</strong> {returnItem.listing.title} <br />
-                <strong>Host:</strong> {returnItem.host.firmName} <br />
-                <strong>Payment Method:</strong> {returnItem.paymentMethod} <br />
-                <strong>Amount Paid:</strong> KES {returnItem.amountPaid} <br />
-                <strong>Status:</strong> {returnItem.status}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="error">No returns found</p>
-        );
-      case 'comments':
-        return comments.length > 0 ? (
-          <ul>
-            {comments.map(comment => (
-              <li key={comment._id} className="list-item">
-                <strong>User:</strong> {comment.user.firmName} <br />
-                <strong>Comment:</strong> {comment.content} <br />
-                <strong>Replies:</strong> {comment.replies.length}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="error">No comments found</p>
-        );
-      case 'updates':
-        return updates.length > 0 ? (
-          <ul>
-            {updates.map(update => (
-              <li key={update._id} className="list-item">
-                <strong>Title:</strong> {update.title} <br />
-                <strong>Description:</strong> {update.description} <br />
-                <strong>Listing:</strong> {update.listing.title}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="error">No updates found</p>
-        );
-      default:
-        return null;
-    }
+    const views = {
+      users: renderUsers(),
+      bookings: bookings.map(booking => (
+        <div key={booking._id} className="booking-card" style={{ marginBottom: '40px' }}>
+          <strong>Customer:</strong> {booking.customerName} <br />
+          <strong>Email:</strong> {booking.customerEmail} <br />
+          <strong>Listing:</strong> {booking.listingTitle} <br />
+          <strong>Total Price:</strong> KES {booking.totalPrice} <br />
+          <strong>Status:</strong> {booking.status}
+        </div>
+      )),
+      properties: properties.map(property => (
+        <div key={property._id} className="property-card" style={{ marginBottom: '40px' }}>
+          <strong>Title:</strong> {property.title} <br />
+          <strong>Category:</strong> {property.category} <br />
+          <strong>Type:</strong> {property.type} <br />
+          <strong>Status:</strong> {property.status}
+        </div>
+      )),
+      returns: returns.map(returnItem => (
+        <div key={returnItem._id} className="return-card" style={{ marginBottom: '40px' }}>
+          <strong>Listing:</strong> {returnItem.listing.title} <br />
+          <strong>Host:</strong> {returnItem.host.firmName} <br />
+          <strong>Payment Method:</strong> {returnItem.paymentMethod} <br />
+          <strong>Amount Paid:</strong> KES {returnItem.amountPaid} <br />
+          <strong>Status:</strong> {returnItem.status}
+        </div>
+      )),
+      comments: comments.map(comment => (
+        <div key={comment._id} className="comment-card" style={{ marginBottom: '40px' }}>
+          <strong>User:</strong> {comment.user.firmName} <br />
+          <strong>Comment:</strong> {comment.content} <br />
+          <strong>Replies:</strong> {comment.replies.length}
+        </div>
+      )),
+      updates: updates.map(update => (
+        <div key={update._id} className="update-card" style={{ marginBottom: '40px' }}>
+          <strong>Title:</strong> {update.title} <br />
+          <strong>Description:</strong> {update.description} <br />
+          <strong>Listing:</strong> {update.listing.title}
+        </div>
+      )),
+    };
+
+    return views[activeView] || <p className="error">No {activeView} found</p>;
   };
 
   return (
     <>
       <Navbar />
       <div className="container">
-        {/* Offcanvas section */}
         <div className="offCanvas">
-          <h3 style={{ marginBottom: '20px' }}>Options</h3>
+          <h3>Options</h3>
           <div className="button-container">
-            <button onClick={() => setActiveView('users')} className="button">Users</button>
-            <button onClick={() => setActiveView('bookings')} className="button">Bookings</button>
-            <button onClick={() => setActiveView('properties')} className="button">Properties</button>
-            <button onClick={() => setActiveView('returns')} className="button">Returns</button>
-            <button onClick={() => setActiveView('comments')} className="button">Comments</button>
-            <button onClick={() => setActiveView('updates')} className="button">Updates</button>
+            {['users', 'bookings', 'properties', 'returns', 'comments', 'updates'].map(view => (
+              <button key={view} onClick={() => setActiveView(view)} className="button">
+                {view.charAt(0).toUpperCase() + view.slice(1)}
+              </button>
+            ))}
           </div>
         </div>
-        {/* Content section */}
         <div className="content">
-          <h2 style={{ marginBottom: '20px' }}>{activeView.charAt(0).toUpperCase() + activeView.slice(1)}</h2>
+          <h2>{activeView.charAt(0).toUpperCase() + activeView.slice(1)}</h2>
           {renderContent()}
         </div>
       </div>
