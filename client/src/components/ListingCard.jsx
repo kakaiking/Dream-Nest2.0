@@ -35,24 +35,37 @@ const ListingCard = ({
   /* ADD TO WISHLIST */
   const patchWishList = async () => {
     if (!user) {
-      // Redirect to login if the user is not logged in
-      navigate('/login');
+      navigate('/login'); // Redirect to login if not logged in
       return;
     }
+  
     if (user?._id !== creator._id) {
-      const response = await fetch(
-        `http://localhost:3001/users/${user?._id}/${listingId}`,
-        {
-          method: "PATCH",
-          header: {
-            "Content-Type": "application/json",
-          },
+      try {
+        const response = await fetch(
+          `http://localhost:3001/users/${user?._id}/${listingId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json", // Fix: Changed 'header' to 'headers'
+            },
+          }
+        );
+  
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to update wishlist");
         }
-      );
-      const data = await response.json();
-      dispatch(setWishList(data.wishList));
+  
+        const data = await response.json();
+        console.log(data);
+        dispatch(setWishList(data.wishList)); // Update Redux state
+      } catch (error) {
+        console.error("Error:", error.message);
+      }
     }
   };
+  
+  
 
   // Function to determine the background gradient based on category
   const getBackgroundGradient = () => {

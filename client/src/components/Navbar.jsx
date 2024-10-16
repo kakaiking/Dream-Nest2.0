@@ -84,12 +84,6 @@ const Navbar = () => {
 
         {dropdownMenu && user && (
           <div className="navbar_right_accountmenu">
-            
-            {isAdmin && (
-              <>
-                <Link to="/admin">Admin Dashboard</Link>
-              </>
-            )}
 
             <Link to={`/${user._id}/trips`}>My Bids</Link>
             <Link to={`/${user._id}/reservations`}>My Project Updates</Link>
@@ -110,6 +104,12 @@ const Navbar = () => {
             >
               Log Out
             </Link>
+
+            {isAdmin && (
+              <><hr />
+                <Link to="/admin">Admin Dashboard</Link>
+              </>
+            )}
           </div>
         )}
       </div>

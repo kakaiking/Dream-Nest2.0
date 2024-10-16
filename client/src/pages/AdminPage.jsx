@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import '../styles/AdminPage.scss'; // Import the CSS file
 import Navbar from '../components/Navbar';
+import Listings from "../components/Listings";
+import { setUsers, updateUserVerifiedState } from '../redux/userSlice'; // Redux actions
 
 const AdminPage = () => {
-  const [users, setUsers] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [properties, setProperties] = useState([]);
   const [returns, setReturns] = useState([]);
@@ -13,10 +15,20 @@ const AdminPage = () => {
   const [activeView, setActiveView] = useState('users');
 
   const navigate = useNavigate(); // For navigation
+  const dispatch = useDispatch();
+
+  const users = useSelector(state => state.user.userList); // Fetch users from Redux state
 
   const fetchData = async () => {
     try {
-      const [usersResponse, bookingsResponse, propertiesResponse, returnsResponse, commentsResponse, updatesResponse] = await Promise.all([
+      const [
+        usersResponse,
+        bookingsResponse,
+        propertiesResponse,
+        returnsResponse,
+        commentsResponse,
+        updatesResponse,
+      ] = await Promise.all([
         fetch('http://localhost:3001/users'),
         fetch('http://localhost:3001/bookings'),
         fetch('http://localhost:3001/properties'),
@@ -36,7 +48,9 @@ const AdminPage = () => {
         throw new Error('One or more requests failed');
       }
 
-      setUsers(await usersResponse.json());
+      const usersData = await usersResponse.json();
+      dispatch(setUsers(usersData)); // Store users in Redux
+
       setBookings(await bookingsResponse.json());
       setProperties(await propertiesResponse.json());
       setReturns(await returnsResponse.json());
@@ -61,15 +75,12 @@ const AdminPage = () => {
       if (!response.ok) throw new Error('Failed to update user status');
 
       const updatedUser = await response.json();
-      setUsers(prevUsers =>
-        prevUsers.map(user => (user._id === userId ? updatedUser.user : user))
-      );
+      dispatch(updateUserVerifiedState(updatedUser.user)); // Update user status in Redux
     } catch (error) {
       console.error('Error updating user status:', error);
     }
   };
 
-  // Helper function to remove 'public' from the path
   const getDocumentPath = (path) => path?.replace(/^\/?public/, '') || '';
 
   const renderUsers = () =>
@@ -83,7 +94,8 @@ const AdminPage = () => {
         <div className="user-info">
           <h3>User: {user.firmName}</h3>
           <h3>Email: {user.email}</h3>
-        </div> <br />
+        </div>
+        <br />
         <div className="user-details">
           <strong>Owner(s):</strong> {user.owners} <br />
           <strong>Phone Number:</strong> {user.phoneNumber} <br />
@@ -124,7 +136,7 @@ const AdminPage = () => {
           <strong>Status:</strong> {user.verified} <br />
           <strong>Created At:</strong> {new Date(user.createdAt).toLocaleString()} <br />
           <strong>Updated At:</strong> {new Date(user.updatedAt).toLocaleString()} <br />
-          <div className="userBtns" style={{marginTop: '10px'}}>
+          <div className="userBtns" style={{ marginTop: '10px' }}>
             <button
               className="button"
               onClick={() => updateUserStatus(user._id, 'verified')}
@@ -144,7 +156,7 @@ const AdminPage = () => {
               className="button revert-button"
               onClick={() => updateUserStatus(user._id, 'notVerified')}
               disabled={user.verified === 'notVerified'}
-              style={{marginTop: '10px'}}
+              style={{ marginTop: '10px' }}
             >
               Revert Verification
             </button>
@@ -165,14 +177,7 @@ const AdminPage = () => {
           <strong>Status:</strong> {booking.status}
         </div>
       )),
-      properties: properties.map(property => (
-        <div key={property._id} className="property-card" style={{ marginBottom: '40px' }}>
-          <strong>Title:</strong> {property.title} <br />
-          <strong>Category:</strong> {property.category} <br />
-          <strong>Type:</strong> {property.type} <br />
-          <strong>Status:</strong> {property.status}
-        </div>
-      )),
+      properties: <Listings />,
       returns: returns.map(returnItem => (
         <div key={returnItem._id} className="return-card" style={{ marginBottom: '40px' }}>
           <strong>Listing:</strong> {returnItem.listing.title} <br />
@@ -206,7 +211,7 @@ const AdminPage = () => {
       <Navbar />
       <div className="container">
         <div className="offCanvas">
-          <h3>Options</h3>
+          <h2>Dashboard</h2>
           <div className="button-container">
             {['users', 'bookings', 'properties', 'returns', 'comments', 'updates'].map(view => (
               <button key={view} onClick={() => setActiveView(view)} className="button">

@@ -90,7 +90,7 @@ const MyProfile = () => {
                                         </div>
 
                                         <div className="igPage">
-                                            <a href="">{user.firstName} {user.lastName}</a>
+                                            <a href="">{user.owners}</a>
                                         </div>
                                     </div>
                                 </div>

@@ -35,6 +35,8 @@ router.get("/:userId/details", async (req, res) => {
   }
 });
 
+
+// Update User's verified state
 router.patch('/:userId/:action', async (req, res) => {
   const { userId, action } = req.params;
 
@@ -65,41 +67,6 @@ router.patch('/:userId/:action', async (req, res) => {
 });
 
 
-
-// // Update user details including profile photo
-// router.put("/:userId/edit", upload.single('profileImage'), async (req, res) => {
-//   try {
-//     const userId = req.params.userId;
-//     const updateData = req.body;
-
-//     // Fetch the existing user first
-//     const existingUser = await User.findById(userId);
-
-//     if (!existingUser) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
-
-//     // Merge the existing user data with the update data
-//     const mergedData = {
-//       ...existingUser.toObject(),
-//       ...updateData
-//     };
-
-//     // Use findByIdAndUpdate with the merged data
-//     const updatedUser = await User.findByIdAndUpdate(
-//       userId,
-//       mergedData,
-//       { new: true, runValidators: true }
-//     );
-
-//     res.json(updatedUser);
-//   } catch (error) {
-//     console.error('Error updating user:', error);
-//     res.status(500).json({ message: 'Error updating user profile' });
-//   }
-// });
-
-
 /* GET USER'S TRIP LIST */
 router.get("/:userId/trips", async (req, res) => {
   try {
@@ -115,26 +82,39 @@ router.get("/:userId/trips", async (req, res) => {
 /* ADD LISTING TO USER'S WISHLIST */
 router.patch("/:userId/:listingId", async (req, res) => {
   try {
-    const { userId, listingId } = req.params
-    const user = await User.findById(userId)
-    const listing = await Listing.findById(listingId).populate("creator")
+    const { userId, listingId } = req.params;
 
-    const favoriteListing = user.wishList.find((item) => item._id.toString() === listingId)
+    console.log(`UserId: ${userId}, ListingId: ${listingId}`); // Log IDs
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const listingExists = await Listing.exists({ _id: listingId });
+    if (!listingExists) {
+      return res.status(404).json({ message: "Listing not found" });
+    }
+
+    const favoriteListing = user.wishList.includes(listingId);
+    console.log(`Favorite Listing Exists: ${favoriteListing}`); // Log wishlist state
 
     if (favoriteListing) {
-      user.wishList = user.wishList.filter((item) => item._id.toString() !== listingId)
-      await user.save()
-      res.status(200).json({ message: "Listing is removed from wish list", wishList: user.wishList })
+      user.wishList = user.wishList.filter((id) => id.toString() !== listingId);
+      await user.save();
+      return res.status(200).json({ message: "Listing removed", wishList: user.wishList });
     } else {
-      user.wishList.push(listing)
-      await user.save()
-      res.status(200).json({ message: "Listing is added to wish list", wishList: user.wishList })
+      user.wishList.push(listingId);
+      await user.save();
+      return res.status(200).json({ message: "Listing added", wishList: user.wishList });
     }
   } catch (err) {
-    console.log(err)
-    res.status(404).json({ error: err.message })
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
-})
+});
+
+
 
 
 
