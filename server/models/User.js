@@ -57,7 +57,7 @@ const UserSchema = new mongoose.Schema(
     verified: {
       type: String,
       enum: ["notVerified", "verified", "rejected"],
-      default: "notVerified",
+      default: "",
     },
     tripList: {
       type: Array,
@@ -77,4 +77,4 @@ const UserSchema = new mongoose.Schema(
 );
 
 const User = mongoose.model("User", UserSchema);
-module.exports = User;
+module.exports = User; 

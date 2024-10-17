@@ -52,7 +52,7 @@ const ListingDetails = () => {
 
       // Calculate price per share only if listing.target is available
       if (data && data.target) {
-        setPricePerShare(data.target / totalShares);
+        setPricePerShare(data.target / data.shares);
       }
 
       setLoading(false);

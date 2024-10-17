@@ -1,37 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import '../styles/AdminPage.scss'; // Import the CSS file
 import Navbar from '../components/Navbar';
-import Listings from "../components/Listings";
-import { setUsers, updateUserVerifiedState } from '../redux/userSlice'; // Redux actions
+import { useSelector } from 'react-redux';
+import Listings from '../components/Listings'; // Import Listings component
+import Loader from '../components/Loader';
 
 const AdminPage = () => {
-  const [bookings, setBookings] = useState([]);
-  const [properties, setProperties] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [bids, setBids] = useState([]);
   const [returns, setReturns] = useState([]);
   const [comments, setComments] = useState([]);
   const [updates, setUpdates] = useState([]);
   const [activeView, setActiveView] = useState('users');
+  
+  // Search state for each data type
+  const [searchUser, setSearchUser] = useState('');
+  const [searchBid, setSearchBid] = useState('');
+  const [searchReturn, setSearchReturn] = useState('');
+  const [searchComment, setSearchComment] = useState('');
+  const [searchUpdate, setSearchUpdate] = useState('');
+  const [searchListing, setSearchListing] = useState(''); // Search state for Listings
 
   const navigate = useNavigate(); // For navigation
-  const dispatch = useDispatch();
-
-  const users = useSelector(state => state.user.userList); // Fetch users from Redux state
 
   const fetchData = async () => {
     try {
-      const [
-        usersResponse,
-        bookingsResponse,
-        propertiesResponse,
-        returnsResponse,
-        commentsResponse,
-        updatesResponse,
-      ] = await Promise.all([
+      const [usersResponse, bidsResponse, returnsResponse, commentsResponse, updatesResponse] = await Promise.all([
         fetch('http://localhost:3001/users'),
         fetch('http://localhost:3001/bookings'),
-        fetch('http://localhost:3001/properties'),
         fetch('http://localhost:3001/returns'),
         fetch('http://localhost:3001/comments'),
         fetch('http://localhost:3001/updates'),
@@ -39,8 +36,7 @@ const AdminPage = () => {
 
       if (
         !usersResponse.ok ||
-        !bookingsResponse.ok ||
-        !propertiesResponse.ok ||
+        !bidsResponse.ok ||
         !returnsResponse.ok ||
         !commentsResponse.ok ||
         !updatesResponse.ok
@@ -48,11 +44,8 @@ const AdminPage = () => {
         throw new Error('One or more requests failed');
       }
 
-      const usersData = await usersResponse.json();
-      dispatch(setUsers(usersData)); // Store users in Redux
-
-      setBookings(await bookingsResponse.json());
-      setProperties(await propertiesResponse.json());
+      setUsers(await usersResponse.json());
+      setBids(await bidsResponse.json());
       setReturns(await returnsResponse.json());
       setComments(await commentsResponse.json());
       setUpdates(await updatesResponse.json());
@@ -75,16 +68,45 @@ const AdminPage = () => {
       if (!response.ok) throw new Error('Failed to update user status');
 
       const updatedUser = await response.json();
-      dispatch(updateUserVerifiedState(updatedUser.user)); // Update user status in Redux
+      setUsers(prevUsers =>
+        prevUsers.map(user => (user._id === userId ? updatedUser.user : user))
+      );
     } catch (error) {
       console.error('Error updating user status:', error);
     }
   };
 
+  // Helper function to remove 'public' from the path
   const getDocumentPath = (path) => path?.replace(/^\/?public/, '') || '';
 
+  const filterUsers = () => {
+    return users.filter(user => user.firmName.toLowerCase().includes(searchUser.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchUser.toLowerCase()));
+  };
+
+  const filterBids = () => {
+    return bids.filter(bid => bid.customerName.toLowerCase().includes(searchBid.toLowerCase()) ||
+      bid.customerEmail.toLowerCase().includes(searchBid.toLowerCase()) ||
+      bid.listingTitle.toLowerCase().includes(searchBid.toLowerCase()));
+  };
+
+  const filterReturns = () => {
+    return returns.filter(returnItem => returnItem.listing.title.toLowerCase().includes(searchReturn.toLowerCase()) ||
+      returnItem.host.firmName.toLowerCase().includes(searchReturn.toLowerCase()));
+  };
+
+  const filterComments = () => {
+    return comments.filter(comment => comment.user.firmName.toLowerCase().includes(searchComment.toLowerCase()) ||
+      comment.content.toLowerCase().includes(searchComment.toLowerCase()));
+  };
+
+  const filterUpdates = () => {
+    return updates.filter(update => update.title.toLowerCase().includes(searchUpdate.toLowerCase()) ||
+      update.description.toLowerCase().includes(searchUpdate.toLowerCase()));
+  };
+
   const renderUsers = () =>
-    users.map(user => (
+    filterUsers().map(user => (
       <div key={user._id} className="user-card" style={{ marginBottom: '40px' }}>
         <img
           src={`http://localhost:3001/${getDocumentPath(user.profileImagePath)}`}
@@ -94,8 +116,7 @@ const AdminPage = () => {
         <div className="user-info">
           <h3>User: {user.firmName}</h3>
           <h3>Email: {user.email}</h3>
-        </div>
-        <br />
+        </div><br />
         <div className="user-details">
           <strong>Owner(s):</strong> {user.owners} <br />
           <strong>Phone Number:</strong> {user.phoneNumber} <br />
@@ -165,67 +186,140 @@ const AdminPage = () => {
       </div>
     ));
 
-  const renderContent = () => {
-    const views = {
-      users: renderUsers(),
-      bookings: bookings.map(booking => (
-        <div key={booking._id} className="booking-card" style={{ marginBottom: '40px' }}>
-          <strong>Customer:</strong> {booking.customerName} <br />
-          <strong>Email:</strong> {booking.customerEmail} <br />
-          <strong>Listing:</strong> {booking.listingTitle} <br />
-          <strong>Total Price:</strong> KES {booking.totalPrice} <br />
-          <strong>Status:</strong> {booking.status}
-        </div>
-      )),
-      properties: <Listings />,
-      returns: returns.map(returnItem => (
-        <div key={returnItem._id} className="return-card" style={{ marginBottom: '40px' }}>
-          <strong>Listing:</strong> {returnItem.listing.title} <br />
-          <strong>Host:</strong> {returnItem.host.firmName} <br />
-          <strong>Payment Method:</strong> {returnItem.paymentMethod} <br />
-          <strong>Amount Paid:</strong> KES {returnItem.amountPaid} <br />
-          <strong>Status:</strong> {returnItem.status}
-        </div>
-      )),
-      comments: comments.map(comment => (
-        <div key={comment._id} className="comment-card" style={{ marginBottom: '40px' }}>
-          <strong>User:</strong> {comment.user.firmName} <br />
-          <strong>Comment:</strong> {comment.content} <br />
-          <strong>Replies:</strong> {comment.replies.length}
-        </div>
-      )),
-      updates: updates.map(update => (
-        <div key={update._id} className="update-card" style={{ marginBottom: '40px' }}>
-          <strong>Title:</strong> {update.title} <br />
-          <strong>Description:</strong> {update.description} <br />
-          <strong>Listing:</strong> {update.listing.title}
-        </div>
-      )),
-    };
+  const renderBids = () =>
+    filterBids().map(booking => (
+      <div key={booking._id} className="booking-card" style={{ marginBottom: '40px' }}>
+        <strong>Bidder:</strong> {booking.customerName} <br />
+        <strong>Bidder's Email:</strong> {booking.customerEmail} <br />
+        <strong>Bid Amount:</strong> Ksh. {booking.totalPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} <br />
+        <hr />
+        <strong>Listing Title:</strong> {booking.listingTitle} <br />
+        <strong>Host Id:</strong> {booking.hostId} <br /><br />
+        <strong>Status:</strong> {booking.status}<br />
+        <strong>Created At:</strong> {new Date(booking.createdAt).toLocaleString()} <br />
+        <strong>Updated At:</strong> {new Date(booking.updatedAt).toLocaleString()} <br />
+      </div>
+    ));
 
-    return views[activeView] || <p className="error">No {activeView} found</p>;
-  };
+  const renderReturns = () =>
+    filterReturns().map(returnItem => (
+      <div key={returnItem._id} className="return-card" style={{ marginBottom: '40px' }}>
+        <strong>Listing:</strong> {returnItem.listing.title} <br />
+        <strong>Host:</strong> {returnItem.host.firmName} <br />
+        <strong>Amount Returned:</strong> Ksh. {returnItem.amountPaid.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} <br />
+        <strong>Status:</strong> {returnItem.status} <br />
+        <strong>Created At:</strong> {new Date(returnItem.createdAt).toLocaleString()} <br />
+        <strong>Updated At:</strong> {new Date(returnItem.updatedAt).toLocaleString()} <br />
+      </div>
+    ));
+
+  const renderComments = () =>
+    filterComments().map(comment => (
+      <div key={comment._id} className="comment-card" style={{ marginBottom: '40px' }}>
+        <strong>Comment By:</strong> {comment.user.firmName} <br />
+        <strong>Content:</strong> {comment.content} <br />
+        <strong>Created At:</strong> {new Date(comment.createdAt).toLocaleString()} <br />
+        <strong>Updated At:</strong> {new Date(comment.updatedAt).toLocaleString()} <br />
+      </div>
+    ));
+
+  const renderUpdates = () =>
+    filterUpdates().map(update => (
+      <div key={update._id} className="update-card" style={{ marginBottom: '40px' }}>
+        <strong>Title:</strong> {update.title} <br />
+        <strong>Description:</strong> {update.description} <br />
+        <strong>Created At:</strong> {new Date(update.createdAt).toLocaleString()} <br />
+        <strong>Updated At:</strong> {new Date(update.updatedAt).toLocaleString()} <br />
+      </div>
+    ));
 
   return (
-    <>
+    <div className="admin-page">
       <Navbar />
-      <div className="container">
-        <div className="offCanvas">
-          <h2>Dashboard</h2>
-          <div className="button-container">
-            {['users', 'bookings', 'properties', 'returns', 'comments', 'updates'].map(view => (
-              <button key={view} onClick={() => setActiveView(view)} className="button">
-                {view.charAt(0).toUpperCase() + view.slice(1)}
-              </button>
-            ))}
-          </div>
+      <div className="admin-content">
+        <h1 style={{marginTop: '30px'}}>Admin Dashboard</h1>
+        <div className="view-switch">
+          <button onClick={() => setActiveView('users')}>Users</button>
+          <button onClick={() => setActiveView('bids')}>Bids</button>
+          <button onClick={() => setActiveView('returns')}>Returns</button>
+          <button onClick={() => setActiveView('comments')}>Comments</button>
+          <button onClick={() => setActiveView('updates')}>Updates</button>
+          <button onClick={() => setActiveView('listings')}>Listings</button> {/* Button to switch to Listings */}
         </div>
-        <div className="content">
-          <h2>{activeView.charAt(0).toUpperCase() + activeView.slice(1)}</h2>
-          {renderContent()}
+        <div className="search-inputs">
+          {activeView === 'users' && (
+            <div className='inputDiv'>
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchUser}
+                onChange={(e) => setSearchUser(e.target.value)}
+              />
+            </div>
+          )}
+          {activeView === 'bids' && (
+            <div className='inputDiv'>
+              <input
+                type="text"
+                placeholder="Search bids..."
+                value={searchBid}
+                onChange={(e) => setSearchBid(e.target.value)}
+              />
+            </div>
+          )}
+          {activeView === 'returns' && (
+            <div className='inputDiv'>
+              <input
+                type="text"
+                placeholder="Search returns..."
+                value={searchReturn}
+                onChange={(e) => setSearchReturn(e.target.value)}
+              />
+            </div>
+          )}
+          {activeView === 'comments' && (
+            <div className='inputDiv'>
+              <input
+                type="text"
+                placeholder="Search comments..."
+                value={searchComment}
+                onChange={(e) => setSearchComment(e.target.value)}
+              />
+            </div>
+          )}
+          {activeView === 'updates' && (
+            <div className='inputDiv'>
+              <input
+                type="text"
+                placeholder="Search updates..."
+                value={searchUpdate}
+                onChange={(e) => setSearchUpdate(e.target.value)}
+              />
+            </div>
+          )}
+          {activeView === 'listings' && (
+            <div className='inputDiv'>
+              <input
+                type="text"
+                placeholder="Search listings..."
+                value={searchListing}
+                onChange={(e) => setSearchListing(e.target.value)}
+              />
+            </div>
+          )}
         </div>
+
+        {activeView === 'users' && renderUsers()}
+        {activeView === 'bids' && renderBids()}
+        {activeView === 'returns' && renderReturns()}
+        {activeView === 'comments' && renderComments()}
+        {activeView === 'updates' && renderUpdates()}
+        {activeView === 'listings' && <Listings searchTerm={searchListing} />} {/* Render Listings component */}
+
+        {/* Loading state */}
+        {users.length === 0 && bids.length === 0 && returns.length === 0 && comments.length === 0 && updates.length === 0 && <Loader />}
       </div>
-    </>
+    </div>
   );
 };
 

@@ -84,7 +84,7 @@ router.patch("/:userId/:listingId", async (req, res) => {
   try {
     const { userId, listingId } = req.params;
 
-    console.log(`UserId: ${userId}, ListingId: ${listingId}`); // Log IDs
+    // console.log(UserId: ${userId}, ListingId: ${listingId}); // Log IDs
 
     const user = await User.findById(userId);
     if (!user) {
@@ -97,7 +97,7 @@ router.patch("/:userId/:listingId", async (req, res) => {
     }
 
     const favoriteListing = user.wishList.includes(listingId);
-    console.log(`Favorite Listing Exists: ${favoriteListing}`); // Log wishlist state
+    // console.log(Favorite Listing Exists: ${favoriteListing}); // Log wishlist state
 
     if (favoriteListing) {
       user.wishList = user.wishList.filter((id) => id.toString() !== listingId);

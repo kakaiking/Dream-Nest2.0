@@ -25,6 +25,7 @@ const CreateListing = () => {
     returns: "",
     paymentDates: "",
     target: "",
+    shares: "",
   });
 
   const handleChangeLocation = (e) => {
@@ -75,10 +76,12 @@ const CreateListing = () => {
       listingForm.append("returns", formLocation.returns);
       listingForm.append("paymentDates", formLocation.paymentDates);
       listingForm.append("target", formLocation.target);
+      listingForm.append("shares", formLocation.shares);
       listingForm.append("title", formDescription.title);
       listingForm.append("description", formDescription.description);
       listingForm.append("highlightDesc", formDescription.highlightDesc);
 
+      console.log(listingForm)
       console.log(FormData)
       /* Send a POST request to server */
       const response = await fetch("http://localhost:3001/properties/create", {
@@ -163,6 +166,20 @@ const CreateListing = () => {
                   placeholder="100,000"
                   name="target"
                   value={formLocation.target}
+                  onChange={handleChangeLocation}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="full">
+              <div className="location">
+                <p>How many shares do you want for this project?</p>
+                <input
+                  type="number"
+                  placeholder="10000"
+                  name="shares"
+                  value={formLocation.shares}
                   onChange={handleChangeLocation}
                   required
                 />
