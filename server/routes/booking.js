@@ -1,6 +1,8 @@
 const router = require("express").Router()
 
 const Booking = require("../models/Booking")
+const Listing = require("../models/Listing");
+
 
 // Get all bookings
 router.get('/', async (req, res) => {
@@ -16,9 +18,20 @@ router.get('/', async (req, res) => {
 /* CREATE BOOKING */
 router.post("/create", async (req, res) => {
   try {
-    const { customerId, hostId, listingId, customerEmail, customerName, totalPrice, listingTitle, customerReturns } = req.body
-    const newBooking = new Booking({ customerId, hostId, listingId, customerEmail, customerName, totalPrice, listingTitle, customerReturns })
+    const { customerId, hostId, listingId, customerEmail, customerName, totalPrice, listingTitle, customerReturns, guestCount } = req.body
+    const newBooking = new Booking({ customerId, hostId, listingId, customerEmail, customerName, totalPrice, listingTitle, customerReturns, guestCount })
     await newBooking.save()
+    
+    // Find the listing and subtract the booked shares
+    const listing = await Listing.findById(listingId);
+    if (!listing) {
+      return res.status(404).json({ error: "Listing not found" });
+    }
+
+    const remainingShares = listing.shares - guestCount;
+    // Update the listing with new remaining shares
+    await Listing.findByIdAndUpdate(listingId, { shares: remainingShares });
+
     res.status(200).json(newBooking)
   } catch (err) {
     console.log(err)

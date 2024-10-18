@@ -23,6 +23,7 @@ const ListingDetails = () => {
 
   const { listingId } = useParams();
   const [listing, setListing] = useState(null);
+  const [pricePerShare, setPricePerShare] = useState(0);
   const [listingTitle, setListingTitle] = useState('')
   const [customerEmail, setCustomerEmail] = useState("")
   const [hostEmail, setHostEmail] = useState("")
@@ -45,6 +46,7 @@ const ListingDetails = () => {
       const data = await response.json();
       console.log("Received data:", data);
       setListing(data);
+      setPricePerShare(data.target / data.shares);
       setListingTitle(data.title)
       setCustomerReturns(data.returns)
       setHostEmail(data.creator.email)
@@ -88,8 +90,7 @@ const ListingDetails = () => {
   //   setDateRange([ranges.selection]);
   // };
 
-  const [pricePerShare, setPricePerShare] = useState(0);
-  const totalShares = 500;
+
   // const remainingShares = 50;
 
   const [guestCount, setGuestCount] = useState(1);
@@ -115,6 +116,7 @@ const ListingDetails = () => {
         customerEmail,
         customerName,
         totalPrice: pricePerShare.toFixed(2) * guestCount,
+        guestCount,
         listingTitle,
         customerReturns
       }
@@ -378,14 +380,17 @@ const ListingDetails = () => {
           </div>
 
           <div className='bidInfo'>
-            <h2>How Many Shares Of This Project Do You Want?</h2>
+            <h2>How Many Shares Of This Project Do You Want?</h2><br />
             <div className="date-range-calendar">
               <h3>
-                {'Target: ' + listing.target.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                {'Target: ksh. ' + listing.target.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
               </h3>
+              <h3>Total Listing Shares: {listing.shares}</h3>
+              <h3>Remaining shares: {listing.shares - guestCount}</h3>
               <h3 style={{ marginTop: '10px' }}>
                 Price per Share: {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
               </h3>
+              
               <div className="basic">
                 <div className="basic_count">
                   <RemoveCircleOutline
