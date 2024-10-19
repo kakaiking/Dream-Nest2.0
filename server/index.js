@@ -116,11 +116,7 @@ app.post("/mpesa/callback", (req, res) => {
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 3001;
 mongoose
-  .connect(process.env.MONGO_URL, {
-    dbName: "CrowdFund_Project",
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URL, { dbName: "CrowdFund_Project" })
   .then(() => {
     app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
   })

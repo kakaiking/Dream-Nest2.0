@@ -14,12 +14,30 @@ import { LuGoal } from "react-icons/lu";
 import { FcBullish } from "react-icons/fc";
 import { FcExpired } from "react-icons/fc";
 
+import { AiOutlineClose } from "react-icons/ai"; // Close icon
+import QRCode from "react-qr-code";
+import html2canvas from "html2canvas"; // For QR download
+import {
+  FacebookShareButton, WhatsappShareButton, TwitterShareButton,
+  LinkedinShareButton, TelegramShareButton
+} from "react-share";
+import {
+  FaFacebook, FaWhatsapp, FaLinkedin, FaTelegram
+} from 'react-icons/fa';
+import { FaSquareXTwitter } from "react-icons/fa6";
+
+
+import { FiShare2 } from "react-icons/fi";
+
 
 import DOMPurify from 'dompurify';
 
 const ListingDetails = () => {
   const user = useSelector((state) => state.user);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const qrRef = useRef(null); // Ref for QR code to download
+  const url = window.location.href;
 
   const { listingId } = useParams();
   const [listing, setListing] = useState(null);
@@ -70,33 +88,26 @@ const ListingDetails = () => {
     getListingDetails();
   }, [listingId]);
 
-
   useEffect(() => {
     setCustomerEmail(user.email);
     setCustomerName(`${user.firmName} `);
   }, []);
 
-  /* BOOKING CALENDAR */
-  // const [dateRange, setDateRange] = useState([
-  //   {
-  //     startDate: new Date(),
-  //     endDate: new Date(),
-  //     key: "selection",
-  //   },
-  // ]);
+  const downloadQRCode = async () => {
+    const canvas = await html2canvas(qrRef.current);
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = "qr-code.png";
+    link.click();
+  };
 
-  // const handleSelect = (ranges) => {
-  //   // Update the selected date range when user makes a selection
-  //   setDateRange([ranges.selection]);
-  // };
-
-
-  // const remainingShares = 50;
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href);
+    alert("Link copied to clipboard!");
+  };
 
   const [guestCount, setGuestCount] = useState(1);
-
   const [activeTab, setActiveTab] = useState('description');
-
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -239,6 +250,46 @@ const ListingDetails = () => {
 
       {/* <!-- Shop Info --> */}
       <section id="shopInfo">
+        {/* Share Modal */}
+        {isModalOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <AiOutlineClose
+                className="close-button"
+                onClick={() => setIsModalOpen(false)}
+              />
+
+              {/* QR Code */}
+              <div ref={qrRef} className="qr-code-container">
+                <QRCode value={url} size={256} />
+              </div>
+              <button className="downloadBtnnn" onClick={downloadQRCode}>Download QR Code</button>
+
+              {/* Link with Copy Button */}
+              <div className="link-container">
+                <input
+                  type="text"
+                  value={url}
+                  readOnly
+                  style={{ width: "80%" }}
+                />
+                
+                <div className="vertical-divider"></div> {/* Vertical Divider */}
+                <button className="copyBtnnn" onClick={copyToClipboard}>Copy Link</button>
+              </div>
+
+              {/* Share Buttons */}
+              <div className="share-buttons">
+                <FacebookShareButton url={url}><FaFacebook size={44} /></FacebookShareButton>
+                <WhatsappShareButton url={url}><FaWhatsapp size={44} /></WhatsappShareButton>
+                <TwitterShareButton url={url}><FaSquareXTwitter size={44} /></TwitterShareButton>
+                <LinkedinShareButton url={url}><FaLinkedin size={44} /></LinkedinShareButton>
+                <TelegramShareButton url={url}><FaTelegram size={44} /></TelegramShareButton>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="infoCard">
           <div className="shopPhoto_Description">
             <div className="shopProfileImage">
@@ -255,7 +306,7 @@ const ListingDetails = () => {
           <div className="shopAbout">
             <div className="aboutBlock">
               <div className="aboutIcon">
-                <LuGoal style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }} />
+                <LuGoal style={{ width: '70%', minWidth: '35px', height: '70%', maxHeight: '50px', maxWidth: '50px', margin: '8% 30%', borderRadius: '7px', objectFit: 'cover' }} />
               </div>
 
               <div className="aboutDesciption">
@@ -271,7 +322,7 @@ const ListingDetails = () => {
 
             <div className="aboutBlock">
               <div className="aboutIcon">
-                <FcBullish style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }} />
+                <FcBullish style={{ width: '70%', minWidth: '35px', height: '70%', maxHeight: '50px', maxWidth: '50px', margin: '8% 30%', borderRadius: '7px', objectFit: 'cover' }} />
 
               </div>
 
@@ -288,7 +339,7 @@ const ListingDetails = () => {
 
             <div className="aboutBlock">
               <div className="aboutIcon">
-                <FcExpired style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }} />
+                <FcExpired style={{ width: '70%', minWidth: '35px', height: '70%', maxHeight: '50px', maxWidth: '50px', margin: '8% 30%', borderRadius: '7px', objectFit: 'cover' }} />
 
               </div>
 
@@ -308,8 +359,8 @@ const ListingDetails = () => {
             </div>
 
             <div className="aboutBlock">
-              <div className="aboutIcon">
-                <img src={`http://localhost:3001/${listing.creator.profileImagePath.replace("public", "")}`} style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }} />
+              <div className="aboutIcon" style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <img src={`http://localhost:3001/${listing.creator.profileImagePath.replace("public", "")}`} style={{ width: '70%', minWidth: '35px', maxWidth: '50px', height: '70%', maxHeight: '50px', margin: '8% 30%', borderRadius: '7px', objectFit: 'cover' }} />
               </div>
 
               <div className="aboutDesciption">
@@ -324,7 +375,36 @@ const ListingDetails = () => {
             </div>
           </div>
         </div>
+
       </section>
+
+      {/* Share Button */}
+      <div
+        className="btnnn"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '200px',
+          padding: '10px',
+          border: '1px solid black',
+          borderRadius: '5px',
+          marginTop: '25px',
+          backgroundColor: '#fff',
+          cursor: 'pointer'
+        }}
+        onClick={() => setIsModalOpen(true)}
+      >
+        <FiShare2
+          className="shareBtn"
+          style={{
+            minWidth: '20px',
+            height: '20px',
+            marginRight: '8px'
+          }}
+        />
+        <p style={{ margin: 0 }}>Share Listing</p>
+      </div>
 
       <div className="listing-details">
         <div className="title">
@@ -390,7 +470,7 @@ const ListingDetails = () => {
               <h3 style={{ marginTop: '10px' }}>
                 Price per Share: {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
               </h3>
-              
+
               <div className="basic">
                 <div className="basic_count">
                   <RemoveCircleOutline
@@ -444,7 +524,7 @@ const ListingDetails = () => {
 
       <div className={`tab  ${activeTab === 'host' ? 'host' : 'hidden'}`}>
         {/* Profile Tab */}
-        <h2 style={{ paddingLeft: '-120px',   marginBottom: '30px' }}>Professional Details:</h2>
+        <h2 style={{ paddingLeft: '-120px', marginBottom: '30px' }}>Professional Details:</h2>
         <section id="profile" className="tabb"> {/* Changed hidden to inline style */}
           <div className="profileContent">
             <div className="verifiedProfile">
@@ -557,8 +637,8 @@ const ListingDetails = () => {
               onClick={handleCreateUpdate}
               style={{ justifyContent: 'center', textAlign: 'center', padding: '1%', fontSize: 'larger', fontWeight: 'bold', marginTop: '30px' }}
             >
-              
-              <AddCircle style={{fontSize: '100px', color: '#24355A'}}/>
+
+              <AddCircle style={{ fontSize: '100px', color: '#24355A' }} />
             </button>
           )}
         </div>

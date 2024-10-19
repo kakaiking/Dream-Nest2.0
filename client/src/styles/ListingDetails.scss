@@ -581,6 +581,135 @@ verifiedDatumTitle{
   width: 100%;
 }
 
+
+// --------------modal-----------------------------------------------------------------------------------------------------------
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  width: 65%;
+  height: 80%;
+  padding: 20px;
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.qr-code-container {
+  margin-bottom: 20px;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.downloadBtnnn{
+  padding: 10px 15px;
+  background-color: #F8395A;
+  border: none;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+  color: white;
+  border-radius: 10px;
+}
+
+.link-container {
+  width: 70%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  border: 1px solid black;
+  padding: 10px;
+  border-radius: 50px;
+  position: relative;
+  overflow: hidden; /* Ensure overflow is hidden */
+}
+
+.link-container input {
+  border: 0;
+  font-size: medium;
+  width: calc(100% - 130px); /* Adjust width to avoid overlap */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Truncate overflowing text with ellipsis */
+}
+
+.copyBtnnn {
+  padding: 5px 15px;
+  width: 120px;
+  height: 30px;
+  background-color: #F8395A;
+  border: none;
+  font-size: medium;
+  cursor: pointer;
+  transition: 0.3s ease;
+  color: white;
+  border-radius: 10px;
+  margin-left: 10px;
+  z-index: 1; /* Ensure button stays above divider */
+}
+
+.vertical-divider {
+  position: absolute;
+  top: 10px;
+  right: 130px; /* Adjust position to align before 'Copy Link' */
+  width: 1px;
+  height: calc(100% - 20px);
+  background-color: black;
+  opacity: 0.3;
+}
+
+
+.share-buttons button {
+  margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #3b5998;
+  color: white;
+}
+
+.btnnn{
+  position: relative;
+  left: 40px;
+  box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.2);
+
+}
+
+.btnnn:hover{
+  cursor: pointer;
+}
+
+.shareBtn:hover{
+ cursor: pointer;
+}
+
+
 @media only screen and (max-width: 600px) {
   .navbar-toggler-icon {
     height: 30px;
@@ -703,7 +832,8 @@ verifiedDatumTitle{
   }
 
   .listing-details {
-    height: 300px;
+    height: 270px;
+    // background-color: red;
   }
 
   .tab {

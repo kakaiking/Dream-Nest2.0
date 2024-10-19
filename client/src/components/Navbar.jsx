@@ -1,10 +1,9 @@
-import { IconButton } from "@mui/material";
-import { Search, Person, Menu } from "@mui/icons-material";
+import { Person, Menu } from "@mui/icons-material";
 import variables from "../styles/variables.scss";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import "../styles/Navbar.scss";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { setLogout } from "../redux/state";
 import {jwtDecode} from "jwt-decode";
 
@@ -13,8 +12,7 @@ const Navbar = () => {
   const [dropdownMenu, setDropdownMenu] = useState(false);
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const [search, setSearch] = useState("");
-  const navigate = useNavigate();
+
 
   // Check if user is admin
   const token = useSelector((state) => state.token);
@@ -23,27 +21,10 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <a href="/">
-        <img src="/assets/logo.png" alt="logo" />
+      <a href="/" style={{textDecoration: 'none', color: '#24355A'}} >
+        {/* <img src="/assets/muamanaLogo.jpg" alt="logo" style={{borderRadius: '7px', height: '50px', width: '50px'}}/> */}
+        <h1>Muamana</h1>
       </a>
-
-      <div className="navbar_search">
-        <input
-          type="text"
-          placeholder="Search ..."
-          value={search}
-          style={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <IconButton disabled={search === ""}>
-          <Search
-            sx={{ color: variables.pinkred }}
-            onClick={() => {
-              navigate(`/properties/search/${search}`);
-            }}
-          />
-        </IconButton>
-      </div>
 
       <div className="navbar_right">
         {user ? (
