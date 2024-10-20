@@ -34,6 +34,10 @@ const ListingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    totalShares: {
+      type: Number,
+      required: true,
+    },
     shares: {
       type: Number,
       required: true,

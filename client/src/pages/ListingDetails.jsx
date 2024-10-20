@@ -64,7 +64,7 @@ const ListingDetails = () => {
       const data = await response.json();
       console.log("Received data:", data);
       setListing(data);
-      setPricePerShare(data.target / data.shares);
+      setPricePerShare(data.target / data.totalShares);
       setListingTitle(data.title)
       setCustomerReturns(data.returns)
       setHostEmail(data.creator.email)
@@ -72,7 +72,7 @@ const ListingDetails = () => {
 
       // Calculate price per share only if listing.target is available
       if (data && data.target) {
-        setPricePerShare(data.target / data.shares);
+        setPricePerShare(data.target / data.totalShares);
       }
 
       setLoading(false);
@@ -465,7 +465,7 @@ const ListingDetails = () => {
               <h3>
                 {'Target: ksh. ' + listing.target.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
               </h3>
-              <h3>Total Listing Shares: {listing.shares}</h3>
+              <h3>Total Listing Shares: {listing.totalShares}</h3>
               <h3>Remaining shares: {listing.shares - guestCount}</h3>
               <h3 style={{ marginTop: '10px' }}>
                 Price per Share: {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}

@@ -76,6 +76,7 @@ const CreateListing = () => {
       listingForm.append("returns", formLocation.returns);
       listingForm.append("paymentDates", formLocation.paymentDates);
       listingForm.append("target", formLocation.target);
+      listingForm.append("totalShares", formLocation.shares);
       listingForm.append("shares", formLocation.shares);
       listingForm.append("title", formDescription.title);
       listingForm.append("description", formDescription.description);
