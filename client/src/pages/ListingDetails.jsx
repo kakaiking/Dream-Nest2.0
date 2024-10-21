@@ -25,7 +25,7 @@ import {
   FaFacebook, FaWhatsapp, FaLinkedin, FaTelegram
 } from 'react-icons/fa';
 import { FaSquareXTwitter } from "react-icons/fa6";
-
+import { SlUserFollow } from "react-icons/sl";
 
 import { FiShare2 } from "react-icons/fi";
 
@@ -48,6 +48,10 @@ const ListingDetails = () => {
   const [customerName, setCustomerName] = useState("")
   const [customerReturns, setCustomerReturns] = useState("")
   const [updates, setUpdates] = useState([]);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
+
+
 
 
   const getListingDetails = async () => {
@@ -92,6 +96,41 @@ const ListingDetails = () => {
     setCustomerEmail(user.email);
     setCustomerName(`${user.firmName} `);
   }, []);
+
+  const checkFollowStatus = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/properties/follow-status/${user._id}/${listingId}`
+      );
+      const data = await response.json();
+      setIsFollowing(data.isFollowing);
+      setFollowersCount(data.followersCount);
+    } catch (err) {
+      console.error("Failed to fetch follow status:", err);
+    }
+  };
+
+  const toggleFollow = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/properties/follow/${user._id}/${listingId}`,
+        { method: "PATCH" }
+      );
+      const data = await response.json();
+      setIsFollowing(data.isFollowing);
+      setFollowersCount(data.followersCount);
+    } catch (err) {
+      console.error("Failed to toggle follow status:", err);
+    }
+  };
+
+
+  useEffect(() => {
+    if (user && listingId) {
+      checkFollowStatus();
+    }
+  }, [user, listingId]);
+
 
   const downloadQRCode = async () => {
     const canvas = await html2canvas(qrRef.current);
@@ -273,7 +312,7 @@ const ListingDetails = () => {
                   readOnly
                   style={{ width: "80%" }}
                 />
-                
+
                 <div className="vertical-divider"></div> {/* Vertical Divider */}
                 <button className="copyBtnnn" onClick={copyToClipboard}>Copy Link</button>
               </div>
@@ -404,6 +443,35 @@ const ListingDetails = () => {
           }}
         />
         <p style={{ margin: 0 }}>Share Listing</p>
+      </div>
+
+      {/* Follow Button */}
+      <div
+        className="btnnn"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '200px',
+          padding: '10px',
+          border: '1px solid black',
+          borderRadius: '5px',
+          marginTop: '25px',
+          backgroundColor: '#fff',
+          cursor: 'pointer'
+        }}
+        onClick={toggleFollow}
+      >
+        <SlUserFollow 
+          className={`follow-btn ${isFollowing ? 'unfollow' : 'follow'}`}
+          style={{
+            minWidth: '20px',
+            height: '20px',
+            marginRight: '8px'
+          }}
+        />
+    
+      <p>{isFollowing ? 'Unfollow' : 'Follow'} [{followersCount}]</p>
       </div>
 
       <div className="listing-details">

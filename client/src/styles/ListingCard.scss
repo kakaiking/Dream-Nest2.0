@@ -98,6 +98,31 @@
   }
 }
 
+.card-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.follow-button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background: #c33764;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: #a02e53;
+  }
+}
+
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 400px) {
   .listing-card{

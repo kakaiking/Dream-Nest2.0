@@ -63,6 +63,11 @@ const ListingSchema = new mongoose.Schema(
       enum: ['notFiled', 'filed'],
       default: 'notFiled',
     },
+    followedBy: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: []
+    }],
   },
   { timestamps: true}
 )

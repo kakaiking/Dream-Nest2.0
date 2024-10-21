@@ -80,6 +80,84 @@ router.post("/create", upload.array("listingPhotos"), async (req, res) => {
   }
 });
 
+/* TOGGLE FOLLOW STATUS */
+router.patch("/follow/:userId/:listingId", async (req, res) => {
+  try {
+    const { userId, listingId } = req.params;
+    const listing = await Listing.findById(listingId);
+    const user = await User.findById(userId);
+
+    if (!listing || !user) {
+      return res.status(404).json({ message: "Listing or user not found" });
+    }
+
+    const isFollowing = listing.followedBy.includes(userId);
+
+    if (isFollowing) {
+      // Unfollow
+      listing.followedBy = listing.followedBy.filter(
+        (id) => id.toString() !== userId
+      );
+    } else {
+      // Follow
+      listing.followedBy.push(userId);
+    }
+
+    await listing.save();
+    
+    res.status(200).json({
+      success: true,
+      isFollowing: !isFollowing,
+      followersCount: listing.followedBy.length
+    });
+  } catch (err) {
+    console.error("Error in follow toggle:", err);
+    res.status(400).json({ message: "Failed to update follow status", error: err.message });
+  }
+});
+
+/* CHECK FOLLOW STATUS */
+router.get("/follow-status/:userId/:listingId", async (req, res) => {
+  try {
+    const { userId, listingId } = req.params;
+    const listing = await Listing.findById(listingId);
+
+    if (!listing) {
+      return res.status(404).json({ message: "Listing not found" });
+    }
+
+    const isFollowing = listing.followedBy.includes(userId);
+    
+    res.status(200).json({
+      isFollowing,
+      followersCount: listing.followedBy.length
+    });
+  } catch (err) {
+    console.error("Error in follow status check:", err);
+    res.status(400).json({ message: "Failed to check follow status", error: err.message });
+  }
+});
+
+/* GET FOLLOWED LISTINGS */
+router.get("/followed/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Find all listings where the userId is in the followedBy array
+    const followedListings = await Listing.find({
+      followedBy: userId
+    }).populate("creator");
+
+    res.status(200).json(followedListings);
+  } catch (err) {
+    console.error("Error fetching followed listings:", err);
+    res.status(400).json({ 
+      message: "Failed to fetch followed listings", 
+      error: err.message 
+    });
+  }
+});
+
 
 /* GET lISTINGS BY CATEGORY */
 router.get("/", async (req, res) => {

@@ -79,42 +79,6 @@ router.get("/:userId/trips", async (req, res) => {
   }
 })
 
-/* ADD LISTING TO USER'S WISHLIST */
-router.patch("/:userId/:listingId", async (req, res) => {
-  try {
-    const { userId, listingId } = req.params;
-
-    // console.log(UserId: ${userId}, ListingId: ${listingId}); // Log IDs
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const listingExists = await Listing.exists({ _id: listingId });
-    if (!listingExists) {
-      return res.status(404).json({ message: "Listing not found" });
-    }
-
-    const favoriteListing = user.wishList.includes(listingId);
-    // console.log(Favorite Listing Exists: ${favoriteListing}); // Log wishlist state
-
-    if (favoriteListing) {
-      user.wishList = user.wishList.filter((id) => id.toString() !== listingId);
-      await user.save();
-      return res.status(200).json({ message: "Listing removed", wishList: user.wishList });
-    } else {
-      user.wishList.push(listingId);
-      await user.save();
-      return res.status(200).json({ message: "Listing added", wishList: user.wishList });
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-});
-
-
 
 
 
