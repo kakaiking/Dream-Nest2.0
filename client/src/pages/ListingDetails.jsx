@@ -417,61 +417,71 @@ const ListingDetails = () => {
 
       </section>
 
-      {/* Share Button */}
-      <div
-        className="btnnn"
+      {/* Follow and Share Buttons */}
+      <div className="btnnns"
         style={{
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '200px',
-          padding: '10px',
-          border: '1px solid black',
-          borderRadius: '5px',
-          marginTop: '25px',
-          backgroundColor: '#fff',
-          cursor: 'pointer'
+          flexDirection: 'row'
         }}
-        onClick={() => setIsModalOpen(true)}
       >
-        <FiShare2
-          className="shareBtn"
+        {/* Follow Button */}
+        <div
+          className="btnnn"
           style={{
-            minWidth: '20px',
-            height: '20px',
-            marginRight: '8px'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '200px',
+            padding: '10px',
+            border: '1px solid black',
+            borderRadius: '5px',
+            marginTop: '25px',
+            marginRight: '15px',
+            backgroundColor: '#fff',
+            cursor: 'pointer'
           }}
-        />
-        <p style={{ margin: 0 }}>Share Listing</p>
-      </div>
+          onClick={toggleFollow}
+        >
+          <SlUserFollow
+            className={`follow-btn ${isFollowing ? 'unfollow' : 'follow'}`}
+            style={{
+              minWidth: '20px',
+              height: '20px',
+              marginRight: '8px'
+            }}
+          />
 
-      {/* Follow Button */}
-      <div
-        className="btnnn"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '200px',
-          padding: '10px',
-          border: '1px solid black',
-          borderRadius: '5px',
-          marginTop: '25px',
-          backgroundColor: '#fff',
-          cursor: 'pointer'
-        }}
-        onClick={toggleFollow}
-      >
-        <SlUserFollow 
-          className={`follow-btn ${isFollowing ? 'unfollow' : 'follow'}`}
+          <h3>{isFollowing ? 'Unfollow' : 'Follow'} [{followersCount}]</h3>
+        </div>
+        {/* Share Button */}
+        <div
+          className="btnnn"
           style={{
-            minWidth: '20px',
-            height: '20px',
-            marginRight: '8px'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '200px',
+            padding: '10px',
+            border: '1px solid black',
+            borderRadius: '5px',
+            marginTop: '25px',
+            backgroundColor: '#fff',
+            cursor: 'pointer'
           }}
-        />
-    
-      <p>{isFollowing ? 'Unfollow' : 'Follow'} [{followersCount}]</p>
+          onClick={() => setIsModalOpen(true)}
+        >
+          <FiShare2
+            className="shareBtn"
+            style={{
+              minWidth: '20px',
+              height: '20px',
+              marginRight: '8px'
+            }}
+          />
+          <h3 style={{ margin: 0 }}>Share Listing</h3>
+        </div>
+
+
       </div>
 
       <div className="listing-details">
