@@ -425,6 +425,7 @@ const ListingDetails = () => {
         }}
       >
         {/* Follow Button */}
+        {user?._id !== listing.creator._id && (
         <div
           className="btnnn"
           style={{
@@ -453,6 +454,8 @@ const ListingDetails = () => {
 
           <h3>{isFollowing ? 'Unfollow' : 'Follow'} [{followersCount}]</h3>
         </div>
+        )}
+        
         {/* Share Button */}
         <div
           className="btnnn"
@@ -480,9 +483,8 @@ const ListingDetails = () => {
           />
           <h3 style={{ margin: 0 }}>Share Listing</h3>
         </div>
-
-
       </div>
+
 
       <div className="listing-details">
         <div className="title">
