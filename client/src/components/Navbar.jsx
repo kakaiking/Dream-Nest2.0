@@ -5,7 +5,8 @@ import { useSelector, useDispatch } from "react-redux";
 import "../styles/Navbar.scss";
 import { Link } from "react-router-dom";
 import { setLogout } from "../redux/state";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+import { HiOutlineBellAlert } from "react-icons/hi2";
 
 
 const Navbar = () => {
@@ -21,16 +22,24 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <a href="/" style={{textDecoration: 'none', color: '#24355A'}} >
+      <a href="/" style={{ textDecoration: 'none', color: '#24355A' }} >
         {/* <img src="/assets/muamanaLogo.jpg" alt="logo" style={{borderRadius: '7px', height: '50px', width: '50px'}}/> */}
         <h1>Muamana</h1>
       </a>
 
       <div className="navbar_right">
         {user ? (
-          <a href="/create-listing" className="host">
-            Start A Funding Project
-          </a>
+          <>
+            <a href="/create-listing" className="host">
+              Start A Funding Project
+            </a>
+            <div className="notiButton" style={{width: '50px'}}>
+            <Link to={`/${user._id}/notifications`}>
+              <HiOutlineBellAlert style={{width: '35%', minWidth: '35px', height: '35%', margin: '8% 20%', borderRadius: '7px', objectFit: 'cover' , color: '#24355A'}}/>
+            </Link>
+            </div>
+            
+          </>
         ) : (
           <a href="/login" className="host">
             Start A Funding Project
@@ -71,7 +80,7 @@ const Navbar = () => {
             <Link to={`/${user._id}/properties`}>My Hosted Projects</Link>
             <Link to={`/${user._id}/wishList`}>Following</Link>
             <Link to={`/${user._id}/details`}>My Profile</Link>
-            <Link to="/create-listing">Host A Project</Link> 
+            <Link to="/create-listing">Host A Project</Link>
             <hr />
             <Link to={`/${user._id}/fileReturns`}>File Returns</Link>
             <Link to={`/${user._id}/return-logs`}>Returns Logs</Link>
