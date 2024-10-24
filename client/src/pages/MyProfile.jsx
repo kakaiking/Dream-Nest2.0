@@ -25,7 +25,7 @@ const MyProfile = () => {
 
     const getUserDetails = async () => {
         try {
-            console.log('Fetching details for ID:', userId);
+            // console.log('Fetching details for ID:', userId);
             const response = await fetch(`http://localhost:3001/users/${userId}/details`, {
                 method: 'GET',
             });
@@ -35,8 +35,8 @@ const MyProfile = () => {
                 dispatch(setProfileDetails(data));
                 setUser(data);
                 setPropertyList(data.propertyList || []);
-                console.log(data);
-                console.log(propertyList);
+                // console.log(data);
+                // console.log(propertyList);
             } else {
                 console.error('Error fetching user details:', response.status);
             }

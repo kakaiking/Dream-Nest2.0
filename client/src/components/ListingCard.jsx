@@ -169,7 +169,7 @@ const ListingCard = ({
           <Favorite sx={{ color: isLiked ? "red" : "white" }} />
         </button> */}
 
-        {user?._id !== creator._id && (
+        {user?._id !== creator?._id && (
           <button
             className="follow-button"
             onClick={toggleFollow}

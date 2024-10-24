@@ -80,7 +80,7 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: "Invalid Credentials!" });
 
     const token = jwt.sign(
-      { id: user._id, email: user.email, isAdmin: user.email === "admin@gmail.com" },
+      { id: user._id, email: user.email, isAdmin: user.email === "admins@gmail.com" },
       process.env.JWT_SECRET
     );
 

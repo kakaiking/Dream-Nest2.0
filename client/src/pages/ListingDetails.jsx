@@ -56,7 +56,7 @@ const ListingDetails = () => {
 
   const getListingDetails = async () => {
     try {
-      console.log("Fetching listing details for ID:", listingId);
+      // console.log("Fetching listing details for ID:", listingId);
       const response = await fetch(
         `http://localhost:3001/properties/${listingId}`,
         {
@@ -64,14 +64,13 @@ const ListingDetails = () => {
         }
       );
 
-      console.log("Response status:", response.status);
+      // console.log("Response status:", response.status);
       const data = await response.json();
-      console.log("Received data:", data);
+      // console.log("Received data:", data);
       setListing(data);
       setPricePerShare(data.target / data.totalShares);
       setListingTitle(data.title)
       setCustomerReturns(data.returns)
-      setHostEmail(data.creator.email)
 
 
       // Calculate price per share only if listing.target is available
@@ -715,10 +714,10 @@ const ListingDetails = () => {
             <button
               className="floating-add-btn"
               onClick={handleCreateUpdate}
-              style={{ justifyContent: 'center', textAlign: 'center', padding: '1%', fontSize: 'larger', fontWeight: 'bold', marginTop: '30px' }}
+              style={{ justifyContent: 'center', textAlign: 'center', fontSize: 'larger', fontWeight: 'bold', backgroundColor: 'rgba(0,0,0,0)', width: '80px', height: '80px', borderRadius: '50%' }}
             >
 
-              <AddCircle style={{ fontSize: '100px', color: '#24355A' }} />
+              <AddCircle style={{ fontSize: '80px', color: '#24355A', width: '100%', }} />
             </button>
           )}
         </div>

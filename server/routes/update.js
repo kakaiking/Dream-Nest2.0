@@ -63,7 +63,7 @@ router.post("/create", authMiddleware, upload.array('supportingDocuments', 5), a
     res.status(200).json(savedUpdate);
   } catch (err) {
     console.log(err);
-    res.status(409).json({ message: "Failed to create update", error: err.message });
+    res.status(409).json({ message: err.message });
   }
 });
 

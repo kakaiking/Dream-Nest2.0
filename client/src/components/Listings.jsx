@@ -78,6 +78,7 @@ const Listings = () => {
               booking = false
             }) => (
               <ListingCard
+              key={_id}
                 listingId={_id}
                 title={title}
                 creator={creator}

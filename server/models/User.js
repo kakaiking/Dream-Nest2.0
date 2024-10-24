@@ -57,7 +57,7 @@ const UserSchema = new mongoose.Schema(
     verified: {
       type: String,
       enum: ["notVerified", "verified", "rejected"],
-      default: "",
+      default: "notVerified",
     },
     tripList: {
       type: Array,

@@ -1,0 +1,18 @@
+{
+    "name": "Muamana",
+    "short_name": "Muamana",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#000000",
+    "description": "Web site created using create-react-app",
+    "icons": [
+      {
+        
+      },
+      {
+
+      }
+    ]
+  }
+  
