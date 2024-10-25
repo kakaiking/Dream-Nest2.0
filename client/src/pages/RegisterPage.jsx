@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import "../styles/Register.scss";
 import { LuUpload } from "react-icons/lu";
-
+import { AiFillFileText } from "react-icons/ai"; // Document Icon
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +33,9 @@ const RegisterPage = () => {
   const [passwordMatch, setPasswordMatch] = useState(true);
 
   useEffect(() => {
-    setPasswordMatch(formData.password === formData.confirmPassword || formData.confirmPassword === "");
+    setPasswordMatch(
+      formData.password === formData.confirmPassword || formData.confirmPassword === ""
+    );
   }, [formData.password, formData.confirmPassword]);
 
   const navigate = useNavigate();
@@ -122,6 +124,36 @@ const RegisterPage = () => {
             />
           )}
 
+          <div className="document-upload">
+            <label htmlFor="krapin">
+              <AiFillFileText size={50} />
+              <p>{formData.kraPin ? formData.kraPin.name : "Upload your KRA Pin"}</p>
+            </label>
+            <input
+              id="krapin"
+              type="file"
+              name="kraPin"
+              style={{ display: "none" }}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="document-upload">
+            <label htmlFor="businessCert">
+              <AiFillFileText size={50} />
+              <p>{formData.businessCertificate ? formData.businessCertificate.name : "Upload your Business Certificate"}</p>
+            </label>
+            <input
+              id="businessCert"
+              type="file"
+              name="businessCertificate"
+              style={{ display: "none" }}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
           <input
             placeholder="Firm Name"
             name="firmName"
@@ -130,17 +162,6 @@ const RegisterPage = () => {
             onChange={handleChange}
             required
           />
-          <label htmlFor="krapin">
-          <LuUpload  />
-            Upload your KRA Pin
-          </label>
-          <input id='krapin' type="file" name="kraPin" placeholder="KRA Pin" onChange={handleChange} required />
-
-          <label htmlFor="businessCert">
-          <LuUpload  />
-            Upload your Business Certificate
-          </label>
-          <input id='businessCert' type="file" name="businessCertificate" placeholder="Business Certificate" onChange={handleChange} required />
 
           <input
             placeholder="Year Started"
@@ -151,7 +172,7 @@ const RegisterPage = () => {
             required
           />
           <input
-            placeholder="CMA Lisence"
+            placeholder="CMA License"
             name="cmaLicenseNumber"
             value={formData.cmaLicenseNumber}
             onChange={handleChange}
@@ -185,14 +206,10 @@ const RegisterPage = () => {
             value={formData.phoneNumber}
             onChange={handleChange}
           />
-          {/* <input
-            placeholder="Physical Address(P.O BOX 25749-00603, Nairobi)"
-            name="physicalAddress"
-            value={formData.physicalAddress}
-            onChange={handleChange}
-            type="text"
-          /> */}
-          <button type="submit" disabled={!passwordMatch}>REGISTER</button>
+
+          <button type="submit" disabled={!passwordMatch}>
+            REGISTER
+          </button>
         </form>
         <a href="/login">Already have an account? Log In Here</a>
       </div>

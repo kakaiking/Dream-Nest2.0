@@ -5,6 +5,8 @@ import Navbar from '../components/Navbar';
 import { useSelector } from 'react-redux';
 import Listings from '../components/Listings'; // Import Listings component
 import Loader from '../components/Loader';
+import { IoDocumentTextOutline } from "react-icons/io5";
+
 
 const AdminPage = () => {
   const [users, setUsers] = useState([]);
@@ -75,6 +77,13 @@ const AdminPage = () => {
       console.error('Error updating user status:', error);
     }
   };
+
+  const stripHtmlTags = (html) => {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    return tempDiv.textContent || tempDiv.innerText || '';
+  };
+  
 
   // Helper function to remove 'public' from the path
   const getDocumentPath = (path) => path?.replace(/^\/?public/, '') || '';
@@ -226,11 +235,38 @@ const AdminPage = () => {
   const renderUpdates = () =>
     filterUpdates().map(update => (
       <div key={update._id} className="update-card" style={{ marginBottom: '40px' }}>
-        <strong>Title:</strong> {update.title} <br />
-        <strong>Description:</strong> {update.description} <br />
-        <strong>Created At:</strong> {new Date(update.createdAt).toLocaleString()} <br />
-        <strong>Updated At:</strong> {new Date(update.updatedAt).toLocaleString()} <br />
-      </div>
+      <strong>Title:</strong> {update.title} <br />
+      <strong>Project:</strong> {update.listing.title} <br />
+      <strong>Host:</strong> {update.listing.creator.firmName} <br />
+      <strong>Description:</strong> {stripHtmlTags(update.description)} <br />
+
+      <div className="supportDocs">
+            <div className="supportTitle" style={{ width: '65%', margin: "0 auto 20px auto", textAlign: "center" }}>
+              <h3><u>Supporting Documents:</u></h3>
+            </div>
+            {update.supportingDocuments && update.supportingDocuments.length > 0 ? (
+              <div className="doc-cards">
+                {update.supportingDocuments.map((doc, index) => (
+                  <div className="doc-card" key={index}>
+                    <a href={`http://localhost:3001/uploads/${doc.fileUrl}`} target="_blank" rel="noopener noreferrer">
+                      <div className="doc-icon">
+                        <IoDocumentTextOutline />
+                      </div>
+                      <div className="doc-name">
+                        {doc.fileName}
+                      </div>
+                    </a>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No supporting documents available.</p>
+            )}
+          </div>
+
+      <strong>Created At:</strong> {new Date(update.createdAt).toLocaleString()} <br />
+      <strong>Updated At:</strong> {new Date(update.updatedAt).toLocaleString()} <br />
+    </div>
     ));
 
   return (

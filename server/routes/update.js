@@ -20,7 +20,12 @@ const upload = multer({ storage: storage });
 // Get all updates (new route)
 router.get('/', async (req, res) => {
   try {
-    const updates = await Update.find().populate('listing');
+    const updates = await Update.find()
+    .populate({
+      path: 'listing',
+      populate: { path: 'creator', select: 'firmName' } // Nested populate
+    });
+    
     res.status(200).json(updates);
   } catch (err) {
     console.log(err);
