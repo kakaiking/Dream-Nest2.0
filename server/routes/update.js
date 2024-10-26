@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
     const updates = await Update.find()
     .populate({
       path: 'listing',
-      populate: { path: 'creator', select: 'firmName' } // Nested populate
+      populate: { path: 'creator', select: 'firmName profileImagePath'  } // Nested populate
     });
     
     res.status(200).json(updates);
