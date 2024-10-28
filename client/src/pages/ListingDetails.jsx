@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import "../styles/ListingDetails.scss";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { RemoveCircleOutline, AddCircleOutline, AddCircle } from "@mui/icons-material";
 
 import "react-date-range/dist/styles.css";
@@ -425,36 +425,36 @@ const ListingDetails = () => {
       >
         {/* Follow Button */}
         {user?._id !== listing.creator._id && (
-        <div
-          className="btnnn"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '200px',
-            padding: '10px',
-            border: '1px solid black',
-            borderRadius: '5px',
-            marginTop: '25px',
-            marginRight: '15px',
-            backgroundColor: '#fff',
-            cursor: 'pointer'
-          }}
-          onClick={toggleFollow}
-        >
-          <SlUserFollow
-            className={`follow-btn ${isFollowing ? 'unfollow' : 'follow'}`}
+          <div
+            className="btnnn"
             style={{
-              minWidth: '20px',
-              height: '20px',
-              marginRight: '8px'
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '200px',
+              padding: '10px',
+              border: '1px solid black',
+              borderRadius: '5px',
+              marginTop: '25px',
+              marginRight: '15px',
+              backgroundColor: '#fff',
+              cursor: 'pointer'
             }}
-          />
+            onClick={toggleFollow}
+          >
+            <SlUserFollow
+              className={`follow-btn ${isFollowing ? 'unfollow' : 'follow'}`}
+              style={{
+                minWidth: '20px',
+                height: '20px',
+                marginRight: '8px'
+              }}
+            />
 
-          <h3>{isFollowing ? 'Unfollow' : 'Follow'} [{followersCount}]</h3>
-        </div>
+            <h3>{isFollowing ? 'Unfollow' : 'Follow'} [{followersCount}]</h3>
+          </div>
         )}
-        
+
         {/* Share Button */}
         <div
           className="btnnn"
@@ -677,6 +677,12 @@ const ListingDetails = () => {
                     <h3 className="countryName">{listing.creator.physical}</h3>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <div className="moreDetailsBtn">
+              <div className="moreDetailsBt" style={{ width: '220px', margin: '0 auto' }}>
+                <Link to={`/${user._id}/details`} className= "moreDetailsBtnn" style={{textDecoration: 'none', color: 'white' , height: '100%', width: '100%'}}> Show More Details</Link>
               </div>
             </div>
           </div>
