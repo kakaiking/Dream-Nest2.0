@@ -169,23 +169,23 @@ const AdminPage = () => {
           <div className="userBtns" style={{ marginTop: '10px' }}>
             <button
               className="button"
-              onClick={() => updateUserStatus(user._id, 'verified')}
-              disabled={user.verified === 'verified'}
+              onClick={() => updateUserStatus(user._id, 'Verified')}
+              disabled={user.verified === 'Verified'}
               style={{ marginRight: '10px', marginBottom: '10px' }}
             >
               Verify
             </button>
             <button
               className="button reject-button"
-              onClick={() => updateUserStatus(user._id, 'rejected')}
-              disabled={user.verified === 'rejected'}
+              onClick={() => updateUserStatus(user._id, 'Rejected')}
+              disabled={user.verified === 'Rejected'}
             >
               Reject
             </button>
             <button
               className="button revert-button"
-              onClick={() => updateUserStatus(user._id, 'notVerified')}
-              disabled={user.verified === 'notVerified'}
+              onClick={() => updateUserStatus(user._id, 'Pending Verification')}
+              disabled={user.verified === 'Pending Verification'}
               style={{ marginTop: '10px' }}
             >
               Revert Verification

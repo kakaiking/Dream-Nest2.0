@@ -682,7 +682,7 @@ const ListingDetails = () => {
 
             <div className="moreDetailsBtn">
               <div className="moreDetailsBt" style={{ width: '220px', margin: '0 auto' }}>
-                <Link to={`/${user._id}/details`} className= "moreDetailsBtnn" style={{textDecoration: 'none', color: 'white' , height: '100%', width: '100%'}}> Show More Details</Link>
+                <Link to={`/${listing.creator._id}/details`} className= "moreDetailsBtnn" style={{textDecoration: 'none', color: 'white' , height: '100%', width: '100%'}}> Show More Details</Link>
               </div>
             </div>
           </div>

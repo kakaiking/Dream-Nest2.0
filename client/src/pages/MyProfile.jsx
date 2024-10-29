@@ -48,24 +48,44 @@ const MyProfile = () => {
         }
     };
 
+    const getPropertyList = async () => {
+        try {
+            const response = await fetch(`http://localhost:3001/users/${userId}/properties`, {
+                method: "GET"
+            })
+            const data = await response.json()
+            // console.log(data)
+            dispatch(setPropertyList(data))
+            setLoading(false)
+        } catch (err) {
+            console.log( err.message)
+        }
+    }
 
+    useEffect(() => {
+        getPropertyList()
+    }, [])
 
     useEffect(() => {
         getUserDetails();
     }, [userId]);
 
-    const [activeTab, setActiveTab] = useState('one');
-
+    const [activeTab, setActiveTab] = useState('description');
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
     };
+
+
+    // Helper function to remove 'public' from the path
+    const getDocumentPath = (path) => path?.replace(/^\/?public/, '') || '';
+
     return (
         <div>{loading ? (
             <Loader /> // Replace with your loading spinner or message
         ) : (
             <div>
-                <Navbar /> 
+                <Navbar />
 
                 {/* <!-- Shop Info --> */}
                 <section id="shopInfo">
@@ -81,7 +101,7 @@ const MyProfile = () => {
                             <div className="shopAbout">
                                 <div className="aboutBlock">
                                     <div className="aboutIcon">
-                                    <FaPeoplePulling style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }}/>
+                                        <FaPeoplePulling style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }} />
                                     </div>
 
                                     <div className="aboutDesciption">
@@ -97,7 +117,7 @@ const MyProfile = () => {
 
                                 <div className="aboutBlock">
                                     <div className="aboutIcon">
-                                    <FaBuildingColumns style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }}/>
+                                        <FaBuildingColumns style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }} />
                                     </div>
 
                                     <div className="aboutDesciption">
@@ -113,7 +133,7 @@ const MyProfile = () => {
 
                                 <div className="aboutBlock">
                                     <div className="aboutIcon">
-                                    <IoIosMail style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }}/>
+                                        <IoIosMail style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }} />
                                     </div>
 
                                     <div className="aboutDesciption">
@@ -131,7 +151,7 @@ const MyProfile = () => {
 
                                 <div className="aboutBlock">
                                     <div className="aboutIcon">
-                                    <LuPhone style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }}/>
+                                        <LuPhone style={{ width: '70%', minWidth: '35px', height: '70%', margin: '8%', borderRadius: '7px', objectFit: 'cover' }} />
                                     </div>
 
                                     <div className="aboutDesciption">
@@ -149,15 +169,39 @@ const MyProfile = () => {
                     </div>
                 </section>
 
-                <div className={`tab`} style={{marginTop: '30px'}}>
+                {/* <!-- Toggle Shop nav --> */}
+                <section id="toggleShop">
+                    <div className="toggleBtns">
+                        <button
+                            id="ProductsHeader"
+                            className={`header-btn toggleHeaderProducts ${activeTab === 'description' ? 'toggleHeaderBorder' : ''}`}
+                            onClick={() => handleTabChange('description')}
+                        >Info</button>
+
+                        <button
+                            id="ProductsHeader"
+                            className={`header-btn toggleHeaderProducts ${activeTab === 'projects' ? 'toggleHeaderBorder' : ''}`}
+                            onClick={() => handleTabChange('projects')}
+                        >Projects</button>
+
+                        <button
+                            className={`header-btn toggleHeaderProducts ${activeTab === 'following' ? 'toggleHeaderBorder' : ''}`}
+                            onClick={() => handleTabChange('following')}
+                        >Following</button>
+
+                    </div>
+
+                </section>
+
+                <div className={`tabProfile ${activeTab === 'description' ? 'description' : 'hidden'}`} style={{}}>
                     {/* Profile Tab */}
-                    <section id="profile" > {/* Changed hidden to inline style */}
-                        <div className="profileContent">
-                            <div className="verifiedProfile">
+                    <section id="profileMy" > {/* Changed hidden to inline style */}
+                        <div className="profileContentMy">
+                            <div className="verifiedProfileMy">
                                 <div className="verifiedProfileHeader">
                                     <h1>{user.verified}</h1>
                                 </div>
-                                
+
                                 <div className="verifiedProfileData">
                                     <div className="verifiedDatum">
                                         <div className="verifiedDatumTitle">
@@ -228,12 +272,77 @@ const MyProfile = () => {
                                             <h3 className="countryName">{user.physical}</h3>
                                         </div>
                                     </div>
+
+                                </div>
+
+                                <div className="supportDocs">
+                                    <div className="supportTitle" style={{ width: '65%', margin: '0 auto 20px auto', textAlign: 'center' }}>
+                                        <h3><u>User Documents:</u></h3>
+                                    </div>
+                                    <div className="doc-cards">
+                                        <div className="doc-card">
+                                            <a
+                                                href={`http://localhost:3001${getDocumentPath(user.kraPinPath)}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <div className="doc-icon">📄</div>
+                                                <div className="doc-name">KRA PIN</div>
+                                            </a>
+                                        </div>
+                                        <div className="doc-card">
+                                            <a
+                                                href={`http://localhost:3001${getDocumentPath(user.businessCertificatePath)}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <div className="doc-icon">📄</div>
+                                                <div className="doc-name">Business Certificate</div>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </section>
                 </div>
 
+                <div className={`tab ${activeTab === 'projects' ? 'projects' : 'hidden'}`}>
+                    <div className="list">
+                        {propertyList.map(
+                            ({
+                                _id,
+                                creator,
+                                title,
+                                bidExpiry,
+                                financialInstruments,
+                                returns,
+                                category,
+                                type,
+                                target,
+                                highlightDesc,
+                                booking = false
+                            }) => (
+                                <ListingCard
+                                    listingId={_id}
+                                    title={title}
+                                    creator={creator}
+                                    bidExpiry={bidExpiry}
+                                    financialInstruments={financialInstruments}
+                                    returns={returns}
+                                    category={category}
+                                    type={type}
+                                    target={target}
+                                    highlightDesc={highlightDesc}
+                                    booking={booking}
+                                />
+                            )
+                        )}
+                    </div>
+                </div>
+
+                <div className={`tab ${activeTab === 'following' ? 'projects' : 'hidden'}`} style={{ marginTop: '30px', height: '10px', width: '100%', backgroundColor: 'green' }}>
+                </div>
 
                 {/* <p>Hello, {user.firstName || 'User'}!</p> Display a fallback if firstName is not available */}
                 <Footer /> {/* Assuming you have a Footer component */}

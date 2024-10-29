@@ -137,12 +137,13 @@ const NotificationsPage = () => {
         <div
           style={{
             justifyContent: 'center',
-            width: '500px',
+            width: '700px',
             textAlign: 'center',
             margin: '20px auto',
+            fontSize: 'medium',
           }}
         >
-          <h1 className="title-list">Notifications</h1>
+          <h1 className="title-list">Followed Broadcasts</h1>
         </div>
         <div
           className="search-input"

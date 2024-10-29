@@ -48,12 +48,12 @@ router.patch('/:userId/:action', async (req, res) => {
     }
 
     // Update user status based on action
-    if (action === 'verified') {
-      user.verified = 'verified';
-    } else if (action === 'rejected') {
-      user.verified = 'rejected';
-    } else if (action === 'notVerified') {
-      user.verified = 'notVerified'; // Assuming you want to set it back to pending
+    if (action === 'Verified') {
+      user.verified = 'Verified';
+    } else if (action === 'Rejected') {
+      user.verified = 'Rejected';
+    } else if (action === 'Pending Verification') {
+      user.verified = 'Pending Verification'; // Assuming you want to set it back to pending
     } else {
       return res.status(400).send({ message: 'Invalid action' });
     }
