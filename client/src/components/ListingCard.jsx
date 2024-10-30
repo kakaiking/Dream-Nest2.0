@@ -109,6 +109,7 @@ const ListingCard = ({
         return "linear-gradient(330deg, #c33764, #1d2671)"; // Default gradient
     }
   };
+  
 
   return (
     <div
@@ -131,11 +132,14 @@ const ListingCard = ({
       {!booking ? (
         <>
           <h2>{title}</h2>
+
           <h3>
             {returns}%, {financialInstruments}
           </h3>
+          <p>{creator ? creator.firmName : 'Loading...'}</p>
+
           <p>{category}</p>
-          <p>{type}</p>
+          {/* <p>{type}</p> */}
           <p>
             <span>
               Target:{" "}

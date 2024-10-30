@@ -3,7 +3,9 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import Navbar from "../components/Navbar";
 import ListingCard from "../components/ListingCard";
-import Footer from "../components/Footer"
+import Footer from "../components/Footer";
+import Loader from '../components/Loader';
+
 
 const WishList = () => {
   const user = useSelector((state) => state.user);
@@ -45,9 +47,7 @@ const WishList = () => {
       <h1 className="title-list" style={{ marginLeft: "40vw" }}>Followed Listings</h1>
       
       {isLoading && (
-        <div className="loading-message" style={{ textAlign: "center", padding: "2rem" }}>
-          Loading your followed listings...
-        </div>
+        <Loader />
       )}
 
       {error && (

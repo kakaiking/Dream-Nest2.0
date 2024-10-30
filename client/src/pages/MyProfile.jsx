@@ -18,6 +18,7 @@ import { LuPhone } from "react-icons/lu";
 const MyProfile = () => {
     const [user, setUser] = useState({});
     const [propertyList, setPropertyList] = useState([]);
+    const [followedListings, setFollowedListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const { userId } = useParams();
     const dispatch = useDispatch();
@@ -58,7 +59,7 @@ const MyProfile = () => {
             dispatch(setPropertyList(data))
             setLoading(false)
         } catch (err) {
-            console.log( err.message)
+            console.log(err.message)
         }
     }
 
@@ -75,6 +76,33 @@ const MyProfile = () => {
     const handleTabChange = (tab) => {
         setActiveTab(tab);
     };
+
+    useEffect(() => {
+        const fetchFollowedListings = async () => {
+            if (!user?._id) return;
+
+            try {
+                setLoading(true);
+                const response = await fetch(
+                    `http://localhost:3001/properties/followed/${user._id}`
+                );
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to fetch followed listings');
+                }
+
+                const data = await response.json();
+                setFollowedListings(data);
+            } catch (err) {
+                console.error('Error fetching followed listings:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFollowedListings();
+    }, [user?._id]);
 
 
     // Helper function to remove 'public' from the path
@@ -160,7 +188,7 @@ const MyProfile = () => {
                                         </div>
 
                                         <div className="igPage">
-                                            <a href="">{user.phoneNumber}</a>
+                                            <a href="">+254 {user.phoneNumber}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -193,7 +221,7 @@ const MyProfile = () => {
 
                 </section>
 
-                <div className={`tabProfile ${activeTab === 'description' ? 'description' : 'hidden'}`} style={{}}>
+                <div className={`tabProfile ${activeTab === 'description' ? 'description' : 'hidden'}`} >
                     {/* Profile Tab */}
                     <section id="profileMy" > {/* Changed hidden to inline style */}
                         <div className="profileContentMy">
@@ -341,7 +369,49 @@ const MyProfile = () => {
                     </div>
                 </div>
 
-                <div className={`tab ${activeTab === 'following' ? 'projects' : 'hidden'}`} style={{ marginTop: '30px', height: '10px', width: '100%', backgroundColor: 'green' }}>
+                <div className={`tab ${activeTab === 'following' ? 'projects' : 'hidden'}`}>
+                    <div className="list">
+                        {followedListings.map((item) => {
+                            if (!item) return null;
+
+                            const {
+                                _id,
+                                creator,
+                                title,
+                                bidExpiry,
+                                financialInstruments,
+                                returns,
+                                category,
+                                type,
+                                target,
+                                highlightDesc = '',
+                                booking = false
+                            } = item;
+
+                            return (
+                                <ListingCard
+                                    key={_id}
+                                    listingId={_id}
+                                    title={title || 'No Title'}
+                                    creator={creator}
+                                    bidExpiry={bidExpiry}
+                                    financialInstruments={financialInstruments}
+                                    returns={returns}
+                                    category={category}
+                                    type={type}
+                                    target={target}
+                                    highlightDesc={highlightDesc}
+                                    booking={booking}
+                                />
+                            );
+                        })}
+
+                        {!loading && followedListings.length === 0 && (
+                            <div className="no-listings" style={{ textAlign: "center", padding: "2rem" }}>
+                                You haven't followed any listings yet.
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* <p>Hello, {user.firstName || 'User'}!</p> Display a fallback if firstName is not available */}
