@@ -210,7 +210,7 @@ const MyProfile = () => {
                             id="ProductsHeader"
                             className={`header-btn toggleHeaderProducts ${activeTab === 'projects' ? 'toggleHeaderBorder' : ''}`}
                             onClick={() => handleTabChange('projects')}
-                        >Projects</button>
+                        >Listings</button>
 
                         <button
                             className={`header-btn toggleHeaderProducts ${activeTab === 'following' ? 'toggleHeaderBorder' : ''}`}

@@ -23,6 +23,7 @@ import UserDetails from './pages/UserDetails';
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import NotificationsPage from "./pages/NotificationsPage";
+import WithdrawPage from "./pages/WithdrawPage";
 
 
 function App() {
@@ -54,6 +55,7 @@ function App() {
           <Route path="/:userId/fileReturns" element={<FileReturnsPage />} />
           <Route path="/:userId/return-logs" element={<ReturnLogs />} />
           <Route path="/:userId/notifications" element={<NotificationsPage />} />
+          <Route path="/:userId/withdraw" element={<WithdrawPage />} />
 
 
 

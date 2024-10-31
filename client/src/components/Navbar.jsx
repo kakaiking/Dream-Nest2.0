@@ -77,10 +77,11 @@ const Navbar = () => {
 
             <Link to={`/${user._id}/trips`}>My Bids</Link>
             <Link to={`/${user._id}/reservations`}>My Project Updates</Link>
-            <Link to={`/${user._id}/properties`}>My Hosted Projects</Link>
-            <Link to={`/${user._id}/wishList`}>Following</Link>
+            {/* <Link to={`/${user._id}/properties`}>My Hosted Projects</Link> */}
+            {/* <Link to={`/${user._id}/wishList`}>Following</Link> */}
             <Link to={`/${user._id}/details`}>My Profile</Link>
             <Link to="/create-listing">Host A Project</Link>
+            <Link to={`/:${user._id}/withdraw`}>File Withdrawal</Link>
             <hr />
             <Link to={`/${user._id}/fileReturns`}>File Returns</Link>
             <Link to={`/${user._id}/return-logs`}>Returns Logs</Link>
