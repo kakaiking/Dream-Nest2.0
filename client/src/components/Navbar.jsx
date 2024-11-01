@@ -76,12 +76,19 @@ const Navbar = () => {
           <div className="navbar_right_accountmenu">
 
             <Link to={`/${user._id}/trips`}>My Bids</Link>
+            <Link to={`/${user._id}/my-withdrawals`}>My Withdrawals</Link>
+            <Link to={`/${user._id}/my-topups`}>My TopUps</Link>
+
             <Link to={`/${user._id}/reservations`}>My Project Updates</Link>
+            <Link to={`/${user._id}/my-project-withdrawals`}>My Project Withdrawals</Link>
+            <Link to={`/${user._id}/my-project-topups`}>My Project TopUps</Link>
+
             {/* <Link to={`/${user._id}/properties`}>My Hosted Projects</Link> */}
             {/* <Link to={`/${user._id}/wishList`}>Following</Link> */}
             <Link to={`/${user._id}/details`}>My Profile</Link>
             <Link to="/create-listing">Host A Project</Link>
             <Link to={`/:${user._id}/withdraw`}>File Withdrawal</Link>
+            <Link to={`/:${user._id}/topup`}>File Top-Up</Link>
             <hr />
             <Link to={`/${user._id}/fileReturns`}>File Returns</Link>
             <Link to={`/${user._id}/return-logs`}>Returns Logs</Link>

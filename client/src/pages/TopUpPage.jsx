@@ -3,13 +3,13 @@ import { useSelector } from 'react-redux';
 import Navbar from '../components/Navbar';
 import RemoveCircleOutline from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
-import '../styles/WithdrawalPage.scss';
+import '../styles/TopUpPage.scss'; // Create a corresponding CSS file if needed
 
-const WithdrawalPage = ({ userId }) => {
+const TopUpPage = () => {
   const user = useSelector((state) => state.user);
   const [bookings, setBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [sharesToWithdraw, setSharesToWithdraw] = useState(0);
+  const [sharesToAdd, setSharesToAdd] = useState(0);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -26,41 +26,38 @@ const WithdrawalPage = ({ userId }) => {
       }
     };
     fetchBookings();
-  }, [userId]);
+  }, [user._id]);
 
-  const handleWithdraw = async () => {
-    if (!selectedBooking || sharesToWithdraw <= 0 || sharesToWithdraw > selectedBooking.guestCount) {
-      alert("Invalid withdrawal amount");
+  const handleTopUp = async () => {
+    if (!selectedBooking || sharesToAdd <= 0) {
+      alert("Invalid top-up amount");
       return;
     }
     try {
-      const response = await fetch(`http://localhost:3001/bookings/${user._id}/withdraw`, {
+      const response = await fetch(`http://localhost:3001/bookings/${user._id}/topup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           bookingId: selectedBooking._id,
-          sharesToWithdraw,
+          sharesToAdd,
         }),
       });
   
       if (response.ok) {
-        alert("Withdrawal processed successfully");
-        setBookings(bookings.map(b => b._id === selectedBooking._id 
-          ? { ...b, guestCount: b.guestCount - sharesToWithdraw } 
-          : b
-        ));
+        alert("Top-up processed successfully");
+        // You might want to update the bookings state here accordingly
         setSelectedBooking(null);
-        setSharesToWithdraw(0);
+        setSharesToAdd(0);
       } else {
         const errorData = await response.json();
-        console.error("Error processing withdrawal:", errorData.message || response.statusText);
-        alert(`Failed to process withdrawal: ${errorData.message || 'Unknown error'}`);
+        console.error("Error processing top-up:", errorData.message || response.statusText);
+        alert(`Failed to process top-up: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error("Error processing withdrawal:", error);
-      alert("Failed to process withdrawal");
+      console.error("Error processing top-up:", error);
+      alert("Failed to process top-up");
     }
   };
 
@@ -68,7 +65,7 @@ const WithdrawalPage = ({ userId }) => {
     <div>
       <Navbar />
       <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
-        <p>If you want to withdraw some shares from a project, select a bid from the dropdown below.</p>
+        <p>If you want to top up shares for a booking, select a booking from the dropdown below.</p>
         <select onChange={e => setSelectedBooking(bookings.find(b => b._id === e.target.value))}>
           <option value="">Select a booking</option>
           {bookings.map(booking => (
@@ -80,19 +77,19 @@ const WithdrawalPage = ({ userId }) => {
 
         {selectedBooking && (
           <div className="basics">
-            <h2>File Withdrawal</h2>
+            <h2>File Top Up</h2>
             <div className="basic_count">
               <RemoveCircleOutline
-                onClick={() => sharesToWithdraw > 0 && setSharesToWithdraw(sharesToWithdraw - 1)}
+                onClick={() => sharesToAdd > 0 && setSharesToAdd(sharesToAdd - 1)}
                 sx={{
                   fontSize: '25px',
                   cursor: 'pointer',
                   "&:hover": { color: 'grey' },
                 }}
               />
-              <p>{sharesToWithdraw}</p>
+              <p>{sharesToAdd}</p>
               <AddCircleOutline
-                onClick={() => sharesToWithdraw < selectedBooking.guestCount && setSharesToWithdraw(sharesToWithdraw + 1)}
+                onClick={() => setSharesToAdd(sharesToAdd + 1)} // No upper limit on top-up
                 sx={{
                   fontSize: '25px',
                   cursor: 'pointer',
@@ -100,8 +97,8 @@ const WithdrawalPage = ({ userId }) => {
                 }}
               />
             </div>
-            <button onClick={handleWithdraw} style={{ marginTop: '20px', padding: '10px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-              Confirm Withdrawal
+            <button onClick={handleTopUp} style={{ marginTop: '20px', padding: '10px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+              Confirm Top Up
             </button>
           </div>
         )}
@@ -110,4 +107,4 @@ const WithdrawalPage = ({ userId }) => {
   );
 };
 
-export default WithdrawalPage;
+export default TopUpPage;

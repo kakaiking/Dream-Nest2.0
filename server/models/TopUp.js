@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const WithdrawalSchema = new mongoose.Schema(
+const TopUpSchema = new mongoose.Schema(
   {
     customerId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -51,5 +51,5 @@ const WithdrawalSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Withdrawal = mongoose.model("Withdrawal", WithdrawalSchema)
-module.exports = Withdrawal
+const TopUp = mongoose.model("TopUp", TopUpSchema)
+module.exports = TopUp

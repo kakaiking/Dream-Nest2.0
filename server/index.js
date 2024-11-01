@@ -17,6 +17,7 @@ const updateRoutes = require("./routes/update.js");
 const commentRoutes = require("./routes/comment.js");
 const returnRoutes = require("./routes/return.js");
 const withdrawalRoutes = require("./routes/withdrawal.js");
+const topupRoutes = require("./routes/topup.js");
 
 
 app.use(cors());
@@ -32,6 +33,7 @@ app.use("/auth", authRoutes);
 app.use("/properties", listingRoutes);
 app.use("/bookings", bookingRoutes);
 app.use("/withdrawals", withdrawalRoutes);
+app.use("/topups", topupRoutes);
 app.use("/users", userRoutes);
 app.use("/updates", updateRoutes);
 app.use("/comments", commentRoutes);

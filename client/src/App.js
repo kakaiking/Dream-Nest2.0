@@ -24,6 +24,11 @@ import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import NotificationsPage from "./pages/NotificationsPage";
 import WithdrawPage from "./pages/WithdrawPage";
+import MyWithdrawals from "./pages/MyWithdrawals";
+import MyProjectWithdrawals from "./pages/MyProjectWithdrawals";
+import TopUpPage from "./pages/TopUpPage";
+import MyTopUps from "./pages/MyTopUps";
+import MyProjectTopUps from "./pages/MyProjectTopUps";
 
 
 function App() {
@@ -56,7 +61,11 @@ function App() {
           <Route path="/:userId/return-logs" element={<ReturnLogs />} />
           <Route path="/:userId/notifications" element={<NotificationsPage />} />
           <Route path="/:userId/withdraw" element={<WithdrawPage />} />
-
+          <Route path="/:userId/my-withdrawals" element={<MyWithdrawals />} />
+          <Route path="/:userId/my-project-withdrawals" element={<MyProjectWithdrawals />} />
+          <Route path="/:userId/topup" element={<TopUpPage />} />
+          <Route path="/:userId/my-topups" element={<MyTopUps />} />
+          <Route path="/:userId/my-project-topups" element={<MyProjectTopUps />} />
 
 
         </Routes>

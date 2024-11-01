@@ -1,0 +1,28 @@
+.basics {
+    width: 200px;
+    height: 100px;
+    margin: 50px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 30px;
+    padding: 15px;
+    border: 1px solid gray;
+    border-radius: 10px;
+    background-color: #eee;
+    box-shadow: 0 3px 10px 2px rgba(0, 0, 0, 0.2);
+  }
+  
+  .basic_count {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 40px;
+  }
+  
+  .basic p {
+    font-weight: bolder;
+  }
+  

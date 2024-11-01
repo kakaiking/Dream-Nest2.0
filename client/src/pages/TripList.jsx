@@ -97,6 +97,7 @@ const TripList = () => {
             <tr>
               <th className="text-center">No</th>
               <th className="text-center">Project Name</th>
+              <th className="text-center">Shares</th>
               <th className="text-center">My Bid Price</th>
               <th className="text-center">Returns (%)</th>
               <th className="text-center">Payout</th>
@@ -108,6 +109,8 @@ const TripList = () => {
               <tr key={reservation._id} className='h-8'>
                 <td className='border-slate-700 text-center'>{index + 1}</td>
                 <td className='border-slate-700 text-center'>{reservation.listingTitle}</td>
+                <td className='border-slate-700 text-center'>{reservation.guestCount}</td>
+
                 <td className='border-slate-700 text-center'>
                   ksh. {reservation.totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 </td>

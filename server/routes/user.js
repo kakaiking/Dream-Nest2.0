@@ -104,7 +104,7 @@ router.get("/:userId/reservations", async (req, res) => {
     res.status(202).json(reservations)
   } catch (err) {
     console.log(err)
-    res.status(404).json({ message: "Can not find reservations!", error: err.message })
+    res.status(404).json({ message: "Can not find Bid!", error: err.message })
   }
 })
 

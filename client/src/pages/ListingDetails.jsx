@@ -51,38 +51,20 @@ const ListingDetails = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
 
+  const navigate = useNavigate()
 
 
 
   const getListingDetails = async () => {
     try {
-      // console.log("Fetching listing details for ID:", listingId);
-      const response = await fetch(
-        `http://localhost:3001/properties/${listingId}`,
-        {
-          method: "GET",
-        }
-      );
-
-      // console.log("Response status:", response.status);
+      const response = await fetch(`http://localhost:3001/properties/${listingId}`);
       const data = await response.json();
-      // console.log("Received data:", data);
       setListing(data);
       setPricePerShare(data.target / data.totalShares);
-      setListingTitle(data.title)
-      setCustomerReturns(data.returns)
-
-
-      // Calculate price per share only if listing.target is available
-      if (data && data.target) {
-        setPricePerShare(data.target / data.totalShares);
-      }
-
       setLoading(false);
     } catch (err) {
-
       console.error("Fetch Listing Details Failed", err);
-      navigate(`/`)
+      navigate(`/`);
       setLoading(false);
     }
   };
@@ -94,7 +76,59 @@ const ListingDetails = () => {
   useEffect(() => {
     setCustomerEmail(user.email);
     setCustomerName(`${user.firmName} `);
-  }, []);
+  }, [user]);
+
+  const checkUserBooking = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/bookings/has-booking/${user._id}/${listingId}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data.hasBooking; // Return the booking status from the response
+      }
+      return false; // No booking found or error
+    } catch (err) {
+      console.error("Failed to check user bookings:", err);
+      return false;
+    }
+  };
+
+  const handleSubmit = async () => {
+    const hasBooking = await checkUserBooking();
+    
+    if (hasBooking) {
+      // User has a booking, navigate to the TopUpPage
+      navigate(`/${user._id}/topup`);
+    } else {
+      // User does not have a booking, proceed with booking creation
+      const bookingForm = {
+        customerId: user._id,
+        listingId,
+        hostId: listing.creator._id,
+        customerEmail,
+        customerName,
+        totalPrice: pricePerShare * guestCount,
+        guestCount,
+        listingTitle: listing.title, 
+        customerReturns: listing.returns 
+      };
+
+      try {
+        const response = await fetch("http://localhost:3001/bookings/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bookingForm),
+        });
+
+        if (response.ok) {
+          navigate(`/${user._id}/trips`);
+        }
+      } catch (err) {
+        console.log("Submit Booking Failed.", err.message);
+      }
+    }
+  };
 
   const checkFollowStatus = async () => {
     try {
@@ -154,37 +188,7 @@ const ListingDetails = () => {
   /* SUBMIT BOOKING */
   const customerId = useSelector((state) => state?.user?._id)
 
-  const navigate = useNavigate()
 
-  const handleSubmit = async () => {
-    try {
-      const bookingForm = {
-        customerId,
-        listingId,
-        hostId: listing.creator._id,
-        customerEmail,
-        customerName,
-        totalPrice: pricePerShare.toFixed(2) * guestCount,
-        guestCount,
-        listingTitle,
-        customerReturns
-      }
-
-      const response = await fetch("http://localhost:3001/bookings/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(bookingForm)
-      })
-
-      if (response.ok) {
-        navigate(`/${customerId}/trips`)
-      }
-    } catch (err) {
-      console.log("Submit Booking Failed.", err.message)
-    }
-  };
 
   const [timeLeft, setTimeLeft] = useState('');
   // Set the date we're counting down to
