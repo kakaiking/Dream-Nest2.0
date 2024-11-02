@@ -273,7 +273,7 @@ const AdminPage = () => {
     <div className="admin-page">
       <Navbar />
       <div className="admin-content">
-        <h1 style={{marginTop: '30px'}}>Admin Dashboard</h1>
+        <h1 style={{marginTop: '30px', marginLeft: '30px'}}>Admin Dashboard</h1>
         <div className="view-switch">
           <button onClick={() => setActiveView('users')}>Users</button>
           <button onClick={() => setActiveView('bids')}>Bids</button>

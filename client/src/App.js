@@ -29,6 +29,7 @@ import MyProjectWithdrawals from "./pages/MyProjectWithdrawals";
 import TopUpPage from "./pages/TopUpPage";
 import MyTopUps from "./pages/MyTopUps";
 import MyProjectTopUps from "./pages/MyProjectTopUps";
+import MyDashboard from "./pages/MyDashboard";
 
 
 function App() {
@@ -66,6 +67,8 @@ function App() {
           <Route path="/:userId/topup" element={<TopUpPage />} />
           <Route path="/:userId/my-topups" element={<MyTopUps />} />
           <Route path="/:userId/my-project-topups" element={<MyProjectTopUps />} />
+          <Route path="/:userId/dashboard" element={<MyDashboard />} />
+
 
 
         </Routes>

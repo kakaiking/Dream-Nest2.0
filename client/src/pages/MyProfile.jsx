@@ -17,7 +17,7 @@ import { LuPhone } from "react-icons/lu";
 
 const MyProfile = () => {
     const [user, setUser] = useState({});
-    const [propertyList, setPropertyList] = useState([]);
+    const [localPropertyList, setLocalPropertyList] = useState([]);
     const [followedListings, setFollowedListings] = useState([]);
     const [loading, setLoading] = useState(true);
     const { userId } = useParams();
@@ -35,7 +35,6 @@ const MyProfile = () => {
                 const data = await response.json();
                 dispatch(setProfileDetails(data));
                 setUser(data);
-                setPropertyList(data.propertyList || []);
                 // console.log(data);
                 // console.log(propertyList);
             } else {
@@ -54,12 +53,20 @@ const MyProfile = () => {
             const response = await fetch(`http://localhost:3001/users/${userId}/properties`, {
                 method: "GET"
             })
-            const data = await response.json()
-            // console.log(data)
-            dispatch(setPropertyList(data))
+
+            if (response.ok) {
+                const data = await response.json()
+                setLocalPropertyList(data);
+                // console.log(data)
+                dispatch(setPropertyList(data))
+            } else {
+                console.error('Error fetching Property Listings :', response.status);
+            }
             setLoading(false)
         } catch (err) {
-            console.log(err.message)
+            console.log(err.message);
+            setLoading(false);
+
         }
     }
 
@@ -337,7 +344,7 @@ const MyProfile = () => {
 
                 <div className={`tab ${activeTab === 'projects' ? 'projects' : 'hidden'}`}>
                     <div className="list">
-                        {propertyList.map(
+                        {localPropertyList.map(
                             ({
                                 _id,
                                 creator,
@@ -352,6 +359,7 @@ const MyProfile = () => {
                                 booking = false
                             }) => (
                                 <ListingCard
+                                key={_id}
                                     listingId={_id}
                                     title={title}
                                     creator={creator}
@@ -408,7 +416,7 @@ const MyProfile = () => {
 
                         {!loading && followedListings.length === 0 && (
                             <div className="no-listings" style={{ textAlign: "center", padding: "2rem" }}>
-                                You haven't followed any listings yet.
+                                No Listings Followed Yet.
                             </div>
                         )}
                     </div>
