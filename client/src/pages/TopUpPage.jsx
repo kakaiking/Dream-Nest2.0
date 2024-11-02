@@ -64,10 +64,14 @@ const TopUpPage = () => {
   return (
     <div>
       <Navbar />
-      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
-        <p>If you want to top up shares for a booking, select a booking from the dropdown below.</p>
-        <select onChange={e => setSelectedBooking(bookings.find(b => b._id === e.target.value))}>
-          <option value="">Select a booking</option>
+      <h1 style={{ margin: "40px" }}>Top Up Shares</h1>
+
+      <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px', backgroundColor: '#fff', borderRadius: '7px', boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)'  }}>
+      <h2>Top up</h2><br />
+                <p>If you want to add some shares to an already existing bid, select the desired bid from the dropdown below.</p> <br />
+                <p>After Selecting the bid to top up, you can specify the number of shares you want to add.</p> <br /><hr /><br />
+                <select onChange={e => setSelectedBooking(bookings.find(b => b._id === e.target.value))} style={{ width: '100%', height: '30px', marginBottom: '20px', borderRadius: '5px' }}>
+          <option value="">Select the bid you want to top up</option>
           {bookings.map(booking => (
             <option key={booking._id} value={booking._id}>
               {booking.listingId.title} - Your shares: {booking.guestCount}

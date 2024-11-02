@@ -6,7 +6,7 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import RemoveCircleOutline from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
 import '../styles/TopUpPage.scss';
-import { setListingStatus, setTripList } from '../redux/state';
+import { setListingStatus, setTripList, setReservationList } from '../redux/state';
 
 
 const MyDashboard = () => {
@@ -17,8 +17,8 @@ const MyDashboard = () => {
     const [updates, setUpdates] = useState([]);
     const [bookings, setBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
-    const [sharesToAdd, setSharesToAdd] = useState(0);
-    const [sharesToWithdraw, setSharesToWithdraw] = useState(0);
+    const [sharesToAdd, setSharesToAdd] = useState(1);
+    const [sharesToWithdraw, setSharesToWithdraw] = useState(1);
     const [activeView, setActiveView] = useState('topUp');
 
     const listings = useSelector((state) => state.listings);
@@ -479,154 +479,172 @@ const MyDashboard = () => {
 
     // Renders 
     const renderTopUp = () => (
-        <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
-            <p>If you want to top up shares for a booking, select a booking from the dropdown below.</p>
-            <select onChange={e => setSelectedBooking(bookings.find(b => b._id === e.target.value))}>
-                <option value="">Select a booking</option>
-                {bookings.map(booking => (
-                    <option key={booking._id} value={booking._id}>
-                        {booking.listingId.title} - Your shares: {booking.guestCount}
-                    </option>
-                ))}
-            </select>
+        <>
+            <h1 style={{ margin: "40px" }}>Top Up Shares</h1>
 
-            {selectedBooking && (
-                <div className="basics">
-                    <h2>File Top Up</h2>
-                    <div className="basic_count">
-                        <RemoveCircleOutline
-                            onClick={() => sharesToAdd > 0 && setSharesToAdd(sharesToAdd - 1)}
-                            sx={{
-                                fontSize: '25px',
-                                cursor: 'pointer',
-                                "&:hover": { color: 'grey' },
-                            }}
-                        />
-                        <p>{sharesToAdd}</p>
-                        <AddCircleOutline
-                            onClick={() => setSharesToAdd(sharesToAdd + 1)}
-                            sx={{
-                                fontSize: '25px',
-                                cursor: 'pointer',
-                                "&:hover": { color: 'grey' },
-                            }}
-                        />
+            <div style={{ maxWidth: '600px', margin: '20px auto', padding: '20px', backgroundColor: '#fff', borderRadius: '7px', boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)' }}>
+                <h2>Top up</h2><br />
+                <p>If you want to add some shares to an already existing bid, select the desired bid from the dropdown below.</p> <br />
+                <p>After Selecting the bid to top up, you can specify the number of shares you want to add.</p> <br /><hr /><br />
+                <select onChange={e => setSelectedBooking(bookings.find(b => b._id === e.target.value))} style={{ width: '100%', height: '30px', marginBottom: '20px', borderRadius: '5px' }}>
+                    <option value="">Select the bid you want to top up</option>
+                    {bookings.map(booking => (
+                        <option key={booking._id} value={booking._id}>
+                            {booking.listingId.title} - Your shares: {booking.guestCount}
+                        </option>
+                    ))}
+                </select> <br />
+                {selectedBooking && (
+                    <div className="basics" >
+                        <h2>Shares To Add</h2>
+
+                        <div className="basic_count">
+                            <RemoveCircleOutline
+                                onClick={() => sharesToAdd > 0 && setSharesToAdd(sharesToAdd - 1)}
+                                sx={{
+                                    fontSize: '25px',
+                                    cursor: 'pointer',
+                                    "&:hover": { color: 'grey' },
+                                }}
+                            />
+                            <p>{sharesToAdd}</p>
+                            <AddCircleOutline
+                                onClick={() => setSharesToAdd(sharesToAdd + 1)}
+                                sx={{
+                                    fontSize: '25px',
+                                    cursor: 'pointer',
+                                    "&:hover": { color: 'grey' },
+                                }}
+                            />
+                        </div>
+                        <button onClick={handleTopUp} style={{ marginTop: '20px', padding: '10px', backgroundColor: 'rgb(161, 64, 255)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                            Confirm
+                        </button>
                     </div>
-                    <button onClick={handleTopUp} style={{ marginTop: '20px', padding: '10px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-                        Confirm Top Up
-                    </button>
-                </div>
-            )}
-        </div>
+                )}
+            </div>
+        </>
     );
 
     const renderWithdraw = () => (
-        <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
-            <p>If you want to withdraw some shares from a project, select a booking from the dropdown below.</p>
-            <select onChange={e => setSelectedBooking(bookings.find(b => b._id === e.target.value))}>
-                <option value="">Select a booking</option>
-                {bookings.map(booking => (
-                    <option key={booking._id} value={booking._id}>
-                        {booking.listingId.title} - Your shares: {booking.guestCount}
-                    </option>
-                ))}
-            </select>
+        <>
+            <h1 style={{ margin: "40px" }}>Withdraw Shares</h1>
+            <div style={{ maxWidth: '600px', height: 'auto', margin: '0 auto', padding: '20px', backgroundColor: '#fff', borderRadius: '7px', boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)' }}>
+                <h2>Withdraw</h2><br />
 
-            {selectedBooking && (
-                <div className="basics">
-                    <h2>File Withdrawal</h2>
-                    <div className="basic_count">
-                        <RemoveCircleOutline
-                            onClick={() => sharesToWithdraw > 0 && setSharesToWithdraw(sharesToWithdraw - 1)}
-                            sx={{
-                                fontSize: '25px',
-                                cursor: 'pointer',
-                                "&:hover": { color: 'grey' },
-                            }}
-                        />
-                        <p>{sharesToWithdraw}</p>
-                        <AddCircleOutline
-                            onClick={() => sharesToWithdraw < selectedBooking.guestCount && setSharesToWithdraw(sharesToWithdraw + 1)}
-                            sx={{
-                                fontSize: '25px',
-                                cursor: 'pointer',
-                                "&:hover": { color: 'grey' },
-                            }}
-                        />
+                <p>If you want to take out some shares from an already existing bid, select the desired bid from the dropdown below.</p> <br />
+                <p>After Selecting the bid to withdraw from, you can specify the number of shares you want to withdraw.</p> <br /><hr /><br />
+                <select onChange={e => setSelectedBooking(bookings.find(b => b._id === e.target.value))} style={{ width: '100%', height: '30px', marginBottom: '20px', borderRadius: '5px' }}>
+                    <option value="">Select the bid you want to withdraw from</option>
+                    {bookings.map(booking => (
+                        <option key={booking._id} value={booking._id}>
+                            {booking.listingId.title} - Your shares: {booking.guestCount}
+                        </option>
+                    ))}
+                </select>
+
+                {selectedBooking && (
+                    <div className="basics">
+                        <h2>Withdraw </h2>
+                        <div className="basic_count">
+                            <RemoveCircleOutline
+                                onClick={() => sharesToWithdraw > 0 && setSharesToWithdraw(sharesToWithdraw - 1)}
+                                sx={{
+                                    fontSize: '25px',
+                                    cursor: 'pointer',
+                                    "&:hover": { color: 'grey' },
+                                }}
+                            />
+                            <p>{sharesToWithdraw}</p>
+                            <AddCircleOutline
+                                onClick={() => sharesToWithdraw < selectedBooking.guestCount && setSharesToWithdraw(sharesToWithdraw + 1)}
+                                sx={{
+                                    fontSize: '25px',
+                                    cursor: 'pointer',
+                                    "&:hover": { color: 'grey' },
+                                }}
+                            />
+                        </div>
+                        <button onClick={handleWithdraw} style={{ marginTop: '20px', padding: '10px', backgroundColor: 'rgb(161, 64, 255)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                            Withdraw
+                        </button>
                     </div>
-                    <button onClick={handleWithdraw} style={{ marginTop: '20px', padding: '10px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-                        Confirm Withdrawal
-                    </button>
-                </div>
-            )}
-        </div>
+                )}
+            </div>
+        </>
     );
 
     const renderFileReturn = () => (
-        <div style={{ maxWidth: '600px', margin: '0 auto', padding: '20px' }}>
-            <h2>File Return</h2>
-            <p>Select a listing to file a return:</p>
-            <select onChange={handleListingSelect}>
-                <option value="">Select a listing</option>
-                {unfiledListings.map(listing => (
-                    <option key={listing._id} value={listing._id}>
-                        {listing.title} - Amount Due: {listing.target * 0.012}
-                    </option>
-                ))}
-            </select>
+        <>
+            <h1 style={{ margin: "40px" }}>File Return </h1>
+            <div style={{ maxWidth: '600px', height: 'auto', margin: '0 auto', padding: '20px', backgroundColor: '#fff', borderRadius: '7px', boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)' }}>
+                <h2>Filing Return</h2><br />
+                <p>To file returns for a funding project, select the listing from the dropdown below and follow through to complete the payment.</p>  <br /><hr /><br />
+                <select onChange={handleListingSelect} style={{ width: '100%', height: '30px', marginBottom: '20px', borderRadius: '5px' }}>
+                    <option value="">Select the listing you want to file returns for</option>
+                    {unfiledListings.map(listing => (
+                        <option key={listing._id} value={listing._id}>
+                            {listing.title} - Amount Due: {listing.target * 0.012}
+                        </option>
+                    ))}
+                </select>
 
-            {selectedListing && (
-                <form onSubmit={handleSubmit}>
-                    <h3>Payment Details</h3>
-                    <div>
-                        <label>Payment Method:</label>
+                {selectedListing && (
+                    <form onSubmit={handleSubmit} style={{ textAlign: 'center' }}>
+                        <h3>Payment Details</h3>
                         <div>
-                            <button type="button" onClick={() => handlePaymentMethodSelect('mpesa')}>
-                                Mpesa
-                            </button>
-                            <button type="button" onClick={() => handlePaymentMethodSelect('bank')}>
-                                Bank Transfer
-                            </button>
+                            <label>(Amount Due: {paymentDue})</label>
+                        </div><br />
+                        <div>
+                            <label>Payment Method:</label>
+                            <div>
+                                <button type="button" onClick={() => handlePaymentMethodSelect('mpesa')}>
+                                    Mpesa
+                                </button>
+                                <button type="button" onClick={() => handlePaymentMethodSelect('bank')}>
+                                    Bank Transfer
+                                </button>
+                            </div> <br />
+                            {paymentMethod && <p>Selected Method: {paymentMethod}</p>}
                         </div>
-                        {paymentMethod && <p>Selected Method: {paymentMethod}</p>}
-                    </div>
-                    <div>
-                        <label>Reference Code:</label>
-                        <input
-                            type="text"
-                            value={returnDetails.referenceCode}
-                            onChange={(e) => setReturnDetails({ ...returnDetails, referenceCode: e.target.value })}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label>Payment Date:</label>
-                        <input
-                            type="date"
-                            value={returnDetails.paymentDate}
-                            onChange={(e) => setReturnDetails({ ...returnDetails, paymentDate: e.target.value })}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label>Payment Time:</label>
-                        <input
-                            type="time"
-                            value={returnDetails.paymentTime}
-                            onChange={(e) => setReturnDetails({ ...returnDetails, paymentTime: e.target.value })}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label>Amount Paid:</label>
-                        <p>{paymentDue}</p>
-                    </div>
-                    <button type="submit" style={{ marginTop: '20px', padding: '10px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-                        Submit Return
-                    </button>
-                </form>
-            )}
-        </div>
+                        <div>
+                            <label>Reference Code:</label>
+                            <input
+                                type="text"
+                                value={returnDetails.referenceCode}
+                                onChange={(e) => setReturnDetails({ ...returnDetails, referenceCode: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label>Payment Date:</label>
+                            <input
+                                type="date"
+                                value={returnDetails.paymentDate}
+                                onChange={(e) => setReturnDetails({ ...returnDetails, paymentDate: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label>Payment Time:</label>
+                            <input
+                                type="time"
+                                value={returnDetails.paymentTime}
+                                onChange={(e) => setReturnDetails({ ...returnDetails, paymentTime: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label>Amount Paid:</label>
+                            <p>{paymentDue}</p>
+                        </div>
+                        <button type="submit" style={{ marginTop: '20px', padding: '10px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                            Submit Return
+                        </button>
+                    </form>
+                )}
+            </div>
+        </>
     );
 
     const renderMyProjectTopUps = () => (
@@ -1056,7 +1074,9 @@ const MyDashboard = () => {
 
     const renderMyReturnLogs = () => (
         <div>
-            <h1 style={{ margin: "40px" }}>Return Logs</h1>
+            <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
+                <h1 className="title-list">My Returns Logs</h1>
+            </div>            
             {returnLogs.length > 0 ? (
                 <table className='table' style={{ width: '80%' }}>
                     <thead>
