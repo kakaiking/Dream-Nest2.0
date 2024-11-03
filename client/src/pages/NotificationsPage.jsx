@@ -26,7 +26,12 @@ const NotificationsPage = () => {
         update.listing.followedBy.includes(user._id)
       );
 
-      setUpdates(followedUpdates);
+      // Sort updates by 'createdAt' in descending order (most recent first)
+      const sortedUpdates = followedUpdates.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      setUpdates(sortedUpdates);
     } catch (error) {
       console.error('Error fetching updates:', error);
     } finally {
@@ -69,13 +74,11 @@ const NotificationsPage = () => {
         <div className="updateNotification">
           <p><strong>{update.listing.creator.firmName}</strong> has made a new update in <strong>{update.listing.title}</strong>.  </p> <br />
           {timeAgo(update.createdAt)}
-
         </div>
 
         <div className="updatePreview">
           <YouTubeThumbnail videoLink={update.videoLink} />
         </div>
-
       </div>
     ));
 

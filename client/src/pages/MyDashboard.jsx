@@ -680,6 +680,9 @@ const MyDashboard = () => {
                         <tr>
                             <th className="text-center">No</th>
                             <th className="text-center">Project Name</th>
+                            <th className="text-center">Bidder's name</th>
+                            <th className="text-center">Email</th>
+                            <th className="text-center">Shares</th>
                             <th className="text-center">Amount</th>
                             <th className="text-center">Date Requested</th>
                             <th className="text-center">Status</th>
@@ -691,6 +694,9 @@ const MyDashboard = () => {
                             <tr key={topup._id} className="h-8">
                                 <td className="border-slate-700 text-center">{index + 1}</td>
                                 <td className="border-slate-700 text-center">{topup.listingId.title}</td>
+                                <td className='border-slate-700 text-center'>{topup.customerName}</td>
+                                <td className='border-slate-700 text-center'><Link to={`/${topup.customerId._id}/details`}>{topup.customerEmail}</Link> </td>
+                                <td className='border-slate-700 text-center'>{topup.guestCount}</td>
                                 <td className="border-slate-700 text-center">ksh. {topup.totalPrice}</td>
                                 <td className="border-slate-700 text-center">{new Date(topup.createdAt).toLocaleDateString()}</td>
                                 <td className="border-slate-700 text-center">{topup.status || "pending"}</td>
@@ -749,6 +755,9 @@ const MyDashboard = () => {
                         <tr>
                             <th className="text-center">No</th>
                             <th className="text-center">Project Name</th>
+                            <th className="text-center">Bidder's name</th>
+                            <th className="text-center">Email</th>
+                            <th className="text-center">Shares</th>
                             <th className="text-center">Amount</th>
                             <th className="text-center">Date Requested</th>
                             <th className="text-center">Status</th>
@@ -760,6 +769,9 @@ const MyDashboard = () => {
                             <tr key={withdrawal._id} className="h-8">
                                 <td className="border-slate-700 text-center">{index + 1}</td>
                                 <td className="border-slate-700 text-center">{withdrawal.listingId.title}</td>
+                                <td className='border-slate-700 text-center'>{withdrawal.customerName}</td>
+                                <td className='border-slate-700 text-center'><Link to={`/${withdrawal.customerId._id}/details`}>{withdrawal.customerEmail}</Link> </td>
+                                <td className='border-slate-700 text-center'>{withdrawal.guestCount}</td>
                                 <td className="border-slate-700 text-center">
                                     ksh. {withdrawal.totalPrice}
                                 </td>
@@ -1148,7 +1160,10 @@ const MyDashboard = () => {
                 <div style={{ width: '20%', background: '#f8f9fa', padding: '20px' }}>
                     <h2 style={{ textAlign: 'center', color: '#333', borderBottom: '1px solid black' }}> Dashboard</h2> <br />
                     <h2>Actions</h2>
+                    <div className="opt">
+
                     <button onClick={() => setActiveView('topUp')} style={buttonStyle}>Top Up</button>
+                    </div>
                     <button onClick={() => setActiveView('withdraw')} style={buttonStyle}>Withdraw</button>
                     <button onClick={() => setActiveView('myProjectTopups')} style={buttonStyle}>Approve Top-Ups</button>
                     <button onClick={() => setActiveView('myProjectWithdrawals')} style={buttonStyle}>Approve Withdrawals</button>
