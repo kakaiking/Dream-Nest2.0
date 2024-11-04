@@ -7,6 +7,8 @@ import RemoveCircleOutline from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
 import '../styles/TopUpPage.scss';
 import { setListingStatus, setTripList, setReservationList } from '../redux/state';
+import { FaMoneyCheckAlt, FaPiggyBank, FaCheckCircle, FaFileInvoiceDollar, FaChartLine, FaChartPie, FaChevronDown, FaChevronRight, FaChevronUp } from 'react-icons/fa';
+
 
 
 const MyDashboard = () => {
@@ -47,6 +49,17 @@ const MyDashboard = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const [showApprovalOptions, setShowApprovalOptions] = useState(false);
+
+    const toggleApprovalOptions = () => {
+        setShowApprovalOptions(!showApprovalOptions);
+    };
+
+    const getButtonStyle = (view) => ({
+        ...buttonStyle,
+        backgroundColor: activeView === view ? '#eee' : 'transparent',
+    });
 
     // ---------------------------- My Project Topups --------------------------------------------------------------------
     const getTopupList = async () => {
@@ -881,7 +894,7 @@ const MyDashboard = () => {
                     onClick={() => setFilter("all")}
                     className={`mx-2 px-4 py-2 rounded ${filter === "all" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
                 >
-                    All Top Ups
+                    All
                 </button>
                 <button
                     onClick={() => setFilter("pending")}
@@ -1161,20 +1174,49 @@ const MyDashboard = () => {
                     <h2 style={{ textAlign: 'center', color: '#333', borderBottom: '1px solid black' }}> Dashboard</h2> <br />
                     <h2>Actions</h2>
                     <div className="opt">
-
-                    <button onClick={() => setActiveView('topUp')} style={buttonStyle}>Top Up</button>
+                        <button onClick={() => setActiveView('topUp')} style={getButtonStyle('topUp')}>
+                            <FaMoneyCheckAlt style={iconStyle} /> Top Up
+                        </button>
                     </div>
-                    <button onClick={() => setActiveView('withdraw')} style={buttonStyle}>Withdraw</button>
-                    <button onClick={() => setActiveView('myProjectTopups')} style={buttonStyle}>Approve Top-Ups</button>
-                    <button onClick={() => setActiveView('myProjectWithdrawals')} style={buttonStyle}>Approve Withdrawals</button>
-                    <button onClick={() => setActiveView('fileReturn')} style={buttonStyle}>File Return</button><br />
-                    <h2>Reports</h2>
-                    <button onClick={() => setActiveView('myBids')} style={buttonStyle}>My Bids</button>
-                    <button onClick={() => setActiveView('myProjectBids')} style={buttonStyle}>My Projects Bids</button>
-                    <button onClick={() => setActiveView('myTopups')} style={buttonStyle}>My Top-Ups</button>
-                    <button onClick={() => setActiveView('myWithdrawals')} style={buttonStyle}>My Withdrawals</button>
-                    <button onClick={() => setActiveView('myReturnLogs')} style={buttonStyle}>My Returns Logs</button>
+                    <button onClick={() => setActiveView('withdraw')} style={getButtonStyle('withdraw')}>
+                        <FaPiggyBank style={iconStyle} /> Withdraw
+                    </button>
 
+                    {/* Approvals Button with Dropdown */}
+                    <button onClick={toggleApprovalOptions} style={buttonStyle}>
+                        <FaCheckCircle style={iconStyle} /> Approvals {showApprovalOptions ? <FaChevronUp style={{ marginLeft: '30px' }} /> : <FaChevronDown style={{ marginLeft: '30px' }} />}
+                    </button>
+                    {showApprovalOptions && (
+                        <div style={{ marginLeft: '20px' }}>
+                            <button onClick={() => setActiveView('myProjectTopups')} style={getButtonStyle('myProjectTopups')}>
+                                <FaCheckCircle style={iconStyle} /> Top Ups
+                            </button>
+                            <button onClick={() => setActiveView('myProjectWithdrawals')} style={getButtonStyle('myProjectWithdrawals')}>
+                                <FaCheckCircle style={iconStyle} /> Withdrawals
+                            </button>
+                        </div>
+                    )}
+
+                    <button onClick={() => setActiveView('fileReturn')} style={getButtonStyle('fileReturn')}>
+                        <FaFileInvoiceDollar style={iconStyle} /> File Return
+                    </button>
+                    <br />
+                    <h2>Reports</h2><hr />
+                    <button onClick={() => setActiveView('myBids')} style={getButtonStyle('myBids')}>
+                        <FaChartLine style={iconStyle} /> My Bids
+                    </button>
+                    <button onClick={() => setActiveView('myProjectBids')} style={getButtonStyle('myProjectBids')}>
+                        <FaChartPie style={iconStyle} /> My Projects Bids
+                    </button>
+                    <button onClick={() => setActiveView('myTopups')} style={getButtonStyle('myTopups')}>
+                        <FaMoneyCheckAlt style={iconStyle} /> My Top-Ups
+                    </button>
+                    <button onClick={() => setActiveView('myWithdrawals')} style={getButtonStyle('myWithdrawals')}>
+                        <FaPiggyBank style={iconStyle} /> My Withdrawals
+                    </button>
+                    <button onClick={() => setActiveView('myReturnLogs')} style={getButtonStyle('myReturnLogs')}>
+                        <FaFileInvoiceDollar style={iconStyle} /> My Returns Logs
+                    </button>
                 </div>
                 <div style={{ width: '80%', padding: '20px', overflowY: 'auto' }}>
                     {renderContent()}
@@ -1185,16 +1227,21 @@ const MyDashboard = () => {
 };
 
 const buttonStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'left',
     width: '100%',
     padding: '10px',
     marginBottom: '10px',
-    backgroundColor: 'rgb(161, 64, 255)',
-    color: '#fff',
+    backgroundColor: 'transparent',
+    color: '#333',
     border: 'none',
-    borderRadius: '5px',
     cursor: 'pointer',
     fontSize: 'medium',
     fontWeight: 'bold'
 };
 
+const iconStyle = {
+    marginRight: '10px'
+};
 export default MyDashboard;
