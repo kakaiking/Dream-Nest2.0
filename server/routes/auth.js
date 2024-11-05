@@ -23,12 +23,7 @@ router.post(
   ]),
   async (req, res) => {
     try {
-      const {
-        owners, email, password, firmName, yearStarted,
-        cmaLicenseNumber, assetsUnderManagement, physical,
-        website, phoneNumber,
-      } = req.body;
-
+      const { owners, email, password, category, type, firmName, yearStarted, cmaLicenseNumber, assetsUnderManagement, physical, website, phoneNumber } = req.body;
       const { profileImage, kraPin, businessCertificate } = req.files;
 
       if (!profileImage || !kraPin || !businessCertificate) {
@@ -40,13 +35,14 @@ router.post(
         return res.status(409).json({ message: "User already exists!" });
       }
 
-      const salt = await bcrypt.genSalt();
-      const hashedPassword = await bcrypt.hash(password, salt);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       const newUser = new User({
         owners,
         email,
         password: hashedPassword,
+        category,
+        type,
         profileImagePath: profileImage[0].path,
         kraPinPath: kraPin[0].path,
         businessCertificatePath: businessCertificate[0].path,
@@ -60,7 +56,7 @@ router.post(
       });
 
       await newUser.save();
-      res.status(200).json({ message: "User registered successfully!", user: newUser });
+      res.status(200).json({ message: "User registered successfully!" });
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Registration failed!", error: err.message });

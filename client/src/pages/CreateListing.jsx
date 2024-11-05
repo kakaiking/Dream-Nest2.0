@@ -15,8 +15,9 @@ import '../styles/QuillEditor.scss';
 
 
 const CreateListing = () => {
-  const [category, setCategory] = useState("");
-  const [type, setType] = useState("");
+  const user = useSelector((state) => state.user);
+  const [category, setCategory] = useState(user.category);
+  const [type, setType] = useState(user.type);
 
   /* LOCATION */
   const [formLocation, setFormLocation] = useState({
@@ -98,6 +99,7 @@ const CreateListing = () => {
     }
   };
 
+
   const modules = {
     toolbar: [
       [{ 'header': '1' }, { 'header': '2' }],  // Add this line
@@ -121,44 +123,13 @@ const CreateListing = () => {
       <Navbar />
 
       <div className="create-listing">
-        <h1>Create A Listing</h1>
+        <h1>Create A Funding Proposal</h1>
         <form onSubmit={handlePost}>
           <div className="create-listing_step1">
             <h2>Step 1: Tell Us About Your Funding Project</h2>
             <hr />
-            <h3>Which Of These Categories Best Describes Your Organization?</h3>
-            <div className="category-list">
-              {categories?.slice(1, 5).map((item, index) => (
-                <div
-                  className={`category ${category === item.label ? "selected" : ""
-                    }`}
-                  key={index}
-                  onClick={() => setCategory(item.label)}
-                >
-                  <div className="category_icon">{item.icon}</div>
-                  <p>{item.label}</p>
-                </div>
-              ))}
-            </div>
 
-            <h3>Are you Certified by the Capital Markets Authority(CMA) of Kenya?</h3>
-            <div className="type-list">
-              {types?.map((item, index) => (
-                <div
-                  className={`type ${type === item.name ? "selected" : ""}`}
-                  key={index}
-                  onClick={() => setType(item.name)}
-                >
-                  <div className="type_text">
-                    <h4>{item.name}</h4>
-                    <p>{item.description}</p>
-                  </div>
-                  <div className="type_icon">{item.icon}</div>
-                </div>
-              ))}
-            </div>
-
-            <h3>Now, What Are Your Project's Details?</h3>
+            {/* <h3>Now, What Are Your Project's Details?</h3> */}
             <div className="full">
               <div className="location">
                 <p>What's Your Project Target?</p>
@@ -244,7 +215,10 @@ const CreateListing = () => {
           </div>
 
           <div className="create-listing_step2">
-            <h3>Finally, Provide The Following Key Information About This Project?</h3>
+          <h2>Step 2: Provide The Following Key Information About This Project</h2>
+          <hr />
+
+            {/* <h3>Finally, Provide The Following Key Information About This Project?</h3> */}
             <div className="description">
               <p>Title</p>
               <input
@@ -256,7 +230,7 @@ const CreateListing = () => {
                 onChange={handleChangeDescription}
                 required
               />
-              <p>Highlight Details</p>
+              <p>Highlight Of Details</p>
               <textarea
                 type="text"
                 placeholder="Highlight details"

@@ -52,12 +52,12 @@ export const categories = [
     icon: <IoBarChart style={{ color: '#6441a5' }} />, 
     description: "This property is close to the beach!",
   },
-  {
-    img: "assets/tower2.jpg",
-    label: "Enterprise",
-    icon: <IoBusiness style={{ color: '#c33764' }} />, 
-    description: "This property has windmills!",
-  },
+  // {
+  //   img: "assets/tower2.jpg",
+  //   label: "Enterprise",
+  //   icon: <IoBusiness style={{ color: '#c33764' }} />, 
+  //   description: "This property has windmills!",
+  // },
   {
     img: "assets/unity.jpg",
     label: "Non-Profit",
@@ -69,7 +69,7 @@ export const categories = [
 export const types = [
   {
     name: "CMA Certified",
-    description: "I have been approved by the Capital Markets Authority to manage funds and have no problem availing it when needed",
+    description: "I have been approved by the Capital Markets Authority to manage funds and have no problem availing necessary documents to prove this when needed",
     icon: <GiCheckMark />,
   },
   {

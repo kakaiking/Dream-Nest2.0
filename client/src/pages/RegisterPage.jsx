@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Register.scss";
-import { LuUpload } from "react-icons/lu";
-import { AiFillFileText } from "react-icons/ai"; // Document Icon
+import { AiFillFileText } from "react-icons/ai";
+import { categories, types } from "../data";
 
 const RegisterPage = () => {
+  const [category, setCategory] = useState("");
+  const [type, setType] = useState("");
+  const [passwordMatch, setPasswordMatch] = useState(true);
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     owners: "",
     email: "",
@@ -20,7 +25,19 @@ const RegisterPage = () => {
     physical: "",
     website: "",
     phoneNumber: "",
+    category: "",
+    type: "",
   });
+
+  useEffect(() => {
+    setFormData((prevData) => ({ ...prevData, category, type }));
+  }, [category, type]);
+
+  useEffect(() => {
+    setPasswordMatch(
+      formData.password === formData.confirmPassword || formData.confirmPassword === ""
+    );
+  }, [formData.password, formData.confirmPassword]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -30,19 +47,8 @@ const RegisterPage = () => {
     });
   };
 
-  const [passwordMatch, setPasswordMatch] = useState(true);
-
-  useEffect(() => {
-    setPasswordMatch(
-      formData.password === formData.confirmPassword || formData.confirmPassword === ""
-    );
-  }, [formData.password, formData.confirmPassword]);
-
-  const navigate = useNavigate();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const registerForm = new FormData();
       for (let key in formData) {
@@ -58,9 +64,11 @@ const RegisterPage = () => {
         navigate("/login");
       }
     } catch (err) {
-      console.log(err.message);
+      console.error(err.message);
     }
   };
+
+  console.log(formData)
 
   return (
     <div className="register">
@@ -101,8 +109,76 @@ const RegisterPage = () => {
           {!passwordMatch && (
             <p style={{ color: "red" }}>Passwords are not matched!</p>
           )}
+          <div className="create-listing_step1">
+
+            <h3 >Which Of These Categories Best Describes Your Organization?</h3>
+            <div className="category-list" style={{ color: '#fff' }}>
+              {categories?.slice(1, 5).map((item, index) => (
+                <div
+                  className={`category ${category === item.label ? "selected" : ""
+                    }`}
+                  key={index}
+                  onClick={() => setCategory(item.label)}
+                >
+                  <div className="category_icon">{item.icon}</div>
+                  <p>{item.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <h3 >Are you Certified by the Capital Markets Authority(CMA) of Kenya?</h3>
+            <div className="type-list" >
+              {types?.map((item, index) => (
+                <div
+                  className={`type ${type === item.name ? "selected" : ""}`}
+                  key={index}
+                  onClick={() => setType(item.name)}
+                >
+                  <div className="type_text">
+                    <h4>{item.name}</h4>
+                    <p>{item.description}</p>
+                  </div>
+                  <div className="type_icon">{item.icon}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          
 
           <input
+            placeholder="Firm Name"
+            name="firmName"
+            type="text"
+            value={formData.firmName}
+            onChange={handleChange}
+            required
+          />
+
+          <input
+            placeholder="Year Started"
+            name="yearStarted"
+            type="number"
+            value={formData.yearStarted}
+            onChange={handleChange}
+            required
+          />
+          <input
+            placeholder="CMA License"
+            name="cmaLicenseNumber"
+            value={formData.cmaLicenseNumber}
+            onChange={handleChange}
+            type="number"
+            required
+          />
+          <input
+            placeholder="Website"
+            name="website"
+            value={formData.website}
+            onChange={handleChange}
+          />
+
+<input
             id="image"
             type="file"
             name="profileImage"
@@ -153,38 +229,7 @@ const RegisterPage = () => {
               required
             />
           </div>
-
-          <input
-            placeholder="Firm Name"
-            name="firmName"
-            type="text"
-            value={formData.firmName}
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            placeholder="Year Started"
-            name="yearStarted"
-            type="number"
-            value={formData.yearStarted}
-            onChange={handleChange}
-            required
-          />
-          <input
-            placeholder="CMA License"
-            name="cmaLicenseNumber"
-            value={formData.cmaLicenseNumber}
-            onChange={handleChange}
-            type="number"
-            required
-          />
-          <input
-            placeholder="Website"
-            name="website"
-            value={formData.website}
-            onChange={handleChange}
-          />
+          
           <input
             placeholder="Assets Under Management (ksh)"
             name="assetsUnderManagement"

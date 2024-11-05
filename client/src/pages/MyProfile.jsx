@@ -141,11 +141,11 @@ const MyProfile = () => {
 
                                     <div className="aboutDesciption">
                                         <div className="title">
-                                            <h2>Owner</h2>
+                                            <h2>Owner/s</h2>
                                         </div>
 
                                         <div className="igPage">
-                                            <a href="">{user.owners}</a>
+                                            <a href="">{user.owners || 'N/A'}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -161,7 +161,7 @@ const MyProfile = () => {
                                         </div>
 
                                         <div className="igPage">
-                                            <a href="">{user.firmName}</a>
+                                            <a href="">{user.firmName || 'N/A'}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -177,7 +177,7 @@ const MyProfile = () => {
                                         </div>
 
                                         <div className="igPage">
-                                            <a href="">{user.email}</a>
+                                            <a href="">{user.email || 'N/A'}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -195,7 +195,7 @@ const MyProfile = () => {
                                         </div>
 
                                         <div className="igPage">
-                                            <a href="">+254 {user.phoneNumber}</a>
+                                            <a href="">+254 {user.phoneNumber || 'N/A'}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -243,7 +243,27 @@ const MyProfile = () => {
                                             <h2 className="country">Company / Firm Name</h2>
                                         </div>
                                         <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.firmName}</h3>
+                                            <h3 className="countryName">{user.firmName || 'N/A'}</h3>
+                                        </div>
+                                    </div>
+                                    <div className="separator"></div>
+
+                                    <div className="verifiedDatum">
+                                        <div className="verifiedDatumTitle">
+                                            <h2 className="country">Category</h2>
+                                        </div>
+                                        <div className="verifiedDatumData">
+                                            <h3 className="countryName">{user.category || 'N/A'}</h3>
+                                        </div>
+                                    </div>
+                                    <div className="separator"></div>
+
+                                    <div className="verifiedDatum">
+                                        <div className="verifiedDatumTitle">
+                                            <h2 className="country">CMA Certified</h2>
+                                        </div>
+                                        <div className="verifiedDatumData">
+                                            <h3 className="countryName">{user.type || 'N/A'}</h3>
                                         </div>
                                     </div>
                                     <div className="separator"></div>
@@ -253,7 +273,7 @@ const MyProfile = () => {
                                             <h2 className="country">Been A Fund Manager Since:</h2>
                                         </div>
                                         <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.yearStarted}</h3>
+                                            <h3 className="countryName">{user.yearStarted || 'N/A'}</h3>
                                         </div>
                                     </div>
                                     <div className="separator"></div>
@@ -263,7 +283,7 @@ const MyProfile = () => {
                                             <h2 className="country">CMA License Number:</h2>
                                         </div>
                                         <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.cmaLicenseNumber}</h3>
+                                            <h3 className="countryName">{user.cmaLicenseNumber || 'N/A'}</h3>
                                         </div>
                                     </div>
                                     <div className="separator"></div>
@@ -273,7 +293,7 @@ const MyProfile = () => {
                                             <h2 className="country">LinkedIn Profile / Professional Website:</h2>
                                         </div>
                                         <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.website}</h3>
+                                            <h3 className="countryName">{user.website || 'N/A'}</h3>
                                         </div>
                                     </div>
                                     <div className="separator"></div>
@@ -283,7 +303,7 @@ const MyProfile = () => {
                                             <h2 className="country"> Hosted Funding Projects:</h2>
                                         </div>
                                         <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.propertyList.length}</h3>
+                                            <h3 className="countryName">{user.propertyList.length || 'N/A'}</h3>
                                         </div>
                                     </div>
                                     <div className="separator"></div>
@@ -294,7 +314,7 @@ const MyProfile = () => {
                                             <h2 className="country">Assets Under Management:</h2>
                                         </div>
                                         <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.assetsUnderManagement}</h3>
+                                            <h3 className="countryName">{user.assetsUnderManagement || 'N/A'}</h3>
                                         </div>
                                     </div>
                                     <div className="separator"></div>
@@ -304,7 +324,7 @@ const MyProfile = () => {
                                             <h2 className="country">Physical Address:</h2>
                                         </div>
                                         <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.physical}</h3>
+                                            <h3 className="countryName">{user.physical || 'N/A'}</h3>
                                         </div>
                                     </div>
 

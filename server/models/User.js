@@ -19,20 +19,29 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
     firmName: {
       type: String,
       default: "",
     },
     yearStarted: {
       type: Number,
-      default: "",
+      default: null,
     },
     cmaLicenseNumber: {
       type: Number,
-      default: "",
+      default: null,
     },
     assetsUnderManagement: {
       type: Number,
+      default: 0,
     },
     physical: {
       type: String,
@@ -63,7 +72,7 @@ const UserSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
-    wishList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Listing' }],
+    wishList: [{ type: mongoose.Schema.Types.ObjectId, ref: "Listing" }],
     propertyList: {
       type: Array,
       default: [],
@@ -77,4 +86,4 @@ const UserSchema = new mongoose.Schema(
 );
 
 const User = mongoose.model("User", UserSchema);
-module.exports = User; 
+module.exports = User;
