@@ -30,6 +30,7 @@ import TopUpPage from "./pages/TopUpPage";
 import MyTopUps from "./pages/MyTopUps";
 import MyProjectTopUps from "./pages/MyProjectTopUps";
 import MyDashboard from "./pages/MyDashboard";
+import InstightsPage from "./pages/InstightsPage";
 
 
 function App() {
@@ -68,6 +69,8 @@ function App() {
           <Route path="/:userId/my-topups" element={<MyTopUps />} />
           <Route path="/:userId/my-project-topups" element={<MyProjectTopUps />} />
           <Route path="/:userId/dashboard" element={<MyDashboard />} />
+          <Route path="/:userId/insights" element={<InstightsPage />} />
+
 
 
 

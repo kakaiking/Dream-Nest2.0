@@ -42,6 +42,18 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
+// Get all bookings for a specific listing
+router.get('/:listingId/host', async (req, res) => {
+  const { listingId } = req.params;
+  try {
+    const bookings = await Booking.find({ listingId: listingId }).populate('listingId');
+    res.json(bookings);
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    res.status(500).json({ message: 'Failed to fetch bookings' });
+  }
+});
+
 /* CREATE BOOKING */
 router.post("/create", async (req, res) => {
   try {

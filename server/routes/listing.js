@@ -27,6 +27,24 @@ router.get('/all', async (req, res) => {
   }
 });
 
+// Get all property listings for a specific creator
+router.get('/all/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params; // Get userId from the route parameter
+
+    // Fetch listings where creator matches the given userId
+    const listings = await Listing.find({ creator: userId })
+      .populate('creator', 'name email') // Populate creator with specific fields
+      .populate('updates', 'title description createdAt') // Populate updates with specific fields
+      .exec();
+
+    res.json(listings);
+  } catch (error) {
+    console.error('Error fetching listings:', error);
+    res.status(500).json({ message: 'Failed to fetch listings' });
+  }
+});
+
 /* CREATE LISTING */
 router.post("/create", upload.array("listingPhotos"), async (req, res) => {
   try {
