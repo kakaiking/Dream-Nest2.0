@@ -40,6 +40,28 @@ router.get('/:userId/projectTopups', async (req, res) => {
     }
 });
 
+// Get all topups for a specific listing
+router.get('/:listingId/projectTopups', async (req, res) => {
+    const { listingId } = req.params;
+    try {
+        // Fetch topups by listingId and populate listingId field with specific fields
+        const topups = await TopUp.find({
+            listingId: mongoose.Types.ObjectId(listingId),
+            status: 'approved',
+        }).populate({
+            path: 'listingId', // Reference to listingId in TopUp model
+            select: 'listingTitle target' // Select only the relevant fields from listingId
+        });
+        // Respond with the fetched topups
+        res.json(topups);
+    } catch (error) {
+        console.error('Error fetching topups:', error);
+        res.status(500).json({ message: 'Failed to fetch topups' });
+    }
+});
+
+
+
 /* EDIT TOPUP STATUS*/
 router.patch("/:id/status", async (req, res) => {
     try {

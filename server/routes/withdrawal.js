@@ -40,6 +40,18 @@ router.get('/:userId/projectWithdrawals', async (req, res) => {
     }
 });
 
+// Get all withdrawals for a specific listing
+router.get('/:listingId/projectWithdrawals', async (req, res) => {
+    const { listingId } = req.params;
+    try {
+        const withdrawls = await Withdrawal.find({ listingId: listingId }).populate('listingId');
+        res.json(withdrawls);
+    } catch (error) {
+        console.error('Error fetching withdrawls:', error);
+        res.status(500).json({ message: 'Failed to fetch withdrawls' });
+    }
+});
+
 /* EDIT WITHDRAWAL STATUS*/
 router.patch("/:id/status", async (req, res) => {
     try {

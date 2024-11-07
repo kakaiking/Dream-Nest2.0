@@ -1,23 +1,47 @@
+import React, { useState, useEffect } from 'react';
 import "../styles/CreateListing.scss";
 import Navbar from "../components/Navbar";
 import { categories, types } from "../data";
-
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Footer from "../components/Footer"
+import Footer from "../components/Footer";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import '../styles/QuillEditor.scss';
 
-
-
-
-
 const CreateListing = () => {
-  const user = useSelector((state) => state.user);
-  const [category, setCategory] = useState(user.category);
-  const [type, setType] = useState(user.type);
+  const [user, setUser] = useState({});
+  const [category, setCategory] = useState("");
+  const [type, setType] = useState("");
+  const userId = useSelector((state) => state.user?._id); // Access user ID directly if possible
+  const [loading, setLoading] = useState(true);
+
+  const getUserDetails = async () => {
+    if (!userId) return; // Ensure userId is available
+
+    try {
+      const response = await fetch(`http://localhost:3001/users/${userId}/details`, {
+        method: 'GET',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data);
+        setCategory(data.category || ""); // Initialize category and type here
+        setType(data.type || "");
+      } else {
+        console.error('Error fetching user details:', response.status);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error('Fetch user details failed:', error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getUserDetails();
+  }, [userId]);
 
   /* LOCATION */
   const [formLocation, setFormLocation] = useState({
@@ -59,15 +83,13 @@ const CreateListing = () => {
     });
   };
 
-  const creatorId = useSelector((state) => state.user._id);
-
+  const creatorId = useSelector((state) => state.user?._id);
   const navigate = useNavigate();
 
   const handlePost = async (e) => {
     e.preventDefault();
 
     try {
-      /* Create a new FormData onject to handle file uploads */
       const listingForm = new FormData();
       listingForm.append("creator", creatorId);
       listingForm.append("category", category);
@@ -83,9 +105,7 @@ const CreateListing = () => {
       listingForm.append("description", formDescription.description);
       listingForm.append("highlightDesc", formDescription.highlightDesc);
 
-      console.log(listingForm)
-      console.log(FormData)
-      /* Send a POST request to server */
+
       const response = await fetch("http://localhost:3001/properties/create", {
         method: "POST",
         body: listingForm,
@@ -99,13 +119,11 @@ const CreateListing = () => {
     }
   };
 
-
   const modules = {
     toolbar: [
-      [{ 'header': '1' }, { 'header': '2' }],  // Add this line
+      [{ 'header': '1' }, { 'header': '2' }],
       ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-      [{ 'list': 'ordered' }, { 'list': 'bullet' },
-      { 'indent': '-1' }, { 'indent': '+1' }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
       ['link', 'image'],
       ['clean']
     ],
@@ -129,7 +147,6 @@ const CreateListing = () => {
             <h2>Step 1: Tell Us About Your Funding Project</h2>
             <hr />
 
-            {/* <h3>Now, What Are Your Project's Details?</h3> */}
             <div className="full">
               <div className="location">
                 <p>What's Your Project Target?</p>
@@ -174,7 +191,7 @@ const CreateListing = () => {
                 <p>Where Will This Money Be Used?</p>
                 <input
                   type="text"
-                  maxlength="21"
+                  maxLength="21"
                   placeholder="Stocks, Bonds, Building A Church..."
                   name="financialInstruments"
                   value={formLocation.financialInstruments}
@@ -186,9 +203,8 @@ const CreateListing = () => {
 
             <div className="half">
               <div className="location">
-                {/* <p>Return (%)</p> */}
                 <details >
-                  <summary style={{cursor: "pointer"}}><b>Returns On Investment (%)</b></summary>
+                  <summary style={{ cursor: "pointer" }}><b>Returns On Investment (%)</b></summary>
                   <p>If there are no returns for this listing, put ROI as 0</p>
                 </details>
                 <input
@@ -215,17 +231,16 @@ const CreateListing = () => {
           </div>
 
           <div className="create-listing_step2">
-          <h2>Step 2: Provide The Following Key Information About This Project</h2>
-          <hr />
+            <h2>Step 2: Provide The Following Key Information About This Project</h2>
+            <hr />
 
-            {/* <h3>Finally, Provide The Following Key Information About This Project?</h3> */}
             <div className="description">
               <p>Title</p>
               <input
                 type="text"
                 placeholder="Title"
                 name="title"
-                maxlength="21"
+                maxLength="21"
                 value={formDescription.title}
                 onChange={handleChangeDescription}
                 required
@@ -245,7 +260,7 @@ const CreateListing = () => {
                 onChange={handleChangeRichText}
                 modules={modules}
                 formats={formats}
-                style={{height: "300px"}}
+                style={{ height: "300px" }}
               />
             </div>
           </div>

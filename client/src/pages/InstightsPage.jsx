@@ -28,10 +28,14 @@ const InsightsPage = () => {
   const [listings, setListings] = useState([]);
   const [selectedListing, setSelectedListing] = useState('');
   const [bookings, setBookings] = useState([]);
+  const [topups, setTopups] = useState([]);
+  const [withdrawals, setWithdrawals] = useState([]);
   const [chartData, setChartData] = useState(null);
-  const [timeframe, setTimeframe] = useState('Daily');
+  const [timeframe, setTimeframe] = useState('Daily');  // Default to daily
   const [listingTarget, setListingTarget] = useState(0);
   const [listingCreationDate, setListingCreationDate] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -49,18 +53,61 @@ const InsightsPage = () => {
   }, [userId]);
 
   useEffect(() => {
+    const fetchTopups = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/topups/`);
+        if (!response.ok) throw new Error('Failed to fetch topups');
+        const data = await response.json();
+        const filteredTopups = data.filter(topup => topup.listingId === selectedListing && topup.status === 'approved');
+        setTopups(filteredTopups);
+      } catch (err) {
+        setError('Failed to fetch topups');
+        console.error('Error fetching topups:', err);
+      }
+    };
+
     if (selectedListing) {
-      const fetchBookings = async () => {
+      fetchTopups();
+    }
+  }, [selectedListing]);
+
+  useEffect(() => {
+    const fetchWithdrawals = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/withdrawals/`);
+        if (!response.ok) throw new Error('Failed to fetch withdrawals');
+        const data = await response.json();
+        const filteredWithdrawals = data.filter(withdrawal => withdrawal.listingId === selectedListing && withdrawal.status === 'approved');
+        setWithdrawals(filteredWithdrawals);
+      } catch (err) {
+        setError('Failed to fetch withdrawals');
+        console.error('Error fetching withdrawals:', err);
+      }
+    };
+
+    if (selectedListing) {
+      fetchWithdrawals();
+    }
+  }, [selectedListing]);
+
+  useEffect(() => {
+    if (selectedListing) {
+      const fetchData = async () => {
         try {
-          const [bookingsResponse, listingResponse] = await Promise.all([ 
+          const [bookingsResponse, listingResponse] = await Promise.all([
             fetch(`http://localhost:3001/bookings/${selectedListing}/host`),
             fetch(`http://localhost:3001/properties/${selectedListing}`)
           ]);
+  
           if (!bookingsResponse.ok || !listingResponse.ok) {
-            throw new Error('Failed to fetch bookings or listing details');
+            throw new Error('Failed to fetch data');
           }
-          const bookingsData = await bookingsResponse.json();
-          const listingData = await listingResponse.json();
+  
+          const [bookingsData, listingData] = await Promise.all([ 
+            bookingsResponse.json(),
+            listingResponse.json()
+          ]);
+  
           setBookings(bookingsData);
           setListingTarget(listingData.target);
           setListingCreationDate(new Date(listingData.createdAt));
@@ -68,66 +115,84 @@ const InsightsPage = () => {
           console.error('Error fetching data:', error);
         }
       };
-
-      fetchBookings();
+  
+      fetchData();
     }
   }, [selectedListing]);
-
-  const generateLabels = (startDate, endDate, interval) => {
-    const labels = [];
-    let currentDate = new Date(startDate);
-
-    while (currentDate <= endDate) {
-      labels.push(
-        interval === 'Hourly'
-          ? currentDate.toLocaleString('en-US', { hour: 'numeric', hour12: true })
-          : currentDate.toLocaleDateString()
-      );
-      if (interval === 'Hourly') {
-        currentDate.setHours(currentDate.getHours() + 1);
-      } else if (interval === 'Daily') {
-        currentDate.setDate(currentDate.getDate() + 1);
-      } else if (interval === 'Weekly') {
-        currentDate.setDate(currentDate.getDate() + 7);
-      } else if (interval === 'Monthly') {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-      } else if (interval === 'Yearly') {
-        currentDate.setFullYear(currentDate.getFullYear() + 1);
-      }
-    }
-    return labels;
-  };
-
+  
   useEffect(() => {
-    if (bookings.length > 0 && listingTarget && listingCreationDate) {
+    if (listingCreationDate) {
       const endDate = new Date();
-      const labels = generateLabels(listingCreationDate, endDate, timeframe);
-      
-      const bookingMap = {};
-      bookings.forEach((booking) => {
-        const bookingDate = new Date(booking.updatedAt);
-        let label = timeframe === 'Hourly'
-          ? bookingDate.toLocaleString('en-US', { hour: 'numeric', hour12: true })
-          : bookingDate.toLocaleDateString();
-        bookingMap[label] = (bookingMap[label] || 0) + booking.totalPrice;
-      });
+      const labels = generateLabels(listingCreationDate, endDate);
+    
+      // Create separate arrays for bookings, topups, and withdrawals with their respective types
+      const bookingsWithTypes = bookings.map((item) => ({
+        date: new Date(item.createdAt).toISOString().split('T')[0], 
+        amount: item.bookingPrice,
+        type: 'booking',
+      }));
 
+      const topupsWithTypes = topups.map((item) => ({
+        date: new Date(item.createdAt).toISOString().split('T')[0],
+        amount: item.totalPrice,
+        type: 'topup',
+      }));
+
+      const withdrawalsWithTypes = withdrawals.map((item) => ({
+        date: new Date(item.createdAt).toISOString().split('T')[0],
+        amount: -item.totalPrice,  // Withdrawal amounts are negative
+        type: 'withdrawal',
+      }));
+
+      // Combine all arrays into one cumulative array
+      const cumulativeArray = [...bookingsWithTypes, ...topupsWithTypes, ...withdrawalsWithTypes];
+      console.log(cumulativeArray)
+  
+      // Sort cumulative array by date
+      cumulativeArray.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
       let cumulativeTotal = 0;
       const dataPoints = labels.map((label) => {
-        cumulativeTotal += bookingMap[label] || 0;
+        cumulativeArray.forEach((item) => {
+          switch (timeframe) {
+            case 'Daily':
+              if (item.date === label) {
+                cumulativeTotal += item.amount;
+              }
+              break;
+            case 'Weekly':
+              const weekNumber = Math.ceil((new Date(item.date).getDate() + new Date(item.date).getDay()) / 7);
+              if (label === `Week ${weekNumber}`) {
+                cumulativeTotal += item.amount;
+              }
+              break;
+            case 'Monthly':
+              if (label === `${new Date(item.date).getMonth() + 1}-${new Date(item.date).getFullYear()}`) {
+                cumulativeTotal += item.amount;
+              }
+              break;
+            case 'Yearly':
+              if (label === new Date(item.date).getFullYear().toString()) {
+                cumulativeTotal += item.amount;
+              }
+              break;
+            default:
+              break;
+          }
+        });
         return cumulativeTotal;
       });
-
+    
       setChartData({
         labels,
         datasets: [
           {
-            label: 'Total Price (Cumulative)',
+            label: 'Cumulative Total',
             data: dataPoints,
             borderColor: 'rgba(75,192,192,1)',
             fill: false,
-            tension: 0.4, // This makes the line curved
-            borderWidth: 2, // Thicker line
+            tension: 0.4,
+            borderWidth: 2,
           },
           {
             label: 'Listing Target',
@@ -139,7 +204,36 @@ const InsightsPage = () => {
         ],
       });
     }
-  }, [bookings, timeframe, listingTarget, listingCreationDate]);
+  }, [bookings, topups, withdrawals, timeframe, listingTarget, listingCreationDate]);
+
+  const generateLabels = (startDate, endDate) => {
+    const labels = [];
+    let currentDate = new Date(startDate);
+  
+    while (currentDate <= endDate) {
+      switch (timeframe) {
+        case 'Daily':
+          labels.push(currentDate.toISOString().split('T')[0]);
+          break;
+        case 'Weekly':
+          const weekNumber = Math.ceil((currentDate.getDate() + currentDate.getDay()) / 7);
+          labels.push(`Week ${weekNumber}`);
+          break;
+        case 'Monthly':
+          labels.push(`${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`);
+          break;
+        case 'Yearly':
+          labels.push(currentDate.getFullYear().toString());
+          break;
+        default:
+          break;
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  
+    // Limit labels to 10 and add overflow
+    return labels.slice(0, 10);
+  };
 
   return (
     <div>
@@ -157,35 +251,35 @@ const InsightsPage = () => {
         ))}
       </select>
       <div style={{ marginTop: '10px' }}>
-        <button onClick={() => setTimeframe('Hourly')}>Hourly</button>
         <button onClick={() => setTimeframe('Daily')}>Daily</button>
         <button onClick={() => setTimeframe('Weekly')}>Weekly</button>
         <button onClick={() => setTimeframe('Monthly')}>Monthly</button>
         <button onClick={() => setTimeframe('Yearly')}>Yearly</button>
       </div>
       {chartData && (
-        <div style={{ marginTop: '20px' }}>
-          <Line
-            data={chartData}
-            options={{
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  title: {
-                    display: true,
-                    text: 'Total Price',
-                  },
-                },
-                x: {
-                  title: {
-                    display: true,
-                    text: `Date (${timeframe})`,
-                  },
-                },
+        <Line
+          data={chartData}
+          options={{
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
               },
-            }}
-          />
-        </div>
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `${context.dataset.label}: ${context.raw.toLocaleString()}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          }}
+        />
       )}
     </div>
   );

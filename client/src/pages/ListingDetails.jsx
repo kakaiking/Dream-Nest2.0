@@ -106,6 +106,7 @@ const ListingDetails = () => {
         hostId: listing.creator._id,
         customerEmail,
         customerName,
+        bookingPrice: pricePerShare * guestCount,
         totalPrice: pricePerShare * guestCount,
         guestCount,
         listingTitle: listing.title, 
@@ -543,15 +544,15 @@ const ListingDetails = () => {
           </div>
 
           <div className='bidInfo'>
-            <h2>How Many Shares Of This Project Do You Want?</h2><br />
+            <h2 style={{textAlign: 'center'}}>Select The Number Of <u>Shares Of Interest</u> You Want For This Project </h2><br /><hr /> <br />
             <div className="date-range-calendar">
               <h3>
                 {'Target: ksh. ' + listing.target.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
               </h3>
               <h3>Total Listing Shares: {listing.totalShares}</h3>
-              <h3>Remaining shares: {listing.shares - guestCount}</h3>
+              <h3>Remaining Shares Of Interest: {listing.shares - guestCount}</h3>
               <h3 style={{ marginTop: '10px' }}>
-                Price per Share: {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                Price Per Share: {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
               </h3>
 
               <div className="basic">

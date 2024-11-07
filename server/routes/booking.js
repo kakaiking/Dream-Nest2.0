@@ -57,8 +57,8 @@ router.get('/:listingId/host', async (req, res) => {
 /* CREATE BOOKING */
 router.post("/create", async (req, res) => {
   try {
-    const { customerId, hostId, listingId, customerEmail, customerName, totalPrice, listingTitle, customerReturns, guestCount } = req.body
-    const newBooking = new Booking({ customerId, hostId, listingId, customerEmail, customerName, totalPrice, listingTitle, customerReturns, guestCount })
+    const { customerId, hostId, listingId, customerEmail, customerName, bookingPrice, totalPrice, listingTitle, customerReturns, guestCount } = req.body
+    const newBooking = new Booking({ customerId, hostId, listingId, customerEmail, customerName, bookingPrice, totalPrice, listingTitle, customerReturns, guestCount })
     await newBooking.save()
     
     // Find the listing and subtract the booked shares
@@ -125,6 +125,7 @@ router.post("/:userId/withdraw", async (req, res) => {
           listingId: listing._id,
           customerEmail: booking.customerEmail,
           customerName: booking.customerName,
+          bookingPrice: booking.bookingPrice,
           totalPrice,
           listingTitle: booking.listingTitle,
           customerReturns: booking.customerReturns,
@@ -171,6 +172,7 @@ router.post("/:userId/topup", async (req, res) => {
       listingId: listing._id,
       customerEmail: booking.customerEmail,
       customerName: booking.customerName,
+      bookingPrice: booking.bookingPrice,
       totalPrice,
       listingTitle: booking.listingTitle,
       customerReturns: booking.customerReturns,
