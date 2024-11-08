@@ -1,285 +1,211 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import Navbar from '../components/Navbar';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import { Line, LineChart, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import Navbar from "../components/Navbar";
 
 const InsightsPage = () => {
   const userId = useSelector((state) => state.user._id);
-  const [listings, setListings] = useState([]);
-  const [selectedListing, setSelectedListing] = useState('');
-  const [bookings, setBookings] = useState([]);
-  const [topups, setTopups] = useState([]);
-  const [withdrawals, setWithdrawals] = useState([]);
-  const [chartData, setChartData] = useState(null);
-  const [timeframe, setTimeframe] = useState('Daily');  // Default to daily
-  const [listingTarget, setListingTarget] = useState(0);
-  const [listingCreationDate, setListingCreationDate] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [insightListings, setInsightListings] = useState([]);
+  const [selectedInsightListing, setSelectedInsightListing] = useState('');
+  const [insightBookings, setInsightBookings] = useState([]);
+  const [insightTopups, setInsightTopups] = useState([]);
+  const [insightWithdrawals, setInsightWithdrawals] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [insightListingTarget, setInsightListingTarget] = useState(0);
+  const [insightListingCreationDate, setInsightListingCreationDate] = useState(null);
 
   useEffect(() => {
-    const fetchListings = async () => {
+    const fetchInsightListings = async () => {
       try {
         const response = await fetch(`http://localhost:3001/properties/all/${userId}`);
-        if (!response.ok) throw new Error('Failed to fetch listings');
+        if (!response.ok) throw new Error('Failed to fetch Insight listings');
         const data = await response.json();
-        setListings(data);
+        setInsightListings(data);
       } catch (error) {
-        console.error('Error fetching listings:', error);
+        console.error('Error fetching Insight listings:', error);
       }
     };
-
-    fetchListings();
+    fetchInsightListings();
   }, [userId]);
 
   useEffect(() => {
-    const fetchTopups = async () => {
+    const fetchTransactions = async () => {
+      if (!selectedInsightListing) return;
       try {
-        const response = await fetch(`http://localhost:3001/topups/`);
-        if (!response.ok) throw new Error('Failed to fetch topups');
-        const data = await response.json();
-        const filteredTopups = data.filter(topup => topup.listingId === selectedListing && topup.status === 'approved');
-        setTopups(filteredTopups);
-      } catch (err) {
-        setError('Failed to fetch topups');
-        console.error('Error fetching topups:', err);
-      }
-    };
+        const [insightBookingsRes, insightTopupsRes, withdrawalsRes, listingRes] = await Promise.all([
+          fetch(`http://localhost:3001/bookings/${selectedInsightListing}/host`),
+          fetch(`http://localhost:3001/topups/`),
+          fetch(`http://localhost:3001/withdrawals/`),
+          fetch(`http://localhost:3001/properties/${selectedInsightListing}`)
+        ]);
 
-    if (selectedListing) {
-      fetchTopups();
-    }
-  }, [selectedListing]);
-
-  useEffect(() => {
-    const fetchWithdrawals = async () => {
-      try {
-        const response = await fetch(`http://localhost:3001/withdrawals/`);
-        if (!response.ok) throw new Error('Failed to fetch withdrawals');
-        const data = await response.json();
-        const filteredWithdrawals = data.filter(withdrawal => withdrawal.listingId === selectedListing && withdrawal.status === 'approved');
-        setWithdrawals(filteredWithdrawals);
-      } catch (err) {
-        setError('Failed to fetch withdrawals');
-        console.error('Error fetching withdrawals:', err);
-      }
-    };
-
-    if (selectedListing) {
-      fetchWithdrawals();
-    }
-  }, [selectedListing]);
-
-  useEffect(() => {
-    if (selectedListing) {
-      const fetchData = async () => {
-        try {
-          const [bookingsResponse, listingResponse] = await Promise.all([
-            fetch(`http://localhost:3001/bookings/${selectedListing}/host`),
-            fetch(`http://localhost:3001/properties/${selectedListing}`)
-          ]);
-  
-          if (!bookingsResponse.ok || !listingResponse.ok) {
-            throw new Error('Failed to fetch data');
-          }
-  
-          const [bookingsData, listingData] = await Promise.all([ 
-            bookingsResponse.json(),
-            listingResponse.json()
-          ]);
-  
-          setBookings(bookingsData);
-          setListingTarget(listingData.target);
-          setListingCreationDate(new Date(listingData.createdAt));
-        } catch (error) {
-          console.error('Error fetching data:', error);
+        if (!insightBookingsRes.ok || !insightTopupsRes.ok || !withdrawalsRes.ok || !listingRes.ok) {
+          throw new Error('Failed to fetch data');
         }
-      };
-  
-      fetchData();
-    }
-  }, [selectedListing]);
-  
-  useEffect(() => {
-    if (listingCreationDate) {
-      const endDate = new Date();
-      const labels = generateLabels(listingCreationDate, endDate);
-    
-      // Create separate arrays for bookings, topups, and withdrawals with their respective types
-      const bookingsWithTypes = bookings.map((item) => ({
-        date: new Date(item.createdAt).toISOString().split('T')[0], 
-        amount: item.bookingPrice,
-        type: 'booking',
-      }));
 
-      const topupsWithTypes = topups.map((item) => ({
-        date: new Date(item.createdAt).toISOString().split('T')[0],
-        amount: item.totalPrice,
-        type: 'topup',
-      }));
+        const [insightBookingsData, insightTopupsData, insightWithdrawalsData, insightListingData] = await Promise.all([
+          insightBookingsRes.json(),
+          insightTopupsRes.json(),
+          withdrawalsRes.json(),
+          listingRes.json()
+        ]);
 
-      const withdrawalsWithTypes = withdrawals.map((item) => ({
-        date: new Date(item.createdAt).toISOString().split('T')[0],
-        amount: -item.totalPrice,  // Withdrawal amounts are negative
-        type: 'withdrawal',
-      }));
-
-      // Combine all arrays into one cumulative array
-      const cumulativeArray = [...bookingsWithTypes, ...topupsWithTypes, ...withdrawalsWithTypes];
-      console.log(cumulativeArray)
-  
-      // Sort cumulative array by date
-      cumulativeArray.sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-      let cumulativeTotal = 0;
-      const dataPoints = labels.map((label) => {
-        cumulativeArray.forEach((item) => {
-          switch (timeframe) {
-            case 'Daily':
-              if (item.date === label) {
-                cumulativeTotal += item.amount;
-              }
-              break;
-            case 'Weekly':
-              const weekNumber = Math.ceil((new Date(item.date).getDate() + new Date(item.date).getDay()) / 7);
-              if (label === `Week ${weekNumber}`) {
-                cumulativeTotal += item.amount;
-              }
-              break;
-            case 'Monthly':
-              if (label === `${new Date(item.date).getMonth() + 1}-${new Date(item.date).getFullYear()}`) {
-                cumulativeTotal += item.amount;
-              }
-              break;
-            case 'Yearly':
-              if (label === new Date(item.date).getFullYear().toString()) {
-                cumulativeTotal += item.amount;
-              }
-              break;
-            default:
-              break;
-          }
-        });
-        return cumulativeTotal;
-      });
-    
-      setChartData({
-        labels,
-        datasets: [
-          {
-            label: 'Cumulative Total',
-            data: dataPoints,
-            borderColor: 'rgba(75,192,192,1)',
-            fill: false,
-            tension: 0.4,
-            borderWidth: 2,
-          },
-          {
-            label: 'Listing Target',
-            data: Array(labels.length).fill(listingTarget),
-            borderColor: 'rgba(255,99,132,0.6)',
-            borderDash: [5, 5],
-            fill: false,
-          },
-        ],
-      });
-    }
-  }, [bookings, topups, withdrawals, timeframe, listingTarget, listingCreationDate]);
-
-  const generateLabels = (startDate, endDate) => {
-    const labels = [];
-    let currentDate = new Date(startDate);
-  
-    while (currentDate <= endDate) {
-      switch (timeframe) {
-        case 'Daily':
-          labels.push(currentDate.toISOString().split('T')[0]);
-          break;
-        case 'Weekly':
-          const weekNumber = Math.ceil((currentDate.getDate() + currentDate.getDay()) / 7);
-          labels.push(`Week ${weekNumber}`);
-          break;
-        case 'Monthly':
-          labels.push(`${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`);
-          break;
-        case 'Yearly':
-          labels.push(currentDate.getFullYear().toString());
-          break;
-        default:
-          break;
+        setInsightBookings(insightBookingsData);
+        setInsightTopups(insightTopupsData.filter(t => t.listingId === selectedInsightListing && t.status === 'approved'));
+        setInsightWithdrawals(insightWithdrawalsData.filter(w => w.listingId === selectedInsightListing && w.status === 'approved'));
+        setInsightListingTarget(insightListingData.target);
+        setInsightListingCreationDate(new Date(insightListingData.createdAt));
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-  
-    // Limit labels to 10 and add overflow
-    return labels.slice(0, 10);
-  };
+    };
+    fetchTransactions();
+  }, [selectedInsightListing]);
+
+  useEffect(() => {
+    if (!insightListingCreationDate) return;
+
+    const processTransactions = () => {
+      const allTransactions = [
+        ...insightBookings.map(b => ({
+          date: new Date(b.createdAt).toLocaleDateString('en-CA'),
+          amount: b.bookingPrice,
+          type: 'booking'
+        })),
+        ...insightTopups.map(t => ({
+          date: new Date(t.createdAt).toLocaleDateString('en-CA'),
+          amount: t.totalPrice,
+          type: 'topup'
+        })),
+        ...insightWithdrawals.map(w => ({
+          date: new Date(w.createdAt).toLocaleDateString('en-CA'),
+          amount: -w.totalPrice,
+          type: 'withdrawal'
+        }))
+      ];
+
+      const dailyTotals = new Map();
+      allTransactions.forEach(transaction => {
+        const currentTotal = dailyTotals.get(transaction.date) || 0;
+        dailyTotals.set(transaction.date, currentTotal + transaction.amount);
+      });
+
+      const generateDateRange = () => {
+        const dates = [];
+        const startDate = new Date(insightListingCreationDate);
+        startDate.setHours(0, 0, 0, 0);
+
+        let cumulativeTotal = 0;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const endDate = new Date(today);
+        endDate.setDate(endDate.getDate() + 5);  // Add 5 extra days to the range
+
+        const currentDate = new Date(startDate);
+
+        while (currentDate <= endDate) {
+          const dateStr = currentDate.toLocaleDateString('en-CA');
+          const dayTotal = currentDate <= today ? dailyTotals.get(dateStr) || 0 : 0;
+          cumulativeTotal += dayTotal;
+
+          dates.push({
+            date: dateStr,
+            total: currentDate <= today ? cumulativeTotal : null, // Set total only for dates up to today
+            target: insightListingTarget
+          });
+
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        return dates;
+      };
+
+      return generateDateRange();
+    };
+
+    const chartData = processTransactions();
+    setChartData(chartData);
+  }, [insightBookings, insightTopups, insightWithdrawals, insightListingCreationDate, insightListingTarget]);
 
   return (
-    <div>
+    <div className="w-full max-w-6xl mx-auto p-4">
       <Navbar />
-      <p>Choose the funding project you want to see insights of</p>
-      <select
-        value={selectedListing}
-        onChange={(e) => setSelectedListing(e.target.value)}
-      >
-        <option value="">Select a listing</option>
-        {listings.map((listing) => (
-          <option key={listing._id} value={listing._id}>
-            {listing.title}
-          </option>
-        ))}
-      </select>
-      <div style={{ marginTop: '10px' }}>
-        <button onClick={() => setTimeframe('Daily')}>Daily</button>
-        <button onClick={() => setTimeframe('Weekly')}>Weekly</button>
-        <button onClick={() => setTimeframe('Monthly')}>Monthly</button>
-        <button onClick={() => setTimeframe('Yearly')}>Yearly</button>
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Select a funding project to view insights
+        </label>
+        <select
+          className="w-full p-2 border border-gray-300 rounded-md"
+          value={selectedInsightListing}
+          onChange={(e) => setSelectedInsightListing(e.target.value)}
+        >
+          <option value="">Select a listing</option>
+          {insightListings.map((listing) => (
+            <option key={listing._id} value={listing._id}>
+              {listing.title}
+            </option>
+          ))}
+        </select>
       </div>
-      {chartData && (
-        <Line
-          data={chartData}
-          options={{
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'top',
-              },
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    return `${context.dataset.label}: ${context.raw.toLocaleString()}`;
-                  }
-                }
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-              },
-            },
-          }}
-        />
+
+      {chartData.length > 0 && (
+        <div className="w-full h-96 bg-white p-4 rounded-lg shadow">
+          <LineChart
+            width={800}
+            height={400}
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 50, bottom: 5 }}
+          >
+            <XAxis
+              dataKey="date"
+              tick={{ fontSize: 12 }}
+              interval={0}
+              label={{ value: 'Date', position: 'insideBottomRight', offset: -5 }}
+              tickFormatter={(value) => {
+                const date = new Date(value);
+                return date.toLocaleDateString('en-US', {
+                  month: 'short',
+                  day: 'numeric'
+                });
+              }}
+            />
+            <YAxis
+              label={{ value: 'Amount', angle: -90, position: 'insideLeft', offset: -20 }}
+            />
+            <Tooltip
+              formatter={(value, name) => [
+                `Ksh.${value?.toLocaleString()}` || "Pending",
+                name === 'Target' ? 'Target' : 'Cumulative Total'
+              ]}
+              labelFormatter={(label) => {
+                const date = new Date(label);
+                return date.toLocaleDateString('en-US', {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric'
+                });
+              }}
+            />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="total"
+              stroke="#4f46e5"
+              name="Cumulative Total"
+              strokeWidth={2}
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="target"
+              stroke="#ef4444"
+              name="Target"
+              strokeDasharray="5 5"
+            />
+          </LineChart>
+        </div>
       )}
     </div>
   );

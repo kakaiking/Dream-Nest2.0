@@ -34,6 +34,16 @@ import DOMPurify from 'dompurify';
 
 const ListingDetails = () => {
   const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    setCustomerEmail(user.email);
+    setCustomerName(`${user.firmName} `);
+  }, [user]);
+
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const qrRef = useRef(null); // Ref for QR code to download
@@ -73,10 +83,6 @@ const ListingDetails = () => {
     getListingDetails();
   }, [listingId]);
 
-  useEffect(() => {
-    setCustomerEmail(user.email);
-    setCustomerName(`${user.firmName} `);
-  }, [user]);
 
   const checkUserBooking = async () => {
     try {

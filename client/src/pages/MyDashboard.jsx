@@ -6,9 +6,9 @@ import { IoDocumentTextOutline } from "react-icons/io5";
 import RemoveCircleOutline from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
 import '../styles/TopUpPage.scss';
-import { setListingStatus, setTripList, setReservationList } from '../redux/state';
+import { setListingStatus, setReservationList } from '../redux/state';
 import { FaMoneyCheckAlt, FaPiggyBank, FaCheckCircle, FaFileInvoiceDollar, FaChartLine, FaChartPie, FaChevronDown, FaChevronRight, FaChevronUp } from 'react-icons/fa';
-
+import { Line, LineChart, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
 
 const MyDashboard = () => {
@@ -21,7 +21,7 @@ const MyDashboard = () => {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [sharesToAdd, setSharesToAdd] = useState(1);
     const [sharesToWithdraw, setSharesToWithdraw] = useState(1);
-    const [activeView, setActiveView] = useState('topUp');
+    const [activeView, setActiveView] = useState('insights');
 
     const listings = useSelector((state) => state.listings);
     const [unfiledListings, setUnfiledListings] = useState([]);
@@ -34,7 +34,7 @@ const MyDashboard = () => {
         paymentTime: '',
     });
     const userId = useSelector((state) => state.user._id);
-    const tripList = useSelector((state) => state.user.tripList);
+    const [tripList, setTripList] = useState([]);
     const reservationList = useSelector((state) => state.user.reservationList);
 
 
@@ -90,7 +90,7 @@ const MyDashboard = () => {
             );
 
             const data = await response.json();
-            dispatch(setTripList(data));
+            setTripList(data)
             setLoading(false);
         } catch (err) {
             console.log("Fetch Trip List failed!", err.message);
@@ -490,7 +490,243 @@ const MyDashboard = () => {
         fetchReturnLogs();
     }, [user._id, user.token]); // Add user._id and user.token as dependencies
 
+    // ---------- Insights ----------------------------------------------------------------------------------------------------
+    const [insightListings, setInsightListings] = useState([]);
+    const [selectedInsightListing, setSelectedInsightListing] = useState('');
+    const [insightBookings, setInsightBookings] = useState([]);
+    const [insightTopups, setInsightTopups] = useState([]);
+    const [insightWithdrawals, setInsightWithdrawals] = useState([]);
+    const [chartData, setChartData] = useState([]);
+    const [insightListingTarget, setInsightListingTarget] = useState(0);
+    const [insightListingCreationDate, setInsightListingCreationDate] = useState(null);
+
+    useEffect(() => {
+        const fetchInsightListings = async () => {
+            try {
+                const response = await fetch(`http://localhost:3001/properties/all/${userId}`);
+                if (!response.ok) throw new Error('Failed to fetch Insight listings');
+                const data = await response.json();
+                setInsightListings(data);
+            } catch (error) {
+                console.error('Error fetching Insight listings:', error);
+            }
+        };
+        fetchInsightListings();
+    }, [userId]);
+
+    useEffect(() => {
+        const fetchTransactions = async () => {
+            if (!selectedInsightListing) return;
+            try {
+                const [insightBookingsRes, insightTopupsRes, withdrawalsRes, listingRes] = await Promise.all([
+                    fetch(`http://localhost:3001/bookings/${selectedInsightListing}/host`),
+                    fetch(`http://localhost:3001/topups/`),
+                    fetch(`http://localhost:3001/withdrawals/`),
+                    fetch(`http://localhost:3001/properties/${selectedInsightListing}`)
+                ]);
+
+                if (!insightBookingsRes.ok || !insightTopupsRes.ok || !withdrawalsRes.ok || !listingRes.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+
+                const [insightBookingsData, insightTopupsData, insightWithdrawalsData, insightListingData] = await Promise.all([
+                    insightBookingsRes.json(),
+                    insightTopupsRes.json(),
+                    withdrawalsRes.json(),
+                    listingRes.json()
+                ]);
+
+                setInsightBookings(insightBookingsData);
+                setInsightTopups(insightTopupsData.filter(t => t.listingId === selectedInsightListing && t.status === 'approved'));
+                setInsightWithdrawals(insightWithdrawalsData.filter(w => w.listingId === selectedInsightListing && w.status === 'approved'));
+                setInsightListingTarget(insightListingData.target);
+                setInsightListingCreationDate(new Date(insightListingData.createdAt));
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchTransactions();
+    }, [selectedInsightListing]);
+
+    useEffect(() => {
+        if (!insightListingCreationDate) return;
+
+        const processTransactions = () => {
+            const allTransactions = [
+                ...insightBookings.map(b => ({
+                    date: new Date(b.createdAt).toLocaleDateString('en-CA'),
+                    amount: b.bookingPrice,
+                    type: 'booking'
+                })),
+                ...insightTopups.map(t => ({
+                    date: new Date(t.createdAt).toLocaleDateString('en-CA'),
+                    amount: t.totalPrice,
+                    type: 'topup'
+                })),
+                ...insightWithdrawals.map(w => ({
+                    date: new Date(w.createdAt).toLocaleDateString('en-CA'),
+                    amount: -w.totalPrice,
+                    type: 'withdrawal'
+                }))
+            ];
+
+            const dailyTotals = new Map();
+            allTransactions.forEach(transaction => {
+                const currentTotal = dailyTotals.get(transaction.date) || 0;
+                dailyTotals.set(transaction.date, currentTotal + transaction.amount);
+            });
+
+            const generateDateRange = () => {
+                const dates = [];
+                const startDate = new Date(insightListingCreationDate);
+                startDate.setHours(0, 0, 0, 0);
+
+                let cumulativeTotal = 0;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const endDate = new Date(today);
+                endDate.setDate(endDate.getDate() + 5);  // Add 5 extra days to the range
+
+                const currentDate = new Date(startDate);
+
+                while (currentDate <= endDate) {
+                    const dateStr = currentDate.toLocaleDateString('en-CA');
+                    const dayTotal = currentDate <= today ? dailyTotals.get(dateStr) || 0 : 0;
+                    cumulativeTotal += dayTotal;
+
+                    dates.push({
+                        date: dateStr,
+                        total: currentDate <= today ? cumulativeTotal : null, // Set total only for dates up to today
+                        target: insightListingTarget
+                    });
+
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                return dates;
+            };
+
+            return generateDateRange();
+        };
+
+        const chartData = processTransactions();
+        setChartData(chartData);
+    }, [insightBookings, insightTopups, insightWithdrawals, insightListingCreationDate, insightListingTarget]);
+
     // Renders 
+    const renderInsights = () => (
+        <div className="w-full max-w-3xl mx-auto p-6">
+            {/* <h1 style={{ margin: "40px", textAlign: "center" }}>Project Insights</h1> */}
+
+            <div
+                style={{
+                    maxWidth: '90%',
+                    margin: '20px auto',
+                    padding: '20px',
+                    backgroundColor: '#fff',
+                    borderRadius: '7px',
+                    boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)',
+                }}
+            >
+                <h2>Insights</h2><br />
+                <p>
+                    Choose a project from the dropdown below to view detailed funding insights and performance metrics.
+                </p>
+                <hr style={{ margin: '20px 0' }} />
+
+                <select
+                    onChange={(e) => setSelectedInsightListing(e.target.value)}
+                    value={selectedInsightListing}
+                    style={{
+                        width: '100%',
+                        height: '35px',
+                        marginBottom: '20px',
+                        borderRadius: '5px',
+                        border: '1px solid #ccc',
+                        padding: '5px',
+                    }}
+                >
+                    <option value="">Select a funding project</option>
+                    {insightListings.map((listing) => (
+                        <option key={listing._id} value={listing._id}>
+                            {listing.title}
+                        </option>
+                    ))}
+                </select>
+
+                {chartData.length > 0 && (
+                    <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                        <h2>Funding Progress</h2>
+                        <p>Review the target versus cumulative funding received over time.</p>
+
+                        <div style={{ width: '100%', overflowX: 'auto' }}>
+                            <LineChart
+                                width={500}
+                                height={300}
+                                data={chartData}
+                                margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
+                            >
+                                <XAxis
+                                    dataKey="date"
+                                    tick={{ fontSize: 12 }}
+                                    interval={0}
+                                    label={{ value: 'Date', position: 'insideBottomRight', offset: -5 }}
+                                    tickFormatter={(value) => {
+                                        const date = new Date(value);
+                                        return date.toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            day: 'numeric',
+                                        });
+                                    }}
+                                />
+                                <YAxis
+                                    label={{
+                                        value: 'Amount (KES)',
+                                        angle: -90,
+                                        position: 'insideLeft',
+                                        offset: -20,
+                                    }}
+                                />
+                                <Tooltip
+                                    formatter={(value, name) => [
+                                        `Ksh.${value?.toLocaleString()}` || "Pending",
+                                        name === 'Target' ? 'Target' : 'Cumulative Total',
+                                    ]}
+                                    labelFormatter={(label) => {
+                                        const date = new Date(label);
+                                        return date.toLocaleDateString('en-US', {
+                                            weekday: 'short',
+                                            month: 'short',
+                                            day: 'numeric',
+                                        });
+                                    }}
+                                />
+                                <Legend />
+                                <Line
+                                    type="monotone"
+                                    dataKey="total"
+                                    stroke="#4f46e5"
+                                    name="Cumulative Total"
+                                    strokeWidth={2}
+                                    dot={{ r: 4 }}
+                                    activeDot={{ r: 6 }}
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="target"
+                                    stroke="#ef4444"
+                                    name="Target"
+                                    strokeDasharray="5 5"
+                                />
+                            </LineChart>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
     const renderTopUp = () => (
         <>
             <h1 style={{ margin: "40px" }}>Top Up Shares</h1>
@@ -1101,7 +1337,7 @@ const MyDashboard = () => {
         <div>
             <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
                 <h1 className="title-list">My Returns Logs</h1>
-            </div>            
+            </div>
             {returnLogs.length > 0 ? (
                 <table className='table' style={{ width: '80%' }}>
                     <thead>
@@ -1137,10 +1373,12 @@ const MyDashboard = () => {
                 <p>No return logs found.</p>
             )}
         </div>
-    )
+    );
 
     const renderContent = () => {
         switch (activeView) {
+            case 'insights':
+                return renderInsights();
             case 'topUp':
                 return renderTopUp();
             case 'withdraw':
@@ -1169,15 +1407,34 @@ const MyDashboard = () => {
     return (
         <>
             <Navbar />
-            <div style={{ display: 'flex', height: '100vh' }}>
-                <div style={{ width: '20%', background: '#f8f9fa', padding: '20px' }}>
+            <div style={{ display: 'flex', height: '100%' }}>
+                <div style={{ width: '20%', height: '100%', background: '#f8f9fa', padding: '20px' }}>
                     <h2 style={{ textAlign: 'center', color: '#333', borderBottom: '1px solid black' }}> Dashboard</h2> <br />
-                    <h2>Actions</h2>
-                    <div className="opt">
-                        <button onClick={() => setActiveView('topUp')} style={getButtonStyle('topUp')}>
-                            <FaMoneyCheckAlt style={iconStyle} /> Top Up
-                        </button>
-                    </div>
+                    <h2>Reports</h2><hr />
+                    <button onClick={() => setActiveView('insights')} style={getButtonStyle('insights')}>
+                        <FaChartLine style={iconStyle} /> Insights
+                    </button>
+                    <button onClick={() => setActiveView('myBids')} style={getButtonStyle('myBids')}>
+                        <FaChartPie style={iconStyle} /> My Bids
+                    </button>
+                    <button onClick={() => setActiveView('myProjectBids')} style={getButtonStyle('myProjectBids')}>
+                        <FaChartPie style={iconStyle} /> My Projects Bids
+                    </button>
+                    <button onClick={() => setActiveView('myTopups')} style={getButtonStyle('myTopups')}>
+                        <FaMoneyCheckAlt style={iconStyle} /> My Top-Ups
+                    </button>
+                    <button onClick={() => setActiveView('myWithdrawals')} style={getButtonStyle('myWithdrawals')}>
+                        <FaPiggyBank style={iconStyle} /> My Withdrawals
+                    </button>
+                    <button onClick={() => setActiveView('myReturnLogs')} style={getButtonStyle('myReturnLogs')}>
+                        <FaFileInvoiceDollar style={iconStyle} /> My Returns Logs
+                    </button>
+                    <br />
+                    <h2>Actions</h2><hr />
+                    <button onClick={() => setActiveView('topUp')} style={getButtonStyle('topUp')}>
+                        <FaMoneyCheckAlt style={iconStyle} /> Top Up
+                    </button>
+
                     <button onClick={() => setActiveView('withdraw')} style={getButtonStyle('withdraw')}>
                         <FaPiggyBank style={iconStyle} /> Withdraw
                     </button>
@@ -1186,6 +1443,7 @@ const MyDashboard = () => {
                     <button onClick={toggleApprovalOptions} style={buttonStyle}>
                         <FaCheckCircle style={iconStyle} /> Approvals {showApprovalOptions ? <FaChevronUp style={{ marginLeft: '30px' }} /> : <FaChevronDown style={{ marginLeft: '30px' }} />}
                     </button>
+
                     {showApprovalOptions && (
                         <div style={{ marginLeft: '20px' }}>
                             <button onClick={() => setActiveView('myProjectTopups')} style={getButtonStyle('myProjectTopups')}>
@@ -1200,23 +1458,8 @@ const MyDashboard = () => {
                     <button onClick={() => setActiveView('fileReturn')} style={getButtonStyle('fileReturn')}>
                         <FaFileInvoiceDollar style={iconStyle} /> File Return
                     </button>
-                    <br />
-                    <h2>Reports</h2><hr />
-                    <button onClick={() => setActiveView('myBids')} style={getButtonStyle('myBids')}>
-                        <FaChartLine style={iconStyle} /> My Bids
-                    </button>
-                    <button onClick={() => setActiveView('myProjectBids')} style={getButtonStyle('myProjectBids')}>
-                        <FaChartPie style={iconStyle} /> My Projects Bids
-                    </button>
-                    <button onClick={() => setActiveView('myTopups')} style={getButtonStyle('myTopups')}>
-                        <FaMoneyCheckAlt style={iconStyle} /> My Top-Ups
-                    </button>
-                    <button onClick={() => setActiveView('myWithdrawals')} style={getButtonStyle('myWithdrawals')}>
-                        <FaPiggyBank style={iconStyle} /> My Withdrawals
-                    </button>
-                    <button onClick={() => setActiveView('myReturnLogs')} style={getButtonStyle('myReturnLogs')}>
-                        <FaFileInvoiceDollar style={iconStyle} /> My Returns Logs
-                    </button>
+                    
+                    
                 </div>
                 <div style={{ width: '80%', padding: '20px', overflowY: 'auto' }}>
                     {renderContent()}
