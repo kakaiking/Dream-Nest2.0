@@ -51,15 +51,33 @@ const MyDashboard = () => {
     const dispatch = useDispatch();
 
     const [showApprovalOptions, setShowApprovalOptions] = useState(false);
+    const [isDashboardVisible, setIsDashboardVisible] = useState(true);
+
+    const toggleDashboard = () => setIsDashboardVisible(!isDashboardVisible);
+
 
     const toggleApprovalOptions = () => {
         setShowApprovalOptions(!showApprovalOptions);
     };
 
     const getButtonStyle = (view) => ({
-        ...buttonStyle,
-        backgroundColor: activeView === view ? '#eee' : 'transparent',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'left',
+        width: '100%',
+        padding: '10px',
+        marginBottom: '10px',
+        backgroundColor: activeView === view ? '#e9ecef' : 'transparent',
+        color: '#333',
+        border: 'none',
+        cursor: 'pointer',
+        fontSize: 'medium',
+        fontWeight: 'bold',
     });
+
+    const iconStyle = {
+        marginRight: '10px'
+    };
 
     // ---------------------------- My Project Topups --------------------------------------------------------------------
     const getTopupList = async () => {
@@ -550,7 +568,7 @@ const MyDashboard = () => {
 
     useEffect(() => {
         if (!insightListingCreationDate) return;
-
+    
         const processTransactions = () => {
             const allTransactions = [
                 ...insightBookings.map(b => ({
@@ -569,50 +587,62 @@ const MyDashboard = () => {
                     type: 'withdrawal'
                 }))
             ];
-
+    
             const dailyTotals = new Map();
             allTransactions.forEach(transaction => {
                 const currentTotal = dailyTotals.get(transaction.date) || 0;
                 dailyTotals.set(transaction.date, currentTotal + transaction.amount);
             });
-
+    
             const generateDateRange = () => {
                 const dates = [];
                 const startDate = new Date(insightListingCreationDate);
                 startDate.setHours(0, 0, 0, 0);
-
+    
                 let cumulativeTotal = 0;
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-
+    
                 const endDate = new Date(today);
                 endDate.setDate(endDate.getDate() + 5);  // Add 5 extra days to the range
-
-                const currentDate = new Date(startDate);
-
+    
+                const dateArray = [];
+                let currentDate = new Date(startDate);
+    
+                // Collect all dates within the range
                 while (currentDate <= endDate) {
                     const dateStr = currentDate.toLocaleDateString('en-CA');
                     const dayTotal = currentDate <= today ? dailyTotals.get(dateStr) || 0 : 0;
                     cumulativeTotal += dayTotal;
-
-                    dates.push({
+                    dateArray.push({
                         date: dateStr,
                         total: currentDate <= today ? cumulativeTotal : null, // Set total only for dates up to today
                         target: insightListingTarget
                     });
-
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
-
+    
+                // Limit displayed dates to a maximum of 10
+                if (dateArray.length > 10) {
+                    const step = Math.ceil(dateArray.length / 10); // Skip dates evenly
+                    for (let i = 0; i < dateArray.length; i += step) {
+                        dates.push(dateArray[i]);
+                    }
+                    if (dates.length < 10) dates.push(dateArray[dateArray.length - 1]); // Ensure the last date is included
+                } else {
+                    dates.push(...dateArray);
+                }
+    
                 return dates;
             };
-
+    
             return generateDateRange();
         };
-
+    
         const chartData = processTransactions();
         setChartData(chartData);
     }, [insightBookings, insightTopups, insightWithdrawals, insightListingCreationDate, insightListingTarget]);
+    
 
     // Renders 
     const renderInsights = () => (
@@ -621,7 +651,7 @@ const MyDashboard = () => {
 
             <div
                 style={{
-                    maxWidth: '90%',
+                    maxWidth: '95%',
                     margin: '20px auto',
                     padding: '20px',
                     backgroundColor: '#fff',
@@ -657,33 +687,33 @@ const MyDashboard = () => {
 
                 {chartData.length > 0 && (
                     <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                        <div className="addedInfo" style={{ width: '100%', height: '120px', backgroundColor: 'red', borderRadius: '7px', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', padding: '10px' }}>
-                            <div className="addedInfo1" style={{ width: '23%', height: '100%', backgroundColor: 'yellow', borderRadius: '7px', display: 'flex', flexDirection: 'row', padding: '10px' }}>
-                                <div className="icon" style={{ width: '40%', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                        <div className="addedInfo" >
+                            <div className="addedInfo1" >
+                                <div className="icon" style={{ width: '40%', minWidth: '85px', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
                                     <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
                                     <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
                                 </div>
                             </div>
 
-                            <div className="addedInfo1" style={{ width: '23%', height: '100%', backgroundColor: 'yellow', borderRadius: '7px', display: 'flex', flexDirection: 'row', padding: '10px' }}>
-                                <div className="icon" style={{ width: '40%', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                            <div className="addedInfo1" >
+                                <div className="icon" style={{ width: '40%', minWidth: '85px', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
                                     <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
                                     <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
                                 </div>
                             </div>
 
-                            <div className="addedInfo1" style={{ width: '23%', height: '100%', backgroundColor: 'yellow', borderRadius: '7px', display: 'flex', flexDirection: 'row', padding: '10px' }}>
-                                <div className="icon" style={{ width: '40%', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                            <div className="addedInfo1" >
+                                <div className="icon" style={{ width: '40%', minWidth: '85px', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
                                     <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
                                     <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
                                 </div>
                             </div>
 
-                            <div className="addedInfo1" style={{ width: '23%', height: '100%', backgroundColor: 'yellow', borderRadius: '7px', display: 'flex', flexDirection: 'row', padding: '10px' }}>
-                                <div className="icon" style={{ width: '40%', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                            <div className="addedInfo1" >
+                                <div className="icon" style={{ width: '40%', minWidth: '85px', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
                                     <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
                                     <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
@@ -696,7 +726,7 @@ const MyDashboard = () => {
                             <div className="chart-section" >
                                 <h2>Funding Progress</h2>
                                 <LineChart
-                                    width={500}
+                                    width={450}
                                     height={300}
                                     data={chartData}
                                     margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
@@ -1447,60 +1477,104 @@ const MyDashboard = () => {
         <>
             <Navbar />
             <div style={{ display: 'flex', height: '100%' }}>
-                <div style={{ width: '20%', height: 'auto', background: '#f8f9fa', padding: '20px' }}>
-                    <h2 style={{ textAlign: 'center', color: '#333', borderBottom: '1px solid black' }}> Dashboard</h2> <br />
-                    <h2>Reports</h2><hr />
-                    <button onClick={() => setActiveView('insights')} style={getButtonStyle('insights')}>
-                        <FaChartLine style={iconStyle} /> Analytics
-                    </button>
-                    <button onClick={() => setActiveView('myBids')} style={getButtonStyle('myBids')}>
-                        <FaChartPie style={iconStyle} /> My Bids
-                    </button>
-                    <button onClick={() => setActiveView('myProjectBids')} style={getButtonStyle('myProjectBids')}>
-                        <FaChartPie style={iconStyle} /> My Projects Bids
-                    </button>
-                    <button onClick={() => setActiveView('myTopups')} style={getButtonStyle('myTopups')}>
-                        <FaMoneyCheckAlt style={iconStyle} /> My Top-Ups
-                    </button>
-                    <button onClick={() => setActiveView('myWithdrawals')} style={getButtonStyle('myWithdrawals')}>
-                        <FaPiggyBank style={iconStyle} /> My Withdrawals
-                    </button>
-                    <button onClick={() => setActiveView('myReturnLogs')} style={getButtonStyle('myReturnLogs')}>
-                        <FaFileInvoiceDollar style={iconStyle} /> My Returns Logs
-                    </button>
-                    <br />
-                    <h2>Actions</h2><hr />
-                    <button onClick={() => setActiveView('topUp')} style={getButtonStyle('topUp')}>
-                        <FaMoneyCheckAlt style={iconStyle} /> Top Up
-                    </button>
+                {/* Sidebar container */}
+                <div style={{ position: 'relative' }}>
+                    {/* Retract Button - Now outside the sidebar */}
+                    <div onClick={toggleDashboard} style={{
+                        position: 'absolute',
+                        top: '20px',
+                        left: isDashboardVisible ? '95%' : '-20px',
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '20px',
+                        background: '#007bff',
+                        color: 'black',
+                        fontSize: 'xx-large',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'left 0.3s',
+                        transform: isDashboardVisible ? 'none' : 'rotate(180deg)',
+                        zIndex: 1000,
+                    }}>
+                        {isDashboardVisible ? '←' : '→'}
+                    </div>
 
-                    <button onClick={() => setActiveView('withdraw')} style={getButtonStyle('withdraw')}>
-                        <FaPiggyBank style={iconStyle} /> Withdraw
-                    </button>
+                    {/* Sidebar Content */}
+                    <div style={{
+                        width: isDashboardVisible ? '20vw' : '0',
+                        transition: 'width 0.3s',
+                        height: '100vh',
+                        overflow: 'hidden',
+                        background: '#f8f9fa',
+                        padding: isDashboardVisible ? '20px' : '0',
+                    }}>
+                        {isDashboardVisible && (
+                            <>
+                                <h2 style={{ textAlign: 'center', color: '#333', borderBottom: '1px solid black' }}>Dashboard</h2>
+                                <br />
+                                <h2>Reports</h2>
+                                <hr />
+                                <button onClick={() => setActiveView('insights')} style={getButtonStyle('insights')}>
+                                    <FaChartLine style={iconStyle} /> Analytics
+                                </button>
+                                <button onClick={() => setActiveView('myBids')} style={getButtonStyle('myBids')}>
+                                    <FaChartPie style={iconStyle} /> My Bids
+                                </button>
+                                <button onClick={() => setActiveView('myProjectBids')} style={getButtonStyle('myProjectBids')}>
+                                    <FaChartPie style={iconStyle} /> My Projects Bids
+                                </button>
+                                <button onClick={() => setActiveView('myTopups')} style={getButtonStyle('myTopups')}>
+                                    <FaMoneyCheckAlt style={iconStyle} /> My Top-Ups
+                                </button>
+                                <button onClick={() => setActiveView('myWithdrawals')} style={getButtonStyle('myWithdrawals')}>
+                                    <FaPiggyBank style={iconStyle} /> My Withdrawals
+                                </button>
+                                <button onClick={() => setActiveView('myReturnLogs')} style={getButtonStyle('myReturnLogs')}>
+                                    <FaFileInvoiceDollar style={iconStyle} /> My Returns Logs
+                                </button>
+                                <br />
+                                <h2>Actions</h2>
+                                <hr />
+                                <button onClick={() => setActiveView('topUp')} style={getButtonStyle('topUp')}>
+                                    <FaMoneyCheckAlt style={iconStyle} /> Top Up
+                                </button>
+                                <button onClick={() => setActiveView('withdraw')} style={getButtonStyle('withdraw')}>
+                                    <FaPiggyBank style={iconStyle} /> Withdraw
+                                </button>
 
-                    {/* Approvals Button with Dropdown */}
-                    <button onClick={toggleApprovalOptions} style={buttonStyle}>
-                        <FaCheckCircle style={iconStyle} /> Approvals {showApprovalOptions ? <FaChevronUp style={{ marginLeft: '30px' }} /> : <FaChevronDown style={{ marginLeft: '30px' }} />}
-                    </button>
+                                {/* Approvals Button with Dropdown */}
+                                <button onClick={toggleApprovalOptions} style={getButtonStyle('approvals')}>
+                                    <FaCheckCircle style={iconStyle} /> Approvals {showApprovalOptions ? <FaChevronUp style={{ marginLeft: '30px' }} /> : <FaChevronDown style={{ marginLeft: '30px' }} />}
+                                </button>
 
-                    {showApprovalOptions && (
-                        <div style={{ marginLeft: '20px' }}>
-                            <button onClick={() => setActiveView('myProjectTopups')} style={getButtonStyle('myProjectTopups')}>
-                                <FaCheckCircle style={iconStyle} /> Top Ups
-                            </button>
-                            <button onClick={() => setActiveView('myProjectWithdrawals')} style={getButtonStyle('myProjectWithdrawals')}>
-                                <FaCheckCircle style={iconStyle} /> Withdrawals
-                            </button>
-                        </div>
-                    )}
+                                {showApprovalOptions && (
+                                    <div style={{ marginLeft: '20px' }}>
+                                        <button onClick={() => setActiveView('myProjectTopups')} style={getButtonStyle('myProjectTopups')}>
+                                            <FaCheckCircle style={iconStyle} /> Top Ups
+                                        </button>
+                                        <button onClick={() => setActiveView('myProjectWithdrawals')} style={getButtonStyle('myProjectWithdrawals')}>
+                                            <FaCheckCircle style={iconStyle} /> Withdrawals
+                                        </button>
+                                    </div>
+                                )}
 
-                    <button onClick={() => setActiveView('fileReturn')} style={getButtonStyle('fileReturn')}>
-                        <FaFileInvoiceDollar style={iconStyle} /> File Return
-                    </button>
-
-
+                                <button onClick={() => setActiveView('fileReturn')} style={getButtonStyle('fileReturn')}>
+                                    <FaFileInvoiceDollar style={iconStyle} /> File Return
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
-                <div style={{ width: '80%', padding: '20px', overflowY: 'auto' }}>
+
+                {/* Main Content */}
+                <div style={{ 
+                    width: isDashboardVisible ? 'calc(100% - 20vw)' : '100%', 
+                    padding: '20px', 
+                    overflowY: 'auto', 
+                    transition: 'width 0.3s'
+                }}>
                     {renderContent()}
                 </div>
             </div>
@@ -1508,22 +1582,4 @@ const MyDashboard = () => {
     );
 };
 
-const buttonStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'left',
-    width: '100%',
-    padding: '10px',
-    marginBottom: '10px',
-    backgroundColor: 'transparent',
-    color: '#333',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: 'medium',
-    fontWeight: 'bold'
-};
-
-const iconStyle = {
-    marginRight: '10px'
-};
 export default MyDashboard;

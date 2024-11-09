@@ -16,7 +16,7 @@
       background-color: green;
     }
   
-    @media (max-width: 1060px) {
+    @media (max-width: 1150px) {
       flex-direction: column;
   
       .chart-section,
@@ -25,3 +25,77 @@
       }
     }
   }
+
+  .addedInfo {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 10px; /* Space between items */
+    padding: 10px;
+}
+
+/* Style for each addedInfo1 element */
+.addedInfo1 {
+    display: flex;
+    flex-direction: row;
+    width: 23%; /* Default width */
+    background-color: yellow;
+    border-radius: 7px;
+    padding: 10px;
+    height: 120px; /* Adjust height as needed */
+}
+
+/* Icon styling */
+.icon {
+    width: 40%;
+    min-width: 75px; /* Fixed minimum width */
+    height: 100%;
+    background-color: green;
+    border-radius: 7px;
+}
+
+/* Info container styling */
+.info {
+    min-width: 75px; /* Fixed minimum width */
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+}
+
+.value {
+    height: 40%;
+    width: 100%;
+    background-color: blue;
+}
+
+.title {
+    height: 60%;
+    width: 100%;
+    background-color: orange;
+}
+
+// @media (max-width: 1340px) {
+//     .addedInfo1 {
+//         width: 35%; /* Two items per row on tablets */
+//     }
+// }
+
+@media (max-width: 1000px) {
+    .addedInfo1 {
+        width: 40%; /* Two items per row on tablets */
+    }
+}
+
+/* Responsive layout for tablet screens */
+@media (max-width: 768px) {
+    .addedInfo1 {
+        width: 45%; /* Two items per row on tablets */
+    }
+}
+
+/* Responsive layout for mobile screens */
+@media (max-width: 703px) {
+    .addedInfo1 {
+        width: 100%; /* One item per row on mobile */
+    }
+}
