@@ -2,11 +2,11 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { IoDocumentTextOutline } from "react-icons/io5";
 import RemoveCircleOutline from '@mui/icons-material/RemoveCircleOutline';
 import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
 import '../styles/TopUpPage.scss';
-import { setListingStatus, setReservationList } from '../redux/state';
+import '../styles/MyDashboard.scss';
+import { setListingStatus } from '../redux/state';
 import { FaMoneyCheckAlt, FaPiggyBank, FaCheckCircle, FaFileInvoiceDollar, FaChartLine, FaChartPie, FaChevronDown, FaChevronRight, FaChevronUp } from 'react-icons/fa';
 import { Line, LineChart, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
@@ -35,7 +35,7 @@ const MyDashboard = () => {
     });
     const userId = useSelector((state) => state.user._id);
     const [tripList, setTripList] = useState([]);
-    const reservationList = useSelector((state) => state.user.reservationList);
+    const [reservationList, setReservationList] = useState([]);
 
 
     const [loading, setLoading] = useState(true);
@@ -420,7 +420,7 @@ const MyDashboard = () => {
             );
 
             const data = await response.json();
-            dispatch(setReservationList(data));
+            setReservationList(data)
             setLoading(false);
         } catch (err) {
             console.log("Fetch Reservation List failed!", err.message);
@@ -536,7 +536,7 @@ const MyDashboard = () => {
                     listingRes.json()
                 ]);
 
-                setInsightBookings(insightBookingsData);
+                setInsightBookings(insightBookingsData.filter(b => b.status === 'approved'));
                 setInsightTopups(insightTopupsData.filter(t => t.listingId === selectedInsightListing && t.status === 'approved'));
                 setInsightWithdrawals(insightWithdrawalsData.filter(w => w.listingId === selectedInsightListing && w.status === 'approved'));
                 setInsightListingTarget(insightListingData.target);
@@ -629,9 +629,9 @@ const MyDashboard = () => {
                     boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)',
                 }}
             >
-                <h2>Insights</h2><br />
+                <h2>Analytics </h2><br />
                 <p>
-                    Choose a project from the dropdown below to view detailed funding insights and performance metrics.
+                    Choose a project from the dropdown below to view detailed funding performance metrics.
                 </p>
                 <hr style={{ margin: '20px 0' }} />
 
@@ -657,70 +657,109 @@ const MyDashboard = () => {
 
                 {chartData.length > 0 && (
                     <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                        <h2>Funding Progress</h2>
-                        <p>Review the target versus cumulative funding received over time.</p>
+                        <div className="addedInfo" style={{ width: '100%', height: '120px', backgroundColor: 'red', borderRadius: '7px', display: 'flex', flexDirection: 'row', justifyContent: 'space-around', padding: '10px' }}>
+                            <div className="addedInfo1" style={{ width: '23%', height: '100%', backgroundColor: 'yellow', borderRadius: '7px', display: 'flex', flexDirection: 'row', padding: '10px' }}>
+                                <div className="icon" style={{ width: '40%', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                                <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
+                                    <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
+                                    <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
+                                </div>
+                            </div>
 
-                        <div style={{ width: '100%', overflowX: 'auto' }}>
-                            <LineChart
-                                width={500}
-                                height={300}
-                                data={chartData}
-                                margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
-                            >
-                                <XAxis
-                                    dataKey="date"
-                                    tick={{ fontSize: 12 }}
-                                    interval={0}
-                                    label={{ value: 'Date', position: 'insideBottomRight', offset: -5 }}
-                                    tickFormatter={(value) => {
-                                        const date = new Date(value);
-                                        return date.toLocaleDateString('en-US', {
-                                            month: 'short',
-                                            day: 'numeric',
-                                        });
-                                    }}
-                                />
-                                <YAxis
-                                    label={{
-                                        value: 'Amount (KES)',
-                                        angle: -90,
-                                        position: 'insideLeft',
-                                        offset: -20,
-                                    }}
-                                />
-                                <Tooltip
-                                    formatter={(value, name) => [
-                                        `Ksh.${value?.toLocaleString()}` || "Pending",
-                                        name === 'Target' ? 'Target' : 'Cumulative Total',
-                                    ]}
-                                    labelFormatter={(label) => {
-                                        const date = new Date(label);
-                                        return date.toLocaleDateString('en-US', {
-                                            weekday: 'short',
-                                            month: 'short',
-                                            day: 'numeric',
-                                        });
-                                    }}
-                                />
-                                <Legend />
-                                <Line
-                                    type="monotone"
-                                    dataKey="total"
-                                    stroke="#4f46e5"
-                                    name="Cumulative Total"
-                                    strokeWidth={2}
-                                    dot={{ r: 4 }}
-                                    activeDot={{ r: 6 }}
-                                />
-                                <Line
-                                    type="monotone"
-                                    dataKey="target"
-                                    stroke="#ef4444"
-                                    name="Target"
-                                    strokeDasharray="5 5"
-                                />
-                            </LineChart>
+                            <div className="addedInfo1" style={{ width: '23%', height: '100%', backgroundColor: 'yellow', borderRadius: '7px', display: 'flex', flexDirection: 'row', padding: '10px' }}>
+                                <div className="icon" style={{ width: '40%', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                                <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
+                                    <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
+                                    <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
+                                </div>
+                            </div>
+
+                            <div className="addedInfo1" style={{ width: '23%', height: '100%', backgroundColor: 'yellow', borderRadius: '7px', display: 'flex', flexDirection: 'row', padding: '10px' }}>
+                                <div className="icon" style={{ width: '40%', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                                <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
+                                    <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
+                                    <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
+                                </div>
+                            </div>
+
+                            <div className="addedInfo1" style={{ width: '23%', height: '100%', backgroundColor: 'yellow', borderRadius: '7px', display: 'flex', flexDirection: 'row', padding: '10px' }}>
+                                <div className="icon" style={{ width: '40%', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                                <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
+                                    <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
+                                    <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
+                                </div>
+                            </div>
+
                         </div>
+
+                        <div  className="chartnInfo" >
+                            <div className="chart-section" >
+                                <h2>Funding Progress</h2>
+                                <LineChart
+                                    width={500}
+                                    height={300}
+                                    data={chartData}
+                                    margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
+                                >
+                                    <XAxis
+                                        dataKey="date"
+                                        tick={{ fontSize: 12 }}
+                                        interval={0}
+                                        label={{ value: 'Date', position: 'insideBottomRight', offset: -5 }}
+                                        tickFormatter={(value) => {
+                                            const date = new Date(value);
+                                            return date.toLocaleDateString('en-US', {
+                                                month: 'short',
+                                                day: 'numeric',
+                                            });
+                                        }}
+                                    />
+                                    <YAxis
+                                        label={{
+                                            value: 'Amount (KES)',
+                                            angle: -90,
+                                            position: 'insideLeft',
+                                            offset: -20,
+                                        }}
+                                    />
+                                    <Tooltip
+                                        formatter={(value, name) => [
+                                            `Ksh.${value?.toLocaleString() || "Pending"}`,
+                                            name === 'Target' ? 'Target' : 'Cumulative Total',
+                                        ]}
+                                        labelFormatter={(label) => {
+                                            const date = new Date(label);
+                                            return date.toLocaleDateString('en-US', {
+                                                weekday: 'short',
+                                                month: 'short',
+                                                day: 'numeric',
+                                            });
+                                        }}
+                                    />
+                                    <Legend />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="total"
+                                        stroke="#4f46e5"
+                                        name="Cumulative Total"
+                                        strokeWidth={2}
+                                        dot={{ r: 4 }}
+                                        activeDot={{ r: 6 }}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="target"
+                                        stroke="#ef4444"
+                                        name="Target"
+                                        strokeDasharray="5 5"
+                                    />
+                                </LineChart>
+                            </div>
+                            <div className="info-section" >
+                                <p>hi</p>
+                            </div>
+                        </div>
+                    <div className="recentTransactions" style={{width: '100%', height: '300px', backgroundColor: 'lightblue'}}></div>
                     </div>
                 )}
             </div>
@@ -1408,11 +1447,11 @@ const MyDashboard = () => {
         <>
             <Navbar />
             <div style={{ display: 'flex', height: '100%' }}>
-                <div style={{ width: '20%', height: '100%', background: '#f8f9fa', padding: '20px' }}>
+                <div style={{ width: '20%', height: 'auto', background: '#f8f9fa', padding: '20px' }}>
                     <h2 style={{ textAlign: 'center', color: '#333', borderBottom: '1px solid black' }}> Dashboard</h2> <br />
                     <h2>Reports</h2><hr />
                     <button onClick={() => setActiveView('insights')} style={getButtonStyle('insights')}>
-                        <FaChartLine style={iconStyle} /> Insights
+                        <FaChartLine style={iconStyle} /> Analytics
                     </button>
                     <button onClick={() => setActiveView('myBids')} style={getButtonStyle('myBids')}>
                         <FaChartPie style={iconStyle} /> My Bids
@@ -1458,8 +1497,8 @@ const MyDashboard = () => {
                     <button onClick={() => setActiveView('fileReturn')} style={getButtonStyle('fileReturn')}>
                         <FaFileInvoiceDollar style={iconStyle} /> File Return
                     </button>
-                    
-                    
+
+
                 </div>
                 <div style={{ width: '80%', padding: '20px', overflowY: 'auto' }}>
                     {renderContent()}
