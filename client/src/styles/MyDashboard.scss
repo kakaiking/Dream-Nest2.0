@@ -39,9 +39,9 @@
     display: flex;
     flex-direction: row;
     width: 23%; /* Default width */
-    background-color: yellow;
+    background-color: #eee;
     border-radius: 7px;
-    padding: 10px;
+    padding: 20px;
     height: 120px; /* Adjust height as needed */
 }
 
@@ -50,7 +50,8 @@
     width: 40%;
     min-width: 75px; /* Fixed minimum width */
     height: 100%;
-    background-color: green;
+    margin-right: 20px;
+    // background-color: green;
     border-radius: 7px;
 }
 
@@ -65,13 +66,13 @@
 .value {
     height: 40%;
     width: 100%;
-    background-color: blue;
+    color: blue;
 }
 
 .title {
     height: 60%;
     width: 100%;
-    background-color: orange;
+    // background-color: #eee;
 }
 
 // @media (max-width: 1340px) {
@@ -93,8 +94,14 @@
     }
 }
 
-/* Responsive layout for mobile screens */
 @media (max-width: 703px) {
+    .addedInfo1 {
+        width: 70%; /* One item per row on mobile */
+    }
+}
+
+/* Responsive layout for mobile screens */
+@media (max-width: 603px) {
     .addedInfo1 {
         width: 100%; /* One item per row on mobile */
     }

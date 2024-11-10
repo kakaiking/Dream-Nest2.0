@@ -7,8 +7,10 @@ import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
 import '../styles/TopUpPage.scss';
 import '../styles/MyDashboard.scss';
 import { setListingStatus } from '../redux/state';
-import { FaMoneyCheckAlt, FaPiggyBank, FaCheckCircle, FaFileInvoiceDollar, FaChartLine, FaChartPie, FaChevronDown, FaChevronRight, FaChevronUp } from 'react-icons/fa';
+import { FaMoneyCheckAlt, FaPiggyBank, FaCheckCircle, FaFileInvoiceDollar, FaChartLine, FaChartPie, FaChevronDown, FaChevronRight, FaChevronUp, FaChevronLeft } from 'react-icons/fa';
 import { Line, LineChart, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import { FaClipboardList } from 'react-icons/fa'; // Import icon from React Icons
+
 
 
 const MyDashboard = () => {
@@ -97,6 +99,9 @@ const MyDashboard = () => {
     useEffect(() => {
         getTopupList();
     }, []);
+
+    // ---------------------------- My Bids --------------------------------------------------------------------
+
 
     const getTripList = async () => {
         try {
@@ -283,15 +288,14 @@ const MyDashboard = () => {
 
     const fetchData = async () => {
         try {
-            const [bidsResponse, returnsResponse, commentsResponse, updatesResponse, bookingsResponse] = await Promise.all([
+            const [bidsResponse, returnsResponse, commentsResponse, updatesResponse] = await Promise.all([
                 fetch('http://localhost:3001/bookings'),
                 fetch('http://localhost:3001/returns'),
                 fetch('http://localhost:3001/comments'),
                 fetch('http://localhost:3001/updates'),
-                fetch(`http://localhost:3001/bookings/${user._id}`)
             ]);
 
-            if (!bidsResponse.ok || !returnsResponse.ok || !commentsResponse.ok || !updatesResponse.ok || !bookingsResponse.ok) {
+            if (!bidsResponse.ok || !returnsResponse.ok || !commentsResponse.ok || !updatesResponse.ok) {
                 throw new Error('One or more requests failed');
             }
 
@@ -299,7 +303,6 @@ const MyDashboard = () => {
             setReturns(await returnsResponse.json());
             setComments(await commentsResponse.json());
             setUpdates(await updatesResponse.json());
-            setBookings(await bookingsResponse.json());
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -517,6 +520,28 @@ const MyDashboard = () => {
     const [chartData, setChartData] = useState([]);
     const [insightListingTarget, setInsightListingTarget] = useState(0);
     const [insightListingCreationDate, setInsightListingCreationDate] = useState(null);
+    const [bookingCount, setBookingCount] = useState(0);
+    const [totalTransactions, setTotalTransactions] = useState(0); // State for total sum of transactions
+
+    useEffect(() => {
+        const fetchBookings = async () => {
+            try {
+                const response = await fetch('http://localhost:3001/bookings');
+                const data = await response.json();
+                setBookings(data);
+            } catch (error) {
+                console.error('Error fetching bookings:', error);
+            }
+        };
+        fetchBookings();
+    }, []);
+
+    useEffect(() => {
+        if (selectedInsightListing) {
+            const count = bookings.filter(booking => booking.listingId === selectedInsightListing).length;
+            setBookingCount(count);
+        }
+    }, [selectedInsightListing, bookings]);
 
     useEffect(() => {
         const fetchInsightListings = async () => {
@@ -568,81 +593,91 @@ const MyDashboard = () => {
 
     useEffect(() => {
         if (!insightListingCreationDate) return;
-    
+
         const processTransactions = () => {
             const allTransactions = [
                 ...insightBookings.map(b => ({
-                    date: new Date(b.createdAt).toLocaleDateString('en-CA'),
-                    amount: b.bookingPrice,
+                    date: b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-CA') : null,
+                    amount: b.bookingPrice || 0,
                     type: 'booking'
                 })),
                 ...insightTopups.map(t => ({
-                    date: new Date(t.createdAt).toLocaleDateString('en-CA'),
-                    amount: t.totalPrice,
+                    date: t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-CA') : null,
+                    amount: t.totalPrice || 0,
                     type: 'topup'
                 })),
                 ...insightWithdrawals.map(w => ({
-                    date: new Date(w.createdAt).toLocaleDateString('en-CA'),
-                    amount: -w.totalPrice,
+                    date: w.createdAt ? new Date(w.createdAt).toLocaleDateString('en-CA') : null,
+                    amount: -(w.totalPrice || 0),
                     type: 'withdrawal'
                 }))
-            ];
-    
+            ].filter(transaction => transaction.date !== null); // Filter out invalid dates
+
+            // Calculate the total sum of all transactions
+            const totalSum = allTransactions.reduce((acc, transaction) => acc + transaction.amount, 0);
+
+            // Store total sum in state
+            setTotalTransactions(totalSum);
+
             const dailyTotals = new Map();
             allTransactions.forEach(transaction => {
                 const currentTotal = dailyTotals.get(transaction.date) || 0;
                 dailyTotals.set(transaction.date, currentTotal + transaction.amount);
             });
-    
+
+            console.log(allTransactions)
+
             const generateDateRange = () => {
                 const dates = [];
                 const startDate = new Date(insightListingCreationDate);
                 startDate.setHours(0, 0, 0, 0);
-    
+
                 let cumulativeTotal = 0;
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-    
+
                 const endDate = new Date(today);
                 endDate.setDate(endDate.getDate() + 5);  // Add 5 extra days to the range
-    
+
                 const dateArray = [];
                 let currentDate = new Date(startDate);
-    
-                // Collect all dates within the range
+
                 while (currentDate <= endDate) {
                     const dateStr = currentDate.toLocaleDateString('en-CA');
                     const dayTotal = currentDate <= today ? dailyTotals.get(dateStr) || 0 : 0;
                     cumulativeTotal += dayTotal;
+
                     dateArray.push({
                         date: dateStr,
-                        total: currentDate <= today ? cumulativeTotal : null, // Set total only for dates up to today
+                        total: currentDate <= today ? cumulativeTotal : null,
                         target: insightListingTarget
                     });
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
-    
-                // Limit displayed dates to a maximum of 10
+
                 if (dateArray.length > 10) {
-                    const step = Math.ceil(dateArray.length / 10); // Skip dates evenly
+                    const step = Math.ceil(dateArray.length / 10);
                     for (let i = 0; i < dateArray.length; i += step) {
                         dates.push(dateArray[i]);
                     }
-                    if (dates.length < 10) dates.push(dateArray[dateArray.length - 1]); // Ensure the last date is included
+                    if (dates.length < 10) dates.push(dateArray[dateArray.length - 1]);
                 } else {
                     dates.push(...dateArray);
                 }
-    
+
                 return dates;
             };
-    
+
             return generateDateRange();
         };
-    
+
         const chartData = processTransactions();
         setChartData(chartData);
+
     }, [insightBookings, insightTopups, insightWithdrawals, insightListingCreationDate, insightListingTarget]);
-    
+
+
+
 
     // Renders 
     const renderInsights = () => (
@@ -688,45 +723,117 @@ const MyDashboard = () => {
                 {chartData.length > 0 && (
                     <div style={{ marginTop: '20px', textAlign: 'center' }}>
                         <div className="addedInfo" >
-                            <div className="addedInfo1" >
-                                <div className="icon" style={{ width: '40%', minWidth: '85px', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                            <div className="addedInfo1">
+                                <div
+                                    className="icon"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        width: '40%',
+                                        minWidth: '85px',
+                                        height: '90%',
+                                        backgroundColor: 'lightblue',
+                                        borderRadius: '7px',
+                                    }}
+                                >
+                                    <FaClipboardList color="white" size={24} />
+                                </div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
-                                    <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
-                                    <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
+                                    <div className="value" style={{ height: '40%', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {bookingCount}
+                                    </div><hr />
+                                    <div className="title" style={{ height: '60%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        Total Bidders
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="addedInfo1" >
-                                <div className="icon" style={{ width: '40%', minWidth: '85px', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                                <div
+                                    className="icon"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        width: '40%',
+                                        minWidth: '85px',
+                                        height: '100%',
+                                        backgroundColor: 'lightblue',
+                                        borderRadius: '7px',
+                                    }}
+                                >
+                                    <FaClipboardList color="white" size={24} />
+                                </div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
-                                    <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
-                                    <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
+                                    <div className="value" style={{ height: '40%', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {totalTransactions}
+                                    </div><hr />
+                                    <div className="title" style={{ height: '60%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        Total Raised 
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="addedInfo1" >
-                                <div className="icon" style={{ width: '40%', minWidth: '85px', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                                <div
+                                    className="icon"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        width: '40%',
+                                        minWidth: '85px',
+                                        height: '100%',
+                                        backgroundColor: 'lightblue',
+                                        borderRadius: '7px',
+                                    }}
+                                >
+                                    <FaClipboardList color="white" size={24} />
+                                </div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
-                                    <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
-                                    <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
+                                    <div className="value" style={{ height: '40%', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {totalTransactions}
+                                    </div><hr />
+                                    <div className="title" style={{ height: '60%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        Total Raised 
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="addedInfo1" >
-                                <div className="icon" style={{ width: '40%', minWidth: '85px', height: '100%', backgroundColor: 'green', borderRadius: '7px' }}></div>
+                                <div
+                                    className="icon"
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        width: '40%',
+                                        minWidth: '85px',
+                                        height: '100%',
+                                        backgroundColor: 'lightblue',
+                                        borderRadius: '7px',
+                                    }}
+                                >
+                                    <FaClipboardList color="white" size={24} />
+                                </div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
-                                    <div className="value" style={{ height: '40%', width: '100%', backgroundColor: 'blue' }}></div>
-                                    <div className="title" style={{ height: '60%', width: '100%', backgroundColor: 'orange' }}></div>
+                                    <div className="value" style={{ height: '40%', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {totalTransactions}
+                                    </div><hr style={{fontWeight: '600px'}}/>
+                                    <div className="title" style={{ height: '60%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        Total Raised 
+                                    </div>
                                 </div>
                             </div>
 
                         </div>
 
-                        <div  className="chartnInfo" >
+                        <div className="chartnInfo" >
                             <div className="chart-section" >
                                 <h2>Funding Progress</h2>
                                 <LineChart
-                                    width={450}
+                                    width={460}
                                     height={300}
                                     data={chartData}
                                     margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
@@ -789,7 +896,7 @@ const MyDashboard = () => {
                                 <p>hi</p>
                             </div>
                         </div>
-                    <div className="recentTransactions" style={{width: '100%', height: '300px', backgroundColor: 'lightblue'}}></div>
+                        <div className="recentTransactions" style={{ width: '100%', height: '300px', backgroundColor: 'lightblue' }}></div>
                     </div>
                 )}
             </div>
@@ -1483,22 +1590,23 @@ const MyDashboard = () => {
                     <div onClick={toggleDashboard} style={{
                         position: 'absolute',
                         top: '20px',
-                        left: isDashboardVisible ? '95%' : '-20px',
-                        width: '40px',
-                        height: '40px',
+                        left: isDashboardVisible ? '95%' : '-10px',
+                        width: '50px',
+                        height: '50px',
                         borderRadius: '20px',
                         background: '#007bff',
                         color: 'black',
                         fontSize: 'xx-large',
+                        fontWeight: '700',
                         display: 'flex',
                         alignItems: 'center',
+                        textAlign: 'center',
                         justifyContent: 'center',
                         cursor: 'pointer',
                         transition: 'left 0.3s',
-                        transform: isDashboardVisible ? 'none' : 'rotate(180deg)',
                         zIndex: 1000,
                     }}>
-                        {isDashboardVisible ? '←' : '→'}
+                        {isDashboardVisible ? <FaChevronLeft /> : <FaChevronRight />}
                     </div>
 
                     {/* Sidebar Content */}
@@ -1569,10 +1677,10 @@ const MyDashboard = () => {
                 </div>
 
                 {/* Main Content */}
-                <div style={{ 
-                    width: isDashboardVisible ? 'calc(100% - 20vw)' : '100%', 
-                    padding: '20px', 
-                    overflowY: 'auto', 
+                <div style={{
+                    width: isDashboardVisible ? 'calc(100% - 20vw)' : '100%',
+                    padding: '20px',
+                    overflowY: 'auto',
                     transition: 'width 0.3s'
                 }}>
                     {renderContent()}
