@@ -115,11 +115,11 @@ const ListingCard = ({
     <div
       className="listing-card"
       onClick={() => {
-        // Restrict non-logged-in users
-        if (!user) {
-          navigate('/login');
-          return;
-        }
+        // // Restrict non-logged-in users
+        // if (!user) {
+        //   navigate('/login');
+        //   return;
+        // }
         navigate(`/properties/${listingId}`);
       }}
     >

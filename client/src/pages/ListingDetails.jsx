@@ -36,12 +36,11 @@ const ListingDetails = () => {
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/login');
-      return;
+    if (user) {
+      setCustomerEmail(user.email);
+      setCustomerName(`${user.firmName} `);
     }
-    setCustomerEmail(user.email);
-    setCustomerName(`${user.firmName} `);
+
   }, [user]);
 
   const [loading, setLoading] = useState(true);
@@ -100,7 +99,7 @@ const ListingDetails = () => {
 
   const handleSubmit = async () => {
     const hasBooking = await checkUserBooking();
-    
+
     if (hasBooking) {
       // User has a booking, navigate to the TopUpPage
       navigate(`/${user._id}/topup`);
@@ -115,8 +114,8 @@ const ListingDetails = () => {
         bookingPrice: pricePerShare * guestCount,
         totalPrice: pricePerShare * guestCount,
         guestCount,
-        listingTitle: listing.title, 
-        customerReturns: listing.returns 
+        listingTitle: listing.title,
+        customerReturns: listing.returns
       };
 
       try {
@@ -272,9 +271,18 @@ const ListingDetails = () => {
       try {
         const response = await fetch(`http://localhost:3001/updates/listing/${listingId}`);
         const data = await response.json();
-        setUpdates(data);
+
+        // Check if data is an array or object and handle accordingly
+        if (Array.isArray(data)) {
+          setUpdates(data);
+          console.log(data)
+        } else {
+          console.error("Invalid data format:", data);
+          setUpdates([]); // Set to empty array if the data format is invalid
+        }
       } catch (err) {
         console.error("Failed to fetch updates", err);
+        setUpdates([]); // Set to empty array on error
       }
     };
 
@@ -290,6 +298,9 @@ const ListingDetails = () => {
     div.innerHTML = html;
     return div.textContent || div.innerText || '';
   };
+
+  console.log(updates)
+
 
   return loading ? (
     <Loader />
@@ -550,7 +561,7 @@ const ListingDetails = () => {
           </div>
 
           <div className='bidInfo'>
-            <h2 style={{textAlign: 'center'}}>Select The Number Of <u>Shares Of Interest</u> You Want For This Project </h2><br /><hr /> <br />
+            <h2 style={{ textAlign: 'center' }}>Select The Number Of <u>Shares Of Interest</u> You Want For This Project </h2><br /><hr /> <br />
             <div className="date-range-calendar">
               <h3>
                 {'Target: ksh. ' + listing.target.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -693,7 +704,7 @@ const ListingDetails = () => {
 
             <div className="moreDetailsBtn">
               <div className="moreDetailsBt" style={{ width: '220px', margin: '0 auto' }}>
-                <Link to={`/${listing.creator._id}/details`} className= "moreDetailsBtnn" style={{textDecoration: 'none', color: 'white' , height: '100%', width: '100%'}}> Show More Details</Link>
+                <Link to={`/${listing.creator._id}/details`} className="moreDetailsBtnn" style={{ textDecoration: 'none', color: 'white', height: '100%', width: '100%' }}> Show More Details</Link>
               </div>
             </div>
           </div>
@@ -704,29 +715,41 @@ const ListingDetails = () => {
         <h2 style={{ paddingLeft: '40px' }}>Project Updates:</h2>
         <div className="tabbU">
 
-          {updates.map((update) => (
-            <div key={update._id} className="update-item" onClick={() => navigate(`/update/${update._id}`)}>
-              <div className="update-itemm">
-                <div className="update-icon">
-                  <YouTubeThumbnail videoLink={update.videoLink} />
-                </div>
+          {Array.isArray(updates) && updates.length > 0 ? (
+            updates.map((update, index) => {
+              // Ensure the update is not null or undefined
+              if (!update || !update._id) {
+                console.warn(`Invalid update at index ${index}`, update); // Log the invalid update for debugging
+                return null; // Skip this invalid update
+              }
 
-                <div className="update-description">
-                  <div className="update-descriptionTitle">
-                    <h3>{update.title}:</h3>
+              return (
+                <div key={update._id} className="update-item" onClick={() => navigate(`/update/${update._id}`)}>
+                  <div className="update-itemm">
+                    <div className="update-icon">
+                      <YouTubeThumbnail videoLink={update.videoLink} />
+                    </div>
+                    <div className="update-description">
+                      <div className="update-descriptionTitle">
+                        <h3>{update.title}:</h3>
+                      </div>
+                      <div className="update-descriptionP">
+                        <p>
+                          {stripHtmlTags(update.description).split(' ').slice(0, 6).join(' ')}
+                          {stripHtmlTags(update.description).split(' ').length > 6 ? '...' : ''}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-
-                  <div className="update-descriptionP">
-                    <p>
-                      {stripHtmlTags(update.description).split(' ').slice(0, 6).join(' ')}
-                      {stripHtmlTags(update.description).split(' ').length > 6 ? '...' : ''}
-                    </p>
-                  </div>
-
                 </div>
-              </div>
-            </div>
-          ))}
+              );
+            })
+          ) : (
+            <div>No updates available</div> // Fallback message when no updates are present
+          )}
+
+
+
           {listing.creator._id === user._id && (
             <button
               className="floating-add-btn"

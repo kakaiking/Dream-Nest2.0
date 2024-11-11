@@ -25,7 +25,8 @@ const MyDashboard = () => {
     const [sharesToWithdraw, setSharesToWithdraw] = useState(1);
     const [activeView, setActiveView] = useState('insights');
 
-    const listings = useSelector((state) => state.listings);
+    // const listings = useSelector((state) => state.listings);
+    const [listings, setListings] = useState([])
     const [unfiledListings, setUnfiledListings] = useState([]);
     const [selectedListing, setSelectedListing] = useState(null);
     const [paymentDue, setPaymentDue] = useState(0);
@@ -47,6 +48,28 @@ const MyDashboard = () => {
     const [topups, setTopups] = useState([]);
     const [withdrawals, setWithdrawals] = useState([]);
     const [returnLogs, setReturnLogs] = useState([]);
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+    useEffect(() => {
+        const handleOnline = () => {
+            setIsOnline(true);
+            alert('Internet connectivity found');
+        };
+
+        const handleOffline = () => {
+            setIsOnline(false);
+            alert('Waiting for internet connection');
+        };
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        // Clean up event listeners on component unmount
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, []);
 
 
     const navigate = useNavigate();
@@ -180,10 +203,12 @@ const MyDashboard = () => {
             });
 
             const data = await response.json();
-            setWithdrawalList(data);
+            setWithdrawalList(Array.isArray(data) ? data : []);
             setLoading(false);
         } catch (err) {
             console.log("Failed to fetch withdrawals:", err.message);
+            setWithdrawalList([]);
+
         }
     };
 
@@ -288,25 +313,44 @@ const MyDashboard = () => {
 
     const fetchData = async () => {
         try {
-            const [bidsResponse, returnsResponse, commentsResponse, updatesResponse] = await Promise.all([
+            const [bidsResponse, returnsResponse, commentsResponse, updatesResponse, listingsResponse] = await Promise.all([
                 fetch('http://localhost:3001/bookings'),
                 fetch('http://localhost:3001/returns'),
                 fetch('http://localhost:3001/comments'),
                 fetch('http://localhost:3001/updates'),
+                fetch('http://localhost:3001/properties/all'),
             ]);
 
-            if (!bidsResponse.ok || !returnsResponse.ok || !commentsResponse.ok || !updatesResponse.ok) {
+            if (!bidsResponse.ok || !returnsResponse.ok || !commentsResponse.ok || !updatesResponse.ok || !listingsResponse.ok) {
                 throw new Error('One or more requests failed');
             }
 
-            setBids(await bidsResponse.json());
-            setReturns(await returnsResponse.json());
-            setComments(await commentsResponse.json());
-            setUpdates(await updatesResponse.json());
+            const [bidsData, returnsData, commentsData, updatesData, listingsData] = await Promise.all([
+                bidsResponse.json(),
+                returnsResponse.json(),
+                commentsResponse.json(),
+                updatesResponse.json(),
+                listingsResponse.json(),
+            ]);
+
+            // Ensure each dataset is an array, defaulting to an empty array if not
+            setBids(Array.isArray(bidsData) ? bidsData : []);
+            setReturns(Array.isArray(returnsData) ? returnsData : []);
+            setComments(Array.isArray(commentsData) ? commentsData : []);
+            setUpdates(Array.isArray(updatesData) ? updatesData : []);
+            setListings(Array.isArray(listingsData) ? listingsData : []);
         } catch (error) {
             console.error('Error fetching data:', error);
+
+            // Set default empty arrays on error
+            setBids([]);
+            setReturns([]);
+            setComments([]);
+            setUpdates([]);
+            setListings([]);
         }
     };
+
 
     const handleTopUp = async () => {
         if (!selectedBooking || sharesToAdd <= 0) {
@@ -531,6 +575,7 @@ const MyDashboard = () => {
     const [myWithdrawalsProjectName, setMyWithdrawalsProjectName] = useState('');
     const [myProjectTopupProjectName, setMyProjectTopupProjectName] = useState('');
     const [myProjectWithdrawalProjectName, setMyProjectWithdrawalProjectName] = useState('');
+    const [recentTransactions, setRecentTransactions] = useState([])
 
 
 
@@ -649,11 +694,17 @@ const MyDashboard = () => {
                 }))
             ].filter(transaction => transaction.date !== null); // Filter out invalid dates
 
+            // Sort transactions by date (most recent first)
+            allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
             // Calculate the total sum of all transactions
             const totalSum = allTransactions.reduce((acc, transaction) => acc + transaction.amount, 0);
 
             // Store total sum in state
             setTotalTransactions(totalSum);
+
+            // Store sorted transactions for display
+            setRecentTransactions(allTransactions);
 
             const dailyTotals = new Map();
             allTransactions.forEach(transaction => {
@@ -870,7 +921,7 @@ const MyDashboard = () => {
                             <div className="chart-section" >
                                 <h2>Funding Progress</h2>
                                 <LineChart
-                                    width={460}
+                                    width={475}
                                     height={300}
                                     data={chartData}
                                     margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
@@ -933,8 +984,29 @@ const MyDashboard = () => {
                                 <p>hi</p>
                             </div>
                         </div>
-                        <div className="recentTransactions" style={{ width: '100%', height: '300px', backgroundColor: 'lightblue' }}>
-                            <h1>Recent Transactions</h1>
+                        <div className="recent-transactions" style={{ width: '90%', height: 'auto', margin: '20px auto' }}>
+                            <h1>Recent Transactions</h1><br />
+                            {recentTransactions.length > 0 ? (
+                                <div>
+                                    {/* Titles Row */}
+                                    <div className="transaction-titles">
+                                        <span>Date</span>
+                                        <span>Type</span>
+                                        <span>Amount</span>
+                                    </div>
+
+                                    {/* Mapping transactions */}
+                                    {recentTransactions.map((transaction, index) => (
+                                        <div key={index} className="transaction-item">
+                                            <span>{transaction.date}</span>
+                                            <span>{transaction.type}</span>
+                                            <span>{transaction.amount}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p>No transactions available</p>
+                            )}
                         </div>
                     </div>
                 )}
@@ -1172,36 +1244,36 @@ const MyDashboard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                            {filteredTopupList
-                                .filter((topup) =>
-                                    topup === "" || topup.listingTitle === myProjectTopupProjectName
-                                )
-                                .map((topup, index) => (
-                            <tr key={topup._id} className="h-8">
-                                <td className="border-slate-700 text-center">{index + 1}</td>
-                                <td className="border-slate-700 text-center">{topup.listingId.title}</td>
-                                <td className='border-slate-700 text-center'>{topup.customerName}</td>
-                                <td className='border-slate-700 text-center'><Link to={`/${topup.customerId._id}/details`}>{topup.customerEmail}</Link> </td>
-                                <td className='border-slate-700 text-center'>{topup.guestCount}</td>
-                                <td className="border-slate-700 text-center">ksh. {topup.totalPrice}</td>
-                                <td className="border-slate-700 text-center">{new Date(topup.createdAt).toLocaleDateString()}</td>
-                                <td className="border-slate-700 text-center">{topup.status || "pending"}</td>
-                                <td className="border-slate-700 text-center">
-                                    {topup.status === "pending" ? (
-                                        <button
-                                            onClick={() => handleApproveTopup(topup._id)}
-                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                        >
-                                            Approve
-                                        </button>
-                                    ) : (
-                                        <button disabled className="bg-gray-400 text-white font-bold py-2 px-4 rounded opacity-50">
-                                            Approved
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
+                        {filteredTopupList
+                            .filter((topup) =>
+                                topup === "" || topup.listingTitle === myProjectTopupProjectName
+                            )
+                            .map((topup, index) => (
+                                <tr key={topup._id} className="h-8">
+                                    <td className="border-slate-700 text-center">{index + 1}</td>
+                                    <td className="border-slate-700 text-center">{topup.listingId.title}</td>
+                                    <td className='border-slate-700 text-center'>{topup.customerName}</td>
+                                    <td className='border-slate-700 text-center'><Link to={`/${topup.customerId._id}/details`}>{topup.customerEmail}</Link> </td>
+                                    <td className='border-slate-700 text-center'>{topup.guestCount}</td>
+                                    <td className="border-slate-700 text-center">ksh. {topup.totalPrice}</td>
+                                    <td className="border-slate-700 text-center">{new Date(topup.createdAt).toLocaleDateString()}</td>
+                                    <td className="border-slate-700 text-center">{topup.status || "pending"}</td>
+                                    <td className="border-slate-700 text-center">
+                                        {topup.status === "pending" ? (
+                                            <button
+                                                onClick={() => handleApproveTopup(topup._id)}
+                                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                            >
+                                                Approve
+                                            </button>
+                                        ) : (
+                                            <button disabled className="bg-gray-400 text-white font-bold py-2 px-4 rounded opacity-50">
+                                                Approved
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>
@@ -1269,38 +1341,38 @@ const MyDashboard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                            {filteredWithdrawalList
-                                .filter((withdrawal) =>
-                                    withdrawal === "" || withdrawal.listingTitle === myProjectWithdrawalProjectName
-                                )
-                                .map((withdrawal, index) => (
-                            <tr key={withdrawal._id} className="h-8">
-                                <td className="border-slate-700 text-center">{index + 1}</td>
-                                <td className="border-slate-700 text-center">{withdrawal.listingId.title}</td>
-                                <td className='border-slate-700 text-center'>{withdrawal.customerName}</td>
-                                <td className='border-slate-700 text-center'><Link to={`/${withdrawal.customerId._id}/details`}>{withdrawal.customerEmail}</Link> </td>
-                                <td className='border-slate-700 text-center'>{withdrawal.guestCount}</td>
-                                <td className="border-slate-700 text-center">
-                                    ksh. {withdrawal.totalPrice}
-                                </td>
-                                <td className="border-slate-700 text-center">{new Date(withdrawal.createdAt).toLocaleDateString()}</td>
-                                <td className="border-slate-700 text-center">{withdrawal.status || "pending"}</td>
-                                <td className="border-slate-700 text-center">
-                                    {withdrawal.status === "pending" ? (
-                                        <button
-                                            onClick={() => handleApproveWithdrawal(withdrawal._id)}
-                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                        >
-                                            Approve
-                                        </button>
-                                    ) : (
-                                        <button disabled className="bg-gray-400 text-white font-bold py-2 px-4 rounded opacity-50">
-                                            Approved
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
+                        {filteredWithdrawalList
+                            .filter((withdrawal) =>
+                                withdrawal === "" || withdrawal.listingTitle === myProjectWithdrawalProjectName
+                            )
+                            .map((withdrawal, index) => (
+                                <tr key={withdrawal._id} className="h-8">
+                                    <td className="border-slate-700 text-center">{index + 1}</td>
+                                    <td className="border-slate-700 text-center">{withdrawal.listingId.title}</td>
+                                    <td className='border-slate-700 text-center'>{withdrawal.customerName}</td>
+                                    <td className='border-slate-700 text-center'><Link to={`/${withdrawal.customerId._id}/details`}>{withdrawal.customerEmail}</Link> </td>
+                                    <td className='border-slate-700 text-center'>{withdrawal.guestCount}</td>
+                                    <td className="border-slate-700 text-center">
+                                        ksh. {withdrawal.totalPrice}
+                                    </td>
+                                    <td className="border-slate-700 text-center">{new Date(withdrawal.createdAt).toLocaleDateString()}</td>
+                                    <td className="border-slate-700 text-center">{withdrawal.status || "pending"}</td>
+                                    <td className="border-slate-700 text-center">
+                                        {withdrawal.status === "pending" ? (
+                                            <button
+                                                onClick={() => handleApproveWithdrawal(withdrawal._id)}
+                                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                            >
+                                                Approve
+                                            </button>
+                                        ) : (
+                                            <button disabled className="bg-gray-400 text-white font-bold py-2 px-4 rounded opacity-50">
+                                                Approved
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>
@@ -1312,7 +1384,7 @@ const MyDashboard = () => {
         const selectedProjectReservations = filteredTripList.filter(
             (reservation) => reservation.listingTitle === mybidProjectName
         );
-    
+
         // Calculate total bids and total payout
         const totalBids = selectedProjectReservations.reduce(
             (acc, reservation) => acc + reservation.totalPrice,
@@ -1323,13 +1395,13 @@ const MyDashboard = () => {
                 acc + (reservation.customerReturns / 100) * reservation.totalPrice,
             0
         );
-    
+
         return (
             <>
                 <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
                     <h1 className="title-list">Your Bids</h1>
                 </div>
-    
+
                 {/* Project Name Dropdown Filter */}
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
                     <select
@@ -1348,7 +1420,7 @@ const MyDashboard = () => {
                         )}
                     </select>
                 </div>
-    
+
                 {/* Filter Buttons */}
                 <div className="filter-buttons" style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
                     <button
@@ -1370,7 +1442,7 @@ const MyDashboard = () => {
                         Approved Bids
                     </button>
                 </div>
-    
+
                 {/* Totals */}
                 <div className="totals" style={{ display: "flex", justifyContent: "space-between", margin: "20px 40px" }}>
                     <div>
@@ -1380,7 +1452,7 @@ const MyDashboard = () => {
                         <strong>Total Payout:</strong> ksh. {totalPayout.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                     </div>
                 </div>
-    
+
                 {/* Table */}
                 <div className="tableContent">
                     <table className="table">
@@ -1446,14 +1518,14 @@ const MyDashboard = () => {
                 </div>
             </>
         );
-    };   
+    };
 
     const renderMyTopUps = () => (
         <>
             <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
                 <h1 className="title-list">My Top Ups</h1>
             </div>
-    
+
             {/* Project Name Dropdown Filter */}
             <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
                 <select
@@ -1472,7 +1544,7 @@ const MyDashboard = () => {
                     )}
                 </select>
             </div>
-    
+
             <div className="filter-buttons" style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
                 <button
                     onClick={() => setFilter("all")}
@@ -1493,24 +1565,24 @@ const MyDashboard = () => {
                     Approved
                 </button>
             </div>
-    
+
             {/* Display Table only if a project is selected */}
-                <div className="tableContent">
-                    <table className='table'>
-                        <thead>
-                            <tr>
-                                <th className="text-center">No</th>
-                                <th className="text-center">Project Name</th>
-                                <th className="text-center">Shares</th>
-                                <th className="text-center">Top Up Amount</th>
-                                <th className="text-center">Returns (%)</th>
-                                <th className="text-center">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="tbod">
-                                {myTopupProjectName && filteredTopUps
-                                    .filter((topup) => topup.listingTitle === myTopupProjectName)
-                                    .map((topup, index) => (
+            <div className="tableContent">
+                <table className='table'>
+                    <thead>
+                        <tr>
+                            <th className="text-center">No</th>
+                            <th className="text-center">Project Name</th>
+                            <th className="text-center">Shares</th>
+                            <th className="text-center">Top Up Amount</th>
+                            <th className="text-center">Returns (%)</th>
+                            <th className="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody className="tbod">
+                        {myTopupProjectName && filteredTopUps
+                            .filter((topup) => topup.listingTitle === myTopupProjectName)
+                            .map((topup, index) => (
                                 <tr key={topup._id} className='h-8'>
                                     <td className='border-slate-700 text-center'>{index + 1}</td>
                                     <td className='border-slate-700 text-center'>{topup.listingId?.title || "N/A"}</td>
@@ -1522,13 +1594,13 @@ const MyDashboard = () => {
                                     <td className='border-slate-700 text-center'>{topup.status || 'pending'}</td>
                                 </tr>
                             ))}
-                        </tbody>
-                    </table>
-                </div>
-            
+                    </tbody>
+                </table>
+            </div>
+
         </>
     );
-    
+
     const renderMyWithdrawals = () => (
         <>
             <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
@@ -1588,23 +1660,23 @@ const MyDashboard = () => {
                         </tr>
                     </thead>
                     <tbody className="tbod">
-                            {myWithdrawalsProjectName && filteredWithdrawals
-                                .filter((withdrawal) => withdrawal.listingTitle === myWithdrawalsProjectName)
-                                .map((withdrawal, index) => (
-                            <tr key={withdrawal._id} className='h-8'>
-                                <td className='border-slate-700 text-center'>{index + 1}</td>
-                                <td className='border-slate-700 text-center'>{withdrawal.listingId?.title || "N/A"}</td>
-                                <td className='border-slate-700 text-center'>{withdrawal.guestCount}</td>
-                                <td className='border-slate-700 text-center'>
-                                    ksh. {withdrawal.totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                </td>
-                                <td className='border-slate-700 text-center'>{withdrawal.customerReturns}</td>
-                                <td className='border-slate-700 text-center'>
-                                    {((withdrawal.customerReturns / 100) * withdrawal.totalPrice).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                </td>
-                                <td className='border-slate-700 text-center'>{withdrawal.status || 'pending'}</td>
-                            </tr>
-                        ))}
+                        {myWithdrawalsProjectName && filteredWithdrawals
+                            .filter((withdrawal) => withdrawal.listingTitle === myWithdrawalsProjectName)
+                            .map((withdrawal, index) => (
+                                <tr key={withdrawal._id} className='h-8'>
+                                    <td className='border-slate-700 text-center'>{index + 1}</td>
+                                    <td className='border-slate-700 text-center'>{withdrawal.listingId?.title || "N/A"}</td>
+                                    <td className='border-slate-700 text-center'>{withdrawal.guestCount}</td>
+                                    <td className='border-slate-700 text-center'>
+                                        ksh. {withdrawal.totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    </td>
+                                    <td className='border-slate-700 text-center'>{withdrawal.customerReturns}</td>
+                                    <td className='border-slate-700 text-center'>
+                                        {((withdrawal.customerReturns / 100) * withdrawal.totalPrice).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    </td>
+                                    <td className='border-slate-700 text-center'>{withdrawal.status || 'pending'}</td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>
@@ -1616,16 +1688,16 @@ const MyDashboard = () => {
         const filteredBids = filteredReservationList.filter(
             (reservation) => projectBidName === "" || reservation.listingTitle === projectBidName
         );
-    
+
         const totalBids = filteredBids.reduce((acc, reservation) => acc + reservation.totalPrice, 0);
         const totalPayout = filteredBids.reduce((acc, reservation) => acc + (reservation.customerReturns / 100) * reservation.totalPrice, 0);
-    
+
         return (
             <>
                 <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
                     <h1 className="title-list">Your Projects' Bids</h1>
                 </div>
-    
+
                 {/* Project Name Dropdown Filter */}
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
                     <select
@@ -1642,7 +1714,7 @@ const MyDashboard = () => {
                         ))}
                     </select>
                 </div>
-    
+
                 {/* Filter Buttons */}
                 <div className="filter-buttons" style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
                     <button
@@ -1664,7 +1736,7 @@ const MyDashboard = () => {
                         Approved Bids
                     </button>
                 </div>
-    
+
                 {/* Totals */}
                 <div className="totals" style={{ display: "flex", justifyContent: "space-between", margin: "20px 40px" }}>
                     <div>
@@ -1674,7 +1746,7 @@ const MyDashboard = () => {
                         <strong>Total Payout:</strong> ksh. {totalPayout.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                     </div>
                 </div>
-    
+
                 {/* Table */}
                 <div className="tableContent">
                     <table className="table">
@@ -1737,7 +1809,7 @@ const MyDashboard = () => {
                 </div>
             </>
         );
-    };    
+    };
 
     const renderMyReturnLogs = () => (
         <div>
@@ -1812,6 +1884,13 @@ const MyDashboard = () => {
 
     return (
         <>
+            {!isOnline ? (
+                <div className="onlineStatus" style={{ width: '100%', height: '50px', backgroundColor: 'red', textAlign: 'center', fontSize: 'large' }}>
+                    <h2>Oops! Waiting for internet connection...</h2>
+                </div>
+            ) : (
+                ''
+            )}
             <Navbar />
             <div style={{ display: 'flex', height: '100%' }}>
                 {/* Sidebar container */}
@@ -1843,7 +1922,7 @@ const MyDashboard = () => {
                     <div style={{
                         width: isDashboardVisible ? '20vw' : '0',
                         transition: 'width 0.3s',
-                        height: '100vh',
+                        height: '100%',
                         overflow: 'hidden',
                         background: '#f8f9fa',
                         padding: isDashboardVisible ? '20px' : '0',
