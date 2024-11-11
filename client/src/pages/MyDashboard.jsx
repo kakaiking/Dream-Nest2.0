@@ -19,7 +19,7 @@ const MyDashboard = () => {
     const [returns, setReturns] = useState([]);
     const [comments, setComments] = useState([]);
     const [updates, setUpdates] = useState([]);
-    const [bookings, setBookings] = useState([]);
+    // const [bookings, setBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [sharesToAdd, setSharesToAdd] = useState(1);
     const [sharesToWithdraw, setSharesToWithdraw] = useState(1);
@@ -359,10 +359,10 @@ const MyDashboard = () => {
 
             if (response.ok) {
                 alert("Withdrawal processed successfully");
-                setBookings(bookings.map(b => b._id === selectedBooking._id
-                    ? { ...b, guestCount: b.guestCount - sharesToWithdraw }
-                    : b
-                ));
+                // setBookings(bookings.map(b => b._id === selectedBooking._id
+                //     ? { ...b, guestCount: b.guestCount - sharesToWithdraw }
+                //     : b
+                // ));
                 setSelectedBooking(null);
                 setSharesToWithdraw(0);
             } else {
@@ -512,6 +512,7 @@ const MyDashboard = () => {
     }, [user._id, user.token]); // Add user._id and user.token as dependencies
 
     // ---------- Insights ----------------------------------------------------------------------------------------------------
+    const [bookings, setBookings] = useState([]);
     const [insightListings, setInsightListings] = useState([]);
     const [selectedInsightListing, setSelectedInsightListing] = useState('');
     const [insightBookings, setInsightBookings] = useState([]);
@@ -521,14 +522,27 @@ const MyDashboard = () => {
     const [insightListingTarget, setInsightListingTarget] = useState(0);
     const [insightListingCreationDate, setInsightListingCreationDate] = useState(null);
     const [bookingCount, setBookingCount] = useState(0);
-    const [totalTransactions, setTotalTransactions] = useState(0); // State for total sum of transactions
+    const [pendingBookingCount, setPendingBookingCount] = useState(0);
+    const [pendingTopups, setPendingTopups] = useState(0);
+    const [pendingWithdrawals, setPendingWithdrawals] = useState(0);
+    const [projectBidName, setProjectBidname] = useState('select');
+    const [mybidProjectName, setMyBidProjectName] = useState('');
+    const [myTopupProjectName, setMyTopupProjectName] = useState('');
+    const [myWithdrawalsProjectName, setMyWithdrawalsProjectName] = useState('');
+    const [myProjectTopupProjectName, setMyProjectTopupProjectName] = useState('');
+    const [myProjectWithdrawalProjectName, setMyProjectWithdrawalProjectName] = useState('');
+
+
+
+    const [totalTransactions, setTotalTransactions] = useState(0);
 
     useEffect(() => {
         const fetchBookings = async () => {
             try {
                 const response = await fetch('http://localhost:3001/bookings');
                 const data = await response.json();
-                setBookings(data);
+                setBookings(data); // Ensure that setBookings updates bookings state correctly
+                // console.log(data);
             } catch (error) {
                 console.error('Error fetching bookings:', error);
             }
@@ -542,6 +556,25 @@ const MyDashboard = () => {
             setBookingCount(count);
         }
     }, [selectedInsightListing, bookings]);
+
+    useEffect(() => {
+        if (selectedInsightListing) {
+            const count = bookings.filter(booking => booking.listingId === selectedInsightListing && booking.status === 'pending').length;
+            setPendingBookingCount(count);
+        }
+    }, [selectedInsightListing, bookings]);
+
+
+    // const fetchPendingBids = () => {
+    //     const filteredPendingBids = bookings.filter(
+    //         (booking) => booking.listingId === selectedInsightListing && booking.status === 'pending'
+    //     );
+    //     setPendingBookingCount(filteredPendingBids);
+    // };
+
+    // useEffect(() => {
+    //     fetchPendingBids();
+    // }, [selectedInsightListing, bookings]);
 
     useEffect(() => {
         const fetchInsightListings = async () => {
@@ -581,6 +614,9 @@ const MyDashboard = () => {
 
                 setInsightBookings(insightBookingsData.filter(b => b.status === 'approved'));
                 setInsightTopups(insightTopupsData.filter(t => t.listingId === selectedInsightListing && t.status === 'approved'));
+                setPendingTopups(insightTopupsData.filter(t => t.listingId === selectedInsightListing && t.status === 'pending'));
+                setPendingWithdrawals(insightWithdrawalsData.filter(t => t.listingId === selectedInsightListing && t.status === 'pending'));
+
                 setInsightWithdrawals(insightWithdrawalsData.filter(w => w.listingId === selectedInsightListing && w.status === 'approved'));
                 setInsightListingTarget(insightListingData.target);
                 setInsightListingCreationDate(new Date(insightListingData.createdAt));
@@ -677,6 +713,7 @@ const MyDashboard = () => {
     }, [insightBookings, insightTopups, insightWithdrawals, insightListingCreationDate, insightListingTarget]);
 
 
+    const projectNames = [...new Set(tripList.map((item) => item.listingTitle))];
 
 
     // Renders 
@@ -767,10 +804,10 @@ const MyDashboard = () => {
                                 </div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
                                     <div className="value" style={{ height: '40%', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        {totalTransactions}
+                                        {pendingBookingCount}
                                     </div><hr />
                                     <div className="title" style={{ height: '60%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        Total Raised 
+                                        Pending Bids
                                     </div>
                                 </div>
                             </div>
@@ -793,10 +830,10 @@ const MyDashboard = () => {
                                 </div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
                                     <div className="value" style={{ height: '40%', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        {totalTransactions}
+                                        {pendingTopups.length}
                                     </div><hr />
                                     <div className="title" style={{ height: '60%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        Total Raised 
+                                        Pending Topups
                                     </div>
                                 </div>
                             </div>
@@ -819,10 +856,10 @@ const MyDashboard = () => {
                                 </div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
                                     <div className="value" style={{ height: '40%', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        {totalTransactions}
-                                    </div><hr style={{fontWeight: '600px'}}/>
+                                        {pendingWithdrawals.length}
+                                    </div><hr style={{ fontWeight: '600px' }} />
                                     <div className="title" style={{ height: '60%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        Total Raised 
+                                        Pending Withdrawals
                                     </div>
                                 </div>
                             </div>
@@ -896,7 +933,9 @@ const MyDashboard = () => {
                                 <p>hi</p>
                             </div>
                         </div>
-                        <div className="recentTransactions" style={{ width: '100%', height: '300px', backgroundColor: 'lightblue' }}></div>
+                        <div className="recentTransactions" style={{ width: '100%', height: '300px', backgroundColor: 'lightblue' }}>
+                            <h1>Recent Transactions</h1>
+                        </div>
                     </div>
                 )}
             </div>
@@ -911,11 +950,11 @@ const MyDashboard = () => {
                 <h2>Top up</h2><br />
                 <p>If you want to add some shares to an already existing bid, select the desired bid from the dropdown below.</p> <br />
                 <p>After Selecting the bid to top up, you can specify the number of shares you want to add.</p> <br /><hr /><br />
-                <select onChange={e => setSelectedBooking(bookings.find(b => b._id === e.target.value))} style={{ width: '100%', height: '30px', marginBottom: '20px', borderRadius: '5px' }}>
+                <select onChange={e => setSelectedBooking(filteredTripList.find(b => b._id === e.target.value))} style={{ width: '100%', height: '30px', marginBottom: '20px', borderRadius: '5px' }}>
                     <option value="">Select the bid you want to top up</option>
-                    {bookings.map(booking => (
+                    {filteredTripList.map(booking => (
                         <option key={booking._id} value={booking._id}>
-                            {booking.listingId.title} - Your shares: {booking.guestCount}
+                            {booking.listingTitle} - Your shares: {booking.guestCount}
                         </option>
                     ))}
                 </select> <br />
@@ -959,11 +998,11 @@ const MyDashboard = () => {
 
                 <p>If you want to take out some shares from an already existing bid, select the desired bid from the dropdown below.</p> <br />
                 <p>After Selecting the bid to withdraw from, you can specify the number of shares you want to withdraw.</p> <br /><hr /><br />
-                <select onChange={e => setSelectedBooking(bookings.find(b => b._id === e.target.value))} style={{ width: '100%', height: '30px', marginBottom: '20px', borderRadius: '5px' }}>
+                <select onChange={e => setSelectedBooking(filteredTripList.find(b => b._id === e.target.value))} style={{ width: '100%', height: '30px', marginBottom: '20px', borderRadius: '5px' }}>
                     <option value="">Select the bid you want to withdraw from</option>
-                    {bookings.map(booking => (
+                    {filteredTripList.map(booking => (
                         <option key={booking._id} value={booking._id}>
-                            {booking.listingId.title} - Your shares: {booking.guestCount}
+                            {booking.listingTitle} - Your shares: {booking.guestCount}
                         </option>
                     ))}
                 </select>
@@ -1078,6 +1117,24 @@ const MyDashboard = () => {
                 <h1 className="title-list">My Project Top Ups</h1>
             </div>
 
+            {/* Project Name Dropdown Filter */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+                <select
+                    onChange={(e) => setMyProjectTopupProjectName(e.target.value)}
+                    className="mx-2 px-4 py-2 rounded bg-gray-200"
+                    style={{ width: "200px", textAlign: "center" }}
+                    value={myProjectTopupProjectName || ""}
+
+                >
+                    <option value="">Select A Project</option>
+                    {Array.from(new Set(filteredReservationList.map((reservation) => reservation.listingTitle))).map((projectName) => (
+                        <option key={projectName} value={projectName}>
+                            {projectName}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
             <div className="filter-buttons" style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
                 <button
                     onClick={() => setFilter("all")}
@@ -1115,7 +1172,11 @@ const MyDashboard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredTopupList.map((topup, index) => (
+                            {filteredTopupList
+                                .filter((topup) =>
+                                    topup === "" || topup.listingTitle === myProjectTopupProjectName
+                                )
+                                .map((topup, index) => (
                             <tr key={topup._id} className="h-8">
                                 <td className="border-slate-700 text-center">{index + 1}</td>
                                 <td className="border-slate-700 text-center">{topup.listingId.title}</td>
@@ -1153,6 +1214,24 @@ const MyDashboard = () => {
                 <h1 className="title-list">My Project Withdrawals</h1>
             </div>
 
+            {/* Project Name Dropdown Filter */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+                <select
+                    onChange={(e) => setMyProjectWithdrawalProjectName(e.target.value)}
+                    className="mx-2 px-4 py-2 rounded bg-gray-200"
+                    style={{ width: "200px", textAlign: "center" }}
+                    value={myProjectWithdrawalProjectName || ""}
+
+                >
+                    <option value="">Select A Project</option>
+                    {Array.from(new Set(filteredReservationList.map((reservation) => reservation.listingTitle))).map((projectName) => (
+                        <option key={projectName} value={projectName}>
+                            {projectName}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
             <div className="filter-buttons" style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
                 <button
                     onClick={() => setFilter("all")}
@@ -1190,7 +1269,11 @@ const MyDashboard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredWithdrawalList.map((withdrawal, index) => (
+                            {filteredWithdrawalList
+                                .filter((withdrawal) =>
+                                    withdrawal === "" || withdrawal.listingTitle === myProjectWithdrawalProjectName
+                                )
+                                .map((withdrawal, index) => (
                             <tr key={withdrawal._id} className="h-8">
                                 <td className="border-slate-700 text-center">{index + 1}</td>
                                 <td className="border-slate-700 text-center">{withdrawal.listingId.title}</td>
@@ -1224,83 +1307,172 @@ const MyDashboard = () => {
         </>
     );
 
-    const renderMyBids = () => (
-        <>
-            <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
-                <h1 className="title-list"> Bids you Placed</h1>
-            </div>
-            <div className="filter-buttons" style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
-                <button
-                    onClick={() => setFilter("all")}
-                    className={`mx-2 px-4 py-2 rounded ${filter === "all" ? "bg-blue-500 text-white selectedz" : "bg-gray-200"}`}
-                >
-                    All
-                </button>
-                <button
-                    onClick={() => setFilter("pending")}
-                    className={`mx-2 px-4 py-2 rounded ${filter === "pending" ? "bg-blue-500 text-white selectedz" : "bg-gray-700"}`}
-                >
-                    Pending
-                </button>
-                <button
-                    onClick={() => setFilter("approved")}
-                    className={`mx-2 px-4 py-2 rounded ${filter === "approved" ? "bg-blue-500 text-white selectedz" : "bg-gray-200"}`}
-                >
-                    Approved
-                </button>
-            </div>
-
-            <div className="totals" style={{ display: "flex", justifyContent: "space-between", margin: "20px 40px" }}>
-                <div>
-                    <strong>Total Bids:</strong> ksh. {totalBidsMyBids.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+    const renderMyBids = () => {
+        // Filter reservations based on the selected project
+        const selectedProjectReservations = filteredTripList.filter(
+            (reservation) => reservation.listingTitle === mybidProjectName
+        );
+    
+        // Calculate total bids and total payout
+        const totalBids = selectedProjectReservations.reduce(
+            (acc, reservation) => acc + reservation.totalPrice,
+            0
+        );
+        const totalPayout = selectedProjectReservations.reduce(
+            (acc, reservation) =>
+                acc + (reservation.customerReturns / 100) * reservation.totalPrice,
+            0
+        );
+    
+        return (
+            <>
+                <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
+                    <h1 className="title-list">Your Bids</h1>
                 </div>
-                <div>
-                    <strong>Total Payout:</strong> ksh. {totalPayoutMyBids.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+    
+                {/* Project Name Dropdown Filter */}
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+                    <select
+                        onChange={(e) => setMyBidProjectName(e.target.value)}
+                        className="mx-2 px-4 py-2 rounded bg-gray-200"
+                        style={{ width: "200px", textAlign: "center" }}
+                        value={mybidProjectName || ""}
+                    >
+                        <option value="">Select A Project</option>
+                        {Array.from(new Set(filteredTripList.map((reservation) => reservation.listingTitle))).map(
+                            (projectName) => (
+                                <option key={projectName} value={projectName}>
+                                    {projectName}
+                                </option>
+                            )
+                        )}
+                    </select>
                 </div>
-            </div>
-
-            <div className="tableContent">
-                <table className='table'>
-                    <thead>
-                        <tr>
-                            <th className="text-center">No</th>
-                            <th className="text-center">Project Name</th>
-                            <th className="text-center">Shares</th>
-                            <th className="text-center">My Bid Price</th>
-                            <th className="text-center">Returns (%)</th>
-                            <th className="text-center">Payout</th>
-                            <th className="text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody className="tbod">
-                        {filteredTripList.map((reservation, index) => (
-                            <tr key={reservation._id} className='h-8'>
-                                <td className='border-slate-700 text-center'>{index + 1}</td>
-                                <td className='border-slate-700 text-center'>{reservation.listingTitle}</td>
-                                <td className='border-slate-700 text-center'>{reservation.guestCount}</td>
-
-                                <td className='border-slate-700 text-center'>
-                                    ksh. {reservation.totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                </td>
-                                <td className='border-slate-700 text-center'>{reservation.customerReturns}</td>
-                                <td className='border-slate-700 text-center'>
-                                    {((reservation.customerReturns / 100) * reservation.totalPrice).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                </td>
-                                <td className='border-slate-700 text-center'>{reservation.status || 'pending'}</td>
+    
+                {/* Filter Buttons */}
+                <div className="filter-buttons" style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
+                    <button
+                        onClick={() => setFilter("all")}
+                        className={`mx-2 px-4 py-2 rounded ${filter === "all" ? "bg-blue-500 text-white selectedz" : "bg-gray-200"}`}
+                    >
+                        All Bids
+                    </button>
+                    <button
+                        onClick={() => setFilter("pending")}
+                        className={`mx-2 px-4 py-2 rounded ${filter === "pending" ? "bg-blue-500 text-white selectedz" : "bg-gray-200"}`}
+                    >
+                        Pending Bids
+                    </button>
+                    <button
+                        onClick={() => setFilter("approved")}
+                        className={`mx-2 px-4 py-2 rounded ${filter === "approved" ? "bg-blue-500 text-white selectedz" : "bg-gray-200"}`}
+                    >
+                        Approved Bids
+                    </button>
+                </div>
+    
+                {/* Totals */}
+                <div className="totals" style={{ display: "flex", justifyContent: "space-between", margin: "20px 40px" }}>
+                    <div>
+                        <strong>Total Bids:</strong> ksh. {totalBids.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    </div>
+                    <div>
+                        <strong>Total Payout:</strong> ksh. {totalPayout.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    </div>
+                </div>
+    
+                {/* Table */}
+                <div className="tableContent">
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th className="text-center">No</th>
+                                <th className="text-center">Project Name</th>
+                                <th className="text-center">Bidder's Name</th>
+                                <th className="text-center">Email</th>
+                                <th className="text-center">Shares</th>
+                                <th className="text-center">Bid Price</th>
+                                <th className="text-center">Returns (%)</th>
+                                <th className="text-center">Payout</th>
+                                <th className="text-center">Status</th>
+                                <th className="text-center">Action</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </>
-    );
+                        </thead>
+                        <tbody className="tbod">
+                            {mybidProjectName &&
+                                selectedProjectReservations
+                                    .filter((reservation) => filter === "all" || reservation.status === filter)
+                                    .map((reservation, index) => (
+                                        <tr key={reservation._id} className="h-8">
+                                            <td className="border-slate-700 text-center">{index + 1}</td>
+                                            <td className="border-slate-700 text-center">{reservation.listingTitle}</td>
+                                            <td className="border-slate-700 text-center">{reservation.customerName}</td>
+                                            <td className="border-slate-700 text-center">
+                                                <Link to={`/${reservation.customerId._id}/details`}>{reservation.customerEmail}</Link>
+                                            </td>
+                                            <td className="border-slate-700 text-center">{reservation.guestCount}</td>
+                                            <td className="border-slate-700 text-center">
+                                                ksh. {reservation.totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                            </td>
+                                            <td className="border-slate-700 text-center">{reservation.customerReturns}</td>
+                                            <td className="border-slate-700 text-center">
+                                                {((reservation.customerReturns / 100) * reservation.totalPrice)
+                                                    .toFixed(2)
+                                                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                            </td>
+                                            <td className="border-slate-700 text-center">{reservation.status || "pending"}</td>
+                                            <td className="border-slate-700 text-center">
+                                                {(!reservation.status || reservation.status === "pending") ? (
+                                                    <button
+                                                        onClick={() => handleApprove(reservation._id)}
+                                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
+                                                        style={{ width: "70px", fontSize: "medium", fontWeight: "bold" }}
+                                                    >
+                                                        Approve
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        disabled
+                                                        className="bg-gray-400 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed"
+                                                    >
+                                                        Approved
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                        </tbody>
+                    </table>
+                </div>
+            </>
+        );
+    };   
 
     const renderMyTopUps = () => (
         <>
             <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
                 <h1 className="title-list">My Top Ups</h1>
             </div>
-
+    
+            {/* Project Name Dropdown Filter */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+                <select
+                    onChange={(e) => setMyTopupProjectName(e.target.value)}
+                    className="mx-2 px-4 py-2 rounded bg-gray-200"
+                    style={{ width: "200px", textAlign: "center" }}
+                    value={myTopupProjectName || ""}
+                >
+                    <option value="">Select A Project</option>
+                    {Array.from(new Set(filteredTopUps.map((topup) => topup.listingTitle))).map(
+                        (projectName) => (
+                            <option key={projectName} value={projectName}>
+                                {projectName}
+                            </option>
+                        )
+                    )}
+                </select>
+            </div>
+    
             <div className="filter-buttons" style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
                 <button
                     onClick={() => setFilter("all")}
@@ -1321,42 +1493,64 @@ const MyDashboard = () => {
                     Approved
                 </button>
             </div>
-
-            <div className="tableContent">
-                <table className='table'>
-                    <thead>
-                        <tr>
-                            <th className="text-center">No</th>
-                            <th className="text-center">Project Name</th>
-                            <th className="text-center">Shares</th>
-                            <th className="text-center">Top Up Amount</th>
-                            <th className="text-center">Returns (%)</th>
-                            <th className="text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody className="tbod">
-                        {filteredTopUps.map((topup, index) => (
-                            <tr key={topup._id} className='h-8'>
-                                <td className='border-slate-700 text-center'>{index + 1}</td>
-                                <td className='border-slate-700 text-center'>{topup.listingId?.title || "N/A"}</td>
-                                <td className='border-slate-700 text-center'>{topup.guestCount}</td>
-                                <td className='border-slate-700 text-center'>
-                                    Ksh. {topup.totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                </td>
-                                <td className='border-slate-700 text-center'>{topup.customerReturns}</td>
-                                <td className='border-slate-700 text-center'>{topup.status || 'pending'}</td>
+    
+            {/* Display Table only if a project is selected */}
+                <div className="tableContent">
+                    <table className='table'>
+                        <thead>
+                            <tr>
+                                <th className="text-center">No</th>
+                                <th className="text-center">Project Name</th>
+                                <th className="text-center">Shares</th>
+                                <th className="text-center">Top Up Amount</th>
+                                <th className="text-center">Returns (%)</th>
+                                <th className="text-center">Status</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody className="tbod">
+                                {myTopupProjectName && filteredTopUps
+                                    .filter((topup) => topup.listingTitle === myTopupProjectName)
+                                    .map((topup, index) => (
+                                <tr key={topup._id} className='h-8'>
+                                    <td className='border-slate-700 text-center'>{index + 1}</td>
+                                    <td className='border-slate-700 text-center'>{topup.listingId?.title || "N/A"}</td>
+                                    <td className='border-slate-700 text-center'>{topup.guestCount}</td>
+                                    <td className='border-slate-700 text-center'>
+                                        Ksh. {topup.totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    </td>
+                                    <td className='border-slate-700 text-center'>{topup.customerReturns}</td>
+                                    <td className='border-slate-700 text-center'>{topup.status || 'pending'}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            
         </>
     );
-
+    
     const renderMyWithdrawals = () => (
         <>
             <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
                 <h1 className="title-list">My Withdrawals</h1>
+            </div>
+
+            {/* Project Name Dropdown Filter */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+                <select
+                    onChange={(e) => setMyWithdrawalsProjectName(e.target.value)}
+                    className="mx-2 px-4 py-2 rounded bg-gray-200"
+                    style={{ width: "200px", textAlign: "center" }}
+                    value={myWithdrawalsProjectName || ""}
+
+                >
+                    <option value="">Select A Project</option>
+                    {Array.from(new Set(filteredReservationList.map((reservation) => reservation.listingTitle))).map((projectName) => (
+                        <option key={projectName} value={projectName}>
+                            {projectName}
+                        </option>
+                    ))}
+                </select>
             </div>
 
             <div className="filter-buttons" style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
@@ -1394,7 +1588,9 @@ const MyDashboard = () => {
                         </tr>
                     </thead>
                     <tbody className="tbod">
-                        {filteredWithdrawals.map((withdrawal, index) => (
+                            {myWithdrawalsProjectName && filteredWithdrawals
+                                .filter((withdrawal) => withdrawal.listingTitle === myWithdrawalsProjectName)
+                                .map((withdrawal, index) => (
                             <tr key={withdrawal._id} className='h-8'>
                                 <td className='border-slate-700 text-center'>{index + 1}</td>
                                 <td className='border-slate-700 text-center'>{withdrawal.listingId?.title || "N/A"}</td>
@@ -1415,99 +1611,133 @@ const MyDashboard = () => {
         </>
     );
 
-    const renderMyProjectsBids = () => (
-        <>
-            <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
-                <h1 className="title-list" >Your Projects' Bids</h1>
-            </div>
-            <div className="filter-buttons" style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
-                <button
-                    onClick={() => setFilter("all")}
-                    className={`mx-2 px-4 py-2 rounded ${filter === "all" ? "bg-blue-500 text-white selectedz" : "bg-gray-200"}`}
-                >
-                    All Bids
-                </button>
-                <button
-                    onClick={() => setFilter("pending")}
-                    className={`mx-2 px-4 py-2 rounded ${filter === "pending" ? "bg-blue-500 text-white selectedz" : "bg-gray-200"}`}
-                >
-                    Pending Bids
-                </button>
-                <button
-                    onClick={() => setFilter("approved")}
-                    className={`mx-2 px-4 py-2 rounded ${filter === "approved" ? "bg-blue-500 text-white selectedz" : "bg-gray-200"}`}
-                >
-                    Approved Bids
-                </button>
-            </div>
-
-            <div className="totals" style={{ display: "flex", justifyContent: "space-between", margin: "20px 40px" }}>
-                <div>
-                    <strong>Total Bids:</strong> ksh. {totalBids.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+    const renderMyProjectsBids = () => {
+        // Calculate total bids and total payout for the selected project
+        const filteredBids = filteredReservationList.filter(
+            (reservation) => projectBidName === "" || reservation.listingTitle === projectBidName
+        );
+    
+        const totalBids = filteredBids.reduce((acc, reservation) => acc + reservation.totalPrice, 0);
+        const totalPayout = filteredBids.reduce((acc, reservation) => acc + (reservation.customerReturns / 100) * reservation.totalPrice, 0);
+    
+        return (
+            <>
+                <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
+                    <h1 className="title-list">Your Projects' Bids</h1>
                 </div>
-                <div>
-                    <strong>Total Payout:</strong> ksh. {totalPayout.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                </div>
-            </div>
-
-            <div className="tableContent">
-                <table className='table'>
-                    <thead>
-                        <tr>
-                            <th className="text-center">No</th>
-                            <th className="text-center">Project Name</th>
-                            <th className="text-center">Bidder's name</th>
-                            <th className="text-center">Email</th>
-                            <th className="text-center">Shares</th>
-                            <th className="text-center">Bid Price</th>
-                            <th className="text-center">Returns (%)</th>
-                            <th className="text-center">Payout</th>
-                            <th className="text-center">Status</th>
-                            <th className="text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody className="tbod">
-                        {filteredReservationList.map((reservation, index) => (
-                            <tr key={reservation._id} className='h-8'>
-                                <td className='border-slate-700 text-center'>{index + 1}</td>
-                                <td className='border-slate-700 text-center'>{reservation.listingTitle}</td>
-                                <td className='border-slate-700 text-center'>{reservation.customerName}</td>
-                                <td className='border-slate-700 text-center'><Link to={`/${reservation.customerId._id}/details`}>{reservation.customerEmail}</Link> </td>
-                                <td className='border-slate-700 text-center'>{reservation.guestCount}</td>
-                                <td className='border-slate-700 text-center'>
-                                    ksh. {reservation.totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                </td>
-                                <td className='border-slate-700 text-center'>{reservation.customerReturns}</td>
-
-                                <td className='border-slate-700 text-center'>
-                                    {((reservation.customerReturns / 100) * reservation.totalPrice).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                </td>
-                                <td className='border-slate-700 text-center'>{reservation.status || 'pending'}</td>
-                                <td className='border-slate-700 text-center'>
-                                    {(!reservation.status || reservation.status === 'pending') ? (
-                                        <button
-                                            onClick={() => handleApprove(reservation._id)}
-                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
-                                            style={{ width: "70px", fontSize: "medium", fontWeight: "bold" }}
-                                        >
-                                            Approve
-                                        </button>
-                                    ) : (
-                                        <button
-                                            disabled
-                                            className="bg-gray-400 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed"
-                                        >
-                                            Approved
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
+    
+                {/* Project Name Dropdown Filter */}
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+                    <select
+                        onChange={(e) => setProjectBidname(e.target.value)}
+                        className="mx-2 px-4 py-2 rounded bg-gray-200"
+                        style={{ width: "200px", textAlign: "center" }}
+                        value={projectBidName || ""}
+                    >
+                        <option value="">Select A Project</option>
+                        {Array.from(new Set(filteredReservationList.map((reservation) => reservation.listingTitle))).map((projectName) => (
+                            <option key={projectName} value={projectName}>
+                                {projectName}
+                            </option>
                         ))}
-                    </tbody>
-                </table>
-            </div>
-        </>
-    );
+                    </select>
+                </div>
+    
+                {/* Filter Buttons */}
+                <div className="filter-buttons" style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}>
+                    <button
+                        onClick={() => setFilter("all")}
+                        className={`mx-2 px-4 py-2 rounded ${filter === "all" ? "bg-blue-500 text-white selectedz" : "bg-gray-200"}`}
+                    >
+                        All Bids
+                    </button>
+                    <button
+                        onClick={() => setFilter("pending")}
+                        className={`mx-2 px-4 py-2 rounded ${filter === "pending" ? "bg-blue-500 text-white selectedz" : "bg-gray-200"}`}
+                    >
+                        Pending Bids
+                    </button>
+                    <button
+                        onClick={() => setFilter("approved")}
+                        className={`mx-2 px-4 py-2 rounded ${filter === "approved" ? "bg-blue-500 text-white selectedz" : "bg-gray-200"}`}
+                    >
+                        Approved Bids
+                    </button>
+                </div>
+    
+                {/* Totals */}
+                <div className="totals" style={{ display: "flex", justifyContent: "space-between", margin: "20px 40px" }}>
+                    <div>
+                        <strong>Total Bids:</strong> ksh. {totalBids.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    </div>
+                    <div>
+                        <strong>Total Payout:</strong> ksh. {totalPayout.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    </div>
+                </div>
+    
+                {/* Table */}
+                <div className="tableContent">
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th className="text-center">No</th>
+                                <th className="text-center">Project Name</th>
+                                <th className="text-center">Bidder's Name</th>
+                                <th className="text-center">Email</th>
+                                <th className="text-center">Shares</th>
+                                <th className="text-center">Bid Price</th>
+                                <th className="text-center">Returns (%)</th>
+                                <th className="text-center">Payout</th>
+                                <th className="text-center">Status</th>
+                                <th className="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="tbod">
+                            {filteredBids.map((reservation, index) => (
+                                <tr key={reservation._id} className="h-8">
+                                    <td className="border-slate-700 text-center">{index + 1}</td>
+                                    <td className="border-slate-700 text-center">{reservation.listingTitle}</td>
+                                    <td className="border-slate-700 text-center">{reservation.customerName}</td>
+                                    <td className="border-slate-700 text-center">
+                                        <Link to={`/${reservation.customerId._id}/details`}>{reservation.customerEmail}</Link>
+                                    </td>
+                                    <td className="border-slate-700 text-center">{reservation.guestCount}</td>
+                                    <td className="border-slate-700 text-center">
+                                        ksh. {reservation.totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    </td>
+                                    <td className="border-slate-700 text-center">{reservation.customerReturns}</td>
+                                    <td className="border-slate-700 text-center">
+                                        {((reservation.customerReturns / 100) * reservation.totalPrice)
+                                            .toFixed(2)
+                                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    </td>
+                                    <td className="border-slate-700 text-center">{reservation.status || "pending"}</td>
+                                    <td className="border-slate-700 text-center">
+                                        {(!reservation.status || reservation.status === "pending") ? (
+                                            <button
+                                                onClick={() => handleApprove(reservation._id)}
+                                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
+                                                style={{ width: "70px", fontSize: "medium", fontWeight: "bold" }}
+                                            >
+                                                Approve
+                                            </button>
+                                        ) : (
+                                            <button
+                                                disabled
+                                                className="bg-gray-400 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed"
+                                            >
+                                                Approved
+                                            </button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </>
+        );
+    };    
 
     const renderMyReturnLogs = () => (
         <div>
@@ -1590,9 +1820,9 @@ const MyDashboard = () => {
                     <div onClick={toggleDashboard} style={{
                         position: 'absolute',
                         top: '20px',
-                        left: isDashboardVisible ? '95%' : '-10px',
-                        width: '50px',
-                        height: '50px',
+                        left: isDashboardVisible ? '90%' : '-10px',
+                        width: '45px',
+                        height: '40px',
                         borderRadius: '20px',
                         background: '#007bff',
                         color: 'black',
