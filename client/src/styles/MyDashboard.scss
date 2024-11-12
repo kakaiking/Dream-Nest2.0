@@ -4,16 +4,17 @@
     width: 100%;
     // background-color: yellow;
     min-height: 300px;
+    margin-top: 20px;
   
     .chart-section {
-      width: 60%;
+      width: 70%;
       min-height: 300px;
     }
   
     .info-section {
-      width: 40%;
+      width: 30%;
       min-height: 300px;
-      background-color: green;
+      background-color: beige;
     }
   
     @media (max-width: 1150px) {

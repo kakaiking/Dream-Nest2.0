@@ -579,7 +579,7 @@ const MyDashboard = () => {
 
 
 
-    const [totalTransactions, setTotalTransactions] = useState(0);
+    // const [totalTransactions, setTotalTransactions] = useState(0);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -701,7 +701,7 @@ const MyDashboard = () => {
             const totalSum = allTransactions.reduce((acc, transaction) => acc + transaction.amount, 0);
 
             // Store total sum in state
-            setTotalTransactions(totalSum);
+            // setTotalTransactions(totalSum);
 
             // Store sorted transactions for display
             setRecentTransactions(allTransactions);
@@ -919,9 +919,9 @@ const MyDashboard = () => {
 
                         <div className="chartnInfo" >
                             <div className="chart-section" >
-                                <h2>Funding Progress</h2>
+                                <h2><u>Funding Progress</u></h2>
                                 <LineChart
-                                    width={475}
+                                    width={530}
                                     height={300}
                                     data={chartData}
                                     margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
@@ -981,11 +981,11 @@ const MyDashboard = () => {
                                 </LineChart>
                             </div>
                             <div className="info-section" >
-                                <p>hi</p>
                             </div>
                         </div>
-                        <div className="recent-transactions" style={{ width: '90%', height: 'auto', margin: '20px auto' }}>
-                            <h1>Recent Transactions</h1><br />
+                        <h2 style={{marginTop: '30px'}}><u>Recent Transactions:</u></h2><br />
+
+                        <div className="recent-transactions" style={{ width: '90%', height: 'auto', margin: '0 auto 20px auto ' }}>
                             {recentTransactions.length > 0 ? (
                                 <div>
                                     {/* Titles Row */}
