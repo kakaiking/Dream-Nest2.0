@@ -14,7 +14,7 @@
 .active,
 .accordion:hover {
     background-color: #ccc;
-    // background-color: #eee;
+    // background-color: #fff;
 
 }
 
@@ -32,7 +32,7 @@
 
 .accordion:after {
     content: '\02795'; /* Unicode character for "plus" sign (+) */
-    font-size: 13px;
+    font-size: 14px;
     color: #777;
     float: right;
     margin-left: 5px;
