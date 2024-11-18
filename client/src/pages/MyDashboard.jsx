@@ -680,17 +680,20 @@ const MyDashboard = () => {
                 ...insightBookings.map(b => ({
                     date: b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-CA') : null,
                     amount: b.bookingPrice || 0,
-                    type: 'booking'
+                    type: 'booking',
+                    customer: b.customerName
                 })),
                 ...insightTopups.map(t => ({
                     date: t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-CA') : null,
                     amount: t.totalPrice || 0,
-                    type: 'topup'
+                    type: 'topup',
+                    customer: t.customerName
                 })),
                 ...insightWithdrawals.map(w => ({
                     date: w.createdAt ? new Date(w.createdAt).toLocaleDateString('en-CA') : null,
                     amount: -(w.totalPrice || 0),
-                    type: 'withdrawal'
+                    type: 'withdrawal',
+                    customer: w.customerName
                 }))
             ].filter(transaction => transaction.date !== null); // Filter out invalid dates
 
@@ -991,6 +994,7 @@ const MyDashboard = () => {
                                     {/* Titles Row */}
                                     <div className="transaction-titles">
                                         <span>Date</span>
+                                        <span>Customer</span>
                                         <span>Type</span>
                                         <span>Amount</span>
                                     </div>
@@ -999,6 +1003,7 @@ const MyDashboard = () => {
                                     {recentTransactions.map((transaction, index) => (
                                         <div key={index} className="transaction-item">
                                             <span>{transaction.date}</span>
+                                            <span>{transaction.customer}</span>
                                             <span>{transaction.type}</span>
                                             <span>{transaction.amount}</span>
                                         </div>
