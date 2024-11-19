@@ -275,7 +275,7 @@ const ListingDetails = () => {
         // Check if data is an array or object and handle accordingly
         if (Array.isArray(data)) {
           setUpdates(data);
-          console.log(data)
+          // console.log(data)
         } else {
           console.error("Invalid data format:", data);
           setUpdates([]); // Set to empty array if the data format is invalid
@@ -299,7 +299,7 @@ const ListingDetails = () => {
     return div.textContent || div.innerText || '';
   };
 
-  console.log(updates)
+  // console.log(updates)
 
 
   return loading ? (

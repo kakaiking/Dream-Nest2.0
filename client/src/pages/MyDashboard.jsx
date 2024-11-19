@@ -21,6 +21,7 @@ const MyDashboard = () => {
     const [updates, setUpdates] = useState([]);
     // const [bookings, setBookings] = useState([]);
     const [selectedBooking, setSelectedBooking] = useState(null);
+    const [pricePerShare, setPricePerShare] = useState(0);
     const [sharesToAdd, setSharesToAdd] = useState(1);
     const [sharesToWithdraw, setSharesToWithdraw] = useState(1);
     const [activeView, setActiveView] = useState('insights');
@@ -53,7 +54,7 @@ const MyDashboard = () => {
     useEffect(() => {
         const handleOnline = () => {
             setIsOnline(true);
-            alert('Internet connectivity found');
+            alert('Internet connectivity restored');
         };
 
         const handleOffline = () => {
@@ -148,6 +149,7 @@ const MyDashboard = () => {
     }, []);
 
     const filteredTripList = useMemo(() => {
+
         return tripList.filter((trip) => {
             if (filter === "all") return true;
             return trip.status === filter;
@@ -986,7 +988,7 @@ const MyDashboard = () => {
                             <div className="info-section" >
                             </div>
                         </div>
-                        <h2 style={{marginTop: '30px'}}><u>Recent Transactions:</u></h2><br />
+                        <h2 style={{ marginTop: '30px' }}><u>Recent Transactions:</u></h2><br />
 
                         <div className="recent-transactions" style={{ width: '90%', height: 'auto', margin: '0 auto 20px auto ' }}>
                             {recentTransactions.length > 0 ? (
@@ -1018,47 +1020,130 @@ const MyDashboard = () => {
             </div>
         </div>
     );
+    console.log(filteredTripList)
 
     const renderTopUp = () => (
         <>
-            <h1 style={{ margin: "40px" }}>Top Up Shares</h1>
-
-            <div style={{ maxWidth: '600px', margin: '20px auto', padding: '20px', backgroundColor: '#fff', borderRadius: '7px', boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)' }}>
-                <h2>Top up</h2><br />
-                <p>If you want to add some shares to an already existing bid, select the desired bid from the dropdown below.</p> <br />
-                <p>After Selecting the bid to top up, you can specify the number of shares you want to add.</p> <br /><hr /><br />
-                <select onChange={e => setSelectedBooking(filteredTripList.find(b => b._id === e.target.value))} style={{ width: '100%', height: '30px', marginBottom: '20px', borderRadius: '5px' }}>
+            <h1 style={{ margin: "40px", textAlign: "center", color: "#333" }}>Top Up Shares</h1>
+    
+            <div style={{ 
+                maxWidth: '600px', 
+                height: 'auto', 
+                margin: '20px auto', 
+                padding: '20px', 
+                backgroundColor: '#fff', 
+                borderRadius: '7px', 
+                boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)' 
+            }}>
+                <h2 style={{ color: "#444" }}>Top up</h2><br />
+                <p style={{ color: "#555", lineHeight: "1.6" }}>
+                    If you want to add some shares to an already existing bid, select the desired bid from the dropdown below.
+                </p><br />
+                <p style={{ color: "#555", lineHeight: "1.6" }}>
+                    After selecting the bid to top up, you can specify the number of shares you want to add.
+                </p><br /><hr /><br />
+                <select
+                    onChange={(e) => {
+                        const selected = filteredTripList.find(b => b._id === e.target.value);
+                        setSelectedBooking(selected);
+                        console.log(selected);
+    
+                        if (selected && selected.listingId.target && selected.listingId.totalShares) {
+                            const calculatedPrice = selected.listingId.target / selected.listingId.totalShares;
+                            console.log(calculatedPrice);
+                            setPricePerShare(calculatedPrice);
+                        } else {
+                            setPricePerShare(0); // Reset if invalid booking is selected
+                        }
+                    }}
+                    style={{ 
+                        width: '100%', 
+                        height: '40px', 
+                        marginBottom: '20px', 
+                        borderRadius: '5px', 
+                        border: '1px solid #ccc', 
+                        padding: '5px', 
+                        fontSize: '16px' 
+                    }}
+                >
                     <option value="">Select the bid you want to top up</option>
                     {filteredTripList.map(booking => (
                         <option key={booking._id} value={booking._id}>
                             {booking.listingTitle} - Your shares: {booking.guestCount}
                         </option>
                     ))}
-                </select> <br />
+                </select>
+                <br />
+    
                 {selectedBooking && (
-                    <div className="basics" >
-                        <h2>Shares To Add</h2>
-
-                        <div className="basic_count">
+                    <div style={{ backgroundColor: '#f9f9f9', padding: '20px', borderRadius: '5px' }}>
+                        <h2 style={{ color: "#444", marginBottom: "15px" }}>Shares To Add</h2>
+    
+                        <div style={{ 
+                            display: "flex", 
+                            alignItems: "center", 
+                            justifyContent: "space-between", 
+                            marginBottom: "20px" 
+                        }}>
                             <RemoveCircleOutline
                                 onClick={() => sharesToAdd > 0 && setSharesToAdd(sharesToAdd - 1)}
                                 sx={{
-                                    fontSize: '25px',
+                                    fontSize: '30px',
                                     cursor: 'pointer',
                                     "&:hover": { color: 'grey' },
                                 }}
                             />
-                            <p>{sharesToAdd}</p>
+                            <p style={{ fontSize: "20px", fontWeight: "bold", margin: "0 15px" }}>{sharesToAdd}</p>
                             <AddCircleOutline
                                 onClick={() => setSharesToAdd(sharesToAdd + 1)}
                                 sx={{
-                                    fontSize: '25px',
+                                    fontSize: '30px',
                                     cursor: 'pointer',
                                     "&:hover": { color: 'grey' },
                                 }}
                             />
                         </div>
-                        <button onClick={handleTopUp} style={{ marginTop: '20px', padding: '10px', backgroundColor: 'rgb(161, 64, 255)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+    
+                        <div style={{ 
+                            backgroundColor: '#ffe4b5', 
+                            padding: '15px', 
+                            borderRadius: '5px', 
+                            textAlign: 'center',
+                            marginBottom: '20px' 
+                        }}>
+                            {sharesToAdd > 0 && (
+                                <h2 style={{ margin: '10px 0' }}>
+                                    Total Top-Up Price: Ksh. {(pricePerShare * sharesToAdd).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                </h2>
+                            )}
+                            {selectedBooking.guestCount > 1 ? (
+                                <h2 style={{ margin: '10px 0' }}>
+                                    {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/= x {selectedBooking.guestCount} Shares
+                                </h2>
+                            ) : (
+                                <h2 style={{ margin: '10px 0' }}>
+                                    {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/= x {selectedBooking.guestCount} Share
+                                </h2>
+                            )}
+                            <h2 style={{ margin: '10px 0', color: "#d35400" }}>
+                                Total Bid Price: Ksh. {(pricePerShare * selectedBooking.guestCount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                            </h2>
+                        </div>
+    
+                        <button 
+                            onClick={handleTopUp} 
+                            style={{ 
+                                marginTop: '20px', 
+                                padding: '10px 20px', 
+                                backgroundColor: 'rgb(161, 64, 255)', 
+                                color: 'white', 
+                                border: 'none', 
+                                borderRadius: '5px', 
+                                cursor: 'pointer', 
+                                fontSize: '16px',
+                                fontWeight: "bold"
+                            }}
+                        >
                             Confirm
                         </button>
                     </div>
@@ -1066,6 +1151,7 @@ const MyDashboard = () => {
             </div>
         </>
     );
+    
 
     const renderWithdraw = () => (
         <>
