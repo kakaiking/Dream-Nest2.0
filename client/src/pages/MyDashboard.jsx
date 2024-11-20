@@ -20,7 +20,8 @@ const MyDashboard = () => {
     const [comments, setComments] = useState([]);
     const [updates, setUpdates] = useState([]);
     // const [bookings, setBookings] = useState([]);
-    const [selectedBooking, setSelectedBooking] = useState(null);
+    const [selectedTopupBooking, setSelectedTopupBooking] = useState(null);
+    const [selectedWithdrawalBooking, setSelectedWithdrawalBooking] = useState(null);
     const [pricePerShare, setPricePerShare] = useState(0);
     const [sharesToAdd, setSharesToAdd] = useState(1);
     const [sharesToWithdraw, setSharesToWithdraw] = useState(1);
@@ -44,7 +45,7 @@ const MyDashboard = () => {
 
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("all");
-    const [topupList, setTopupList] = useState([]);
+    const [topupList, setTopupList] = useState([0]);
     const [withdrawalList, setWithdrawalList] = useState([]);
     const [topups, setTopups] = useState([]);
     const [withdrawals, setWithdrawals] = useState([]);
@@ -156,15 +157,15 @@ const MyDashboard = () => {
         });
     }, [tripList, filter]);
 
-    const totalPayoutMyBids = useMemo(() => {
-        return filteredTripList.reduce((sum, trip) => {
-            return sum + (trip.customerReturns / 100) * trip.totalPrice;
-        }, 0);
-    }, [filteredTripList]);
+    // const totalPayoutMyBids = useMemo(() => {
+    //     return filteredTripList.reduce((sum, trip) => {
+    //         return sum + (trip.customerReturns / 100) * trip.totalPrice;
+    //     }, 0);
+    // }, [filteredTripList]);
 
-    const totalBidsMyBids = useMemo(() => {
-        return filteredTripList.reduce((sum, trip) => sum + trip.totalPrice, 0);
-    }, [filteredTripList]);
+    // const totalBidsMyBids = useMemo(() => {
+    //     return filteredTripList.reduce((sum, trip) => sum + trip.totalPrice, 0);
+    // }, [filteredTripList]);
 
     const handleApproveTopup = async (id) => {
         try {
@@ -355,7 +356,7 @@ const MyDashboard = () => {
 
 
     const handleTopUp = async () => {
-        if (!selectedBooking || sharesToAdd <= 0) {
+        if (!selectedTopupBooking || sharesToAdd <= 0) {
             alert("Invalid top-up amount");
             return;
         }
@@ -366,14 +367,14 @@ const MyDashboard = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    bookingId: selectedBooking._id,
+                    bookingId: selectedTopupBooking._id,
                     sharesToAdd,
                 }),
             });
 
             if (response.ok) {
                 alert("Top-up processed successfully");
-                setSelectedBooking(null);
+                setSelectedTopupBooking(null);
                 setSharesToAdd(0);
             } else {
                 const errorData = await response.json();
@@ -387,7 +388,7 @@ const MyDashboard = () => {
     };
 
     const handleWithdraw = async () => {
-        if (!selectedBooking || sharesToWithdraw <= 0 || sharesToWithdraw > selectedBooking.guestCount) {
+        if (!selectedWithdrawalBooking || sharesToWithdraw <= 0 || sharesToWithdraw > selectedWithdrawalBooking.guestCount) {
             alert("Invalid withdrawal amount");
             return;
         }
@@ -398,7 +399,7 @@ const MyDashboard = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    bookingId: selectedBooking._id,
+                    bookingId: selectedWithdrawalBooking._id,
                     sharesToWithdraw,
                 }),
             });
@@ -409,7 +410,7 @@ const MyDashboard = () => {
                 //     ? { ...b, guestCount: b.guestCount - sharesToWithdraw }
                 //     : b
                 // ));
-                setSelectedBooking(null);
+                setSelectedWithdrawalBooking(null);
                 setSharesToWithdraw(0);
             } else {
                 const errorData = await response.json();
@@ -779,6 +780,7 @@ const MyDashboard = () => {
 
             <div
                 style={{
+                    minWidth: '500px',
                     maxWidth: '95%',
                     margin: '20px auto',
                     padding: '20px',
@@ -1020,50 +1022,46 @@ const MyDashboard = () => {
             </div>
         </div>
     );
-    console.log(filteredTripList)
 
     const renderTopUp = () => (
         <>
             <h1 style={{ margin: "40px", textAlign: "center", color: "#333" }}>Top Up Shares</h1>
-    
-            <div style={{ 
-                maxWidth: '600px', 
-                height: 'auto', 
-                margin: '20px auto', 
-                padding: '20px', 
-                backgroundColor: '#fff', 
-                borderRadius: '7px', 
-                boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)' 
+
+            <div style={{
+                minWidth: '450px',
+                maxWidth: '700px',
+                height: 'auto',
+                margin: '20px auto',
+                padding: '20px',
+                backgroundColor: '#fff',
+                borderRadius: '7px',
+                boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)'
             }}>
                 <h2 style={{ color: "#444" }}>Top up</h2><br />
                 <p style={{ color: "#555", lineHeight: "1.6" }}>
                     If you want to add some shares to an already existing bid, select the desired bid from the dropdown below.
                 </p><br />
-                <p style={{ color: "#555", lineHeight: "1.6" }}>
-                    After selecting the bid to top up, you can specify the number of shares you want to add.
-                </p><br /><hr /><br />
+                <hr /><br />
                 <select
+                    value={selectedTopupBooking?._id || ""}
                     onChange={(e) => {
-                        const selected = filteredTripList.find(b => b._id === e.target.value);
-                        setSelectedBooking(selected);
-                        console.log(selected);
-    
-                        if (selected && selected.listingId.target && selected.listingId.totalShares) {
-                            const calculatedPrice = selected.listingId.target / selected.listingId.totalShares;
-                            console.log(calculatedPrice);
-                            setPricePerShare(calculatedPrice);
+                        const selectedTopup = filteredTripList.find(b => b._id === e.target.value);
+                        setSelectedTopupBooking(selectedTopup);
+                        setSelectedWithdrawalBooking(null); // Reset withdrawal selection
+                        if (selectedTopup && selectedTopup.listingId.target && selectedTopup.listingId.totalShares) {
+                            setPricePerShare(selectedTopup.listingId.target / selectedTopup.listingId.totalShares);
                         } else {
                             setPricePerShare(0); // Reset if invalid booking is selected
                         }
                     }}
-                    style={{ 
-                        width: '100%', 
-                        height: '40px', 
-                        marginBottom: '20px', 
-                        borderRadius: '5px', 
-                        border: '1px solid #ccc', 
-                        padding: '5px', 
-                        fontSize: '16px' 
+                    style={{
+                        width: '100%',
+                        height: '40px',
+                        marginBottom: '20px',
+                        borderRadius: '5px',
+                        border: '1px solid #ccc',
+                        padding: '5px',
+                        fontSize: '16px'
                     }}
                 >
                     <option value="">Select the bid you want to top up</option>
@@ -1074,16 +1072,16 @@ const MyDashboard = () => {
                     ))}
                 </select>
                 <br />
-    
-                {selectedBooking && (
+
+                {selectedTopupBooking && (
                     <div style={{ backgroundColor: '#f9f9f9', padding: '20px', borderRadius: '5px' }}>
                         <h2 style={{ color: "#444", marginBottom: "15px" }}>Shares To Add</h2>
-    
-                        <div style={{ 
-                            display: "flex", 
-                            alignItems: "center", 
-                            justifyContent: "space-between", 
-                            marginBottom: "20px" 
+
+                        <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            marginBottom: "20px"
                         }}>
                             <RemoveCircleOutline
                                 onClick={() => sharesToAdd > 0 && setSharesToAdd(sharesToAdd - 1)}
@@ -1103,43 +1101,43 @@ const MyDashboard = () => {
                                 }}
                             />
                         </div>
-    
-                        <div style={{ 
-                            backgroundColor: '#ffe4b5', 
-                            padding: '15px', 
-                            borderRadius: '5px', 
+
+                        <div style={{
+                            backgroundColor: '#ffe4b5',
+                            padding: '15px',
+                            borderRadius: '5px',
                             textAlign: 'center',
-                            marginBottom: '20px' 
+                            marginBottom: '20px'
                         }}>
                             {sharesToAdd > 0 && (
                                 <h2 style={{ margin: '10px 0' }}>
-                                    Total Top-Up Price: Ksh. {(pricePerShare * sharesToAdd).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    Top-Up Amount:    Ksh. {(pricePerShare * sharesToAdd).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                 </h2>
                             )}
-                            {selectedBooking.guestCount > 1 ? (
+                            {selectedTopupBooking.guestCount > 1 ? (
                                 <h2 style={{ margin: '10px 0' }}>
-                                    {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/= x {selectedBooking.guestCount} Shares
+                                    {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/= x {selectedTopupBooking.guestCount} Shares
                                 </h2>
                             ) : (
                                 <h2 style={{ margin: '10px 0' }}>
-                                    {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/= x {selectedBooking.guestCount} Share
+                                    {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/= x {selectedTopupBooking.guestCount} Share
                                 </h2>
                             )}
                             <h2 style={{ margin: '10px 0', color: "#d35400" }}>
-                                Total Bid Price: Ksh. {(pricePerShare * selectedBooking.guestCount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                Total Bid Price: Ksh. {(pricePerShare * selectedTopupBooking.guestCount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                             </h2>
                         </div>
-    
-                        <button 
-                            onClick={handleTopUp} 
-                            style={{ 
-                                marginTop: '20px', 
-                                padding: '10px 20px', 
-                                backgroundColor: 'rgb(161, 64, 255)', 
-                                color: 'white', 
-                                border: 'none', 
-                                borderRadius: '5px', 
-                                cursor: 'pointer', 
+
+                        <button
+                            onClick={handleTopUp}
+                            style={{
+                                marginTop: '20px',
+                                padding: '10px 20px',
+                                backgroundColor: 'rgb(161, 64, 255)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                cursor: 'pointer',
                                 fontSize: '16px',
                                 fontWeight: "bold"
                             }}
@@ -1151,17 +1149,43 @@ const MyDashboard = () => {
             </div>
         </>
     );
-    
+
 
     const renderWithdraw = () => (
         <>
             <h1 style={{ margin: "40px" }}>Withdraw Shares</h1>
-            <div style={{ maxWidth: '600px', height: 'auto', margin: '0 auto', padding: '20px', backgroundColor: '#fff', borderRadius: '7px', boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)' }}>
+            <div style={{
+                minWidth: '450px',
+                maxWidth: '700px', 
+                height: 'auto',
+                margin: '0 auto',
+                padding: '20px',
+                backgroundColor: '#fff',
+                borderRadius: '7px',
+                boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)'
+            }}>
                 <h2>Withdraw</h2><br />
-
-                <p>If you want to take out some shares from an already existing bid, select the desired bid from the dropdown below.</p> <br />
-                <p>After Selecting the bid to withdraw from, you can specify the number of shares you want to withdraw.</p> <br /><hr /><br />
-                <select onChange={e => setSelectedBooking(filteredTripList.find(b => b._id === e.target.value))} style={{ width: '100%', height: '30px', marginBottom: '20px', borderRadius: '5px' }}>
+                <p>If you want to take out some shares from an already existing bid, select the desired bid from the dropdown below.</p><br />
+                <hr /><br />
+                <select
+                    value={selectedWithdrawalBooking?._id || ""}
+                    onChange={(e) => {
+                        const selectedWithdrawal = filteredTripList.find(b => b._id === e.target.value);
+                        setSelectedWithdrawalBooking(selectedWithdrawal);
+                        setSelectedTopupBooking(null); // Reset top-up selection
+                        if (selectedWithdrawal && selectedWithdrawal.listingId.target && selectedWithdrawal.listingId.totalShares) {
+                            setPricePerShare(selectedWithdrawal.listingId.target / selectedWithdrawal.listingId.totalShares);
+                        } else {
+                            setPricePerShare(0); // Reset if invalid booking is selected
+                        }
+                    }}
+                    style={{
+                        width: '100%',
+                        height: '30px',
+                        marginBottom: '20px',
+                        borderRadius: '5px'
+                    }}
+                >
                     <option value="">Select the bid you want to withdraw from</option>
                     {filteredTripList.map(booking => (
                         <option key={booking._id} value={booking._id}>
@@ -1170,10 +1194,16 @@ const MyDashboard = () => {
                     ))}
                 </select>
 
-                {selectedBooking && (
-                    <div className="basics">
-                        <h2>Withdraw </h2>
-                        <div className="basic_count">
+                {selectedWithdrawalBooking && (
+                    <div style={{ padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '7px', marginTop: '20px' }}>
+                        <h2 style={{ marginBottom: '20px', textAlign: 'center', color: '#333' }}>Withdraw Shares</h2>
+                        <div className="basic_count" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '20px',
+                            marginBottom: '20px'
+                        }}>
                             <RemoveCircleOutline
                                 onClick={() => sharesToWithdraw > 0 && setSharesToWithdraw(sharesToWithdraw - 1)}
                                 sx={{
@@ -1182,9 +1212,9 @@ const MyDashboard = () => {
                                     "&:hover": { color: 'grey' },
                                 }}
                             />
-                            <p>{sharesToWithdraw}</p>
+                            <p style={{ fontSize: '20px', fontWeight: 'bold' }}>{sharesToWithdraw}</p>
                             <AddCircleOutline
-                                onClick={() => sharesToWithdraw < selectedBooking.guestCount && setSharesToWithdraw(sharesToWithdraw + 1)}
+                                onClick={() => sharesToWithdraw < selectedWithdrawalBooking.guestCount && setSharesToWithdraw(sharesToWithdraw + 1)}
                                 sx={{
                                     fontSize: '25px',
                                     cursor: 'pointer',
@@ -1192,14 +1222,47 @@ const MyDashboard = () => {
                                 }}
                             />
                         </div>
-                        <button onClick={handleWithdraw} style={{ marginTop: '20px', padding: '10px', backgroundColor: 'rgb(161, 64, 255)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-                            Withdraw
+
+                        <div className="totalPrice" style={{
+                            backgroundColor: '#ffefd5',
+                            padding: '15px',
+                            borderRadius: '7px',
+                            textAlign: 'center'
+                        }}>
+                            {sharesToWithdraw > 0 && (
+                                <h2 style={{ margin: '10px 0', color: '#555' }}>
+                                    Total Withdrawal Amount: Ksh. {(pricePerShare * sharesToWithdraw).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                </h2>
+                            )}
+                            <h3 style={{ margin: '10px 0', color: '#777' }}>
+                                {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/= per Share
+                            </h3>
+                            <h2 style={{ margin: '10px 0', color: '#333' }}>
+                                Total Current Bid Value: Ksh. {(pricePerShare * selectedWithdrawalBooking.guestCount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                            </h2>
+                        </div>
+
+                        <button
+                            onClick={handleWithdraw}
+                            style={{
+                                marginTop: '20px',
+                                padding: '10px',
+                                backgroundColor: 'rgb(161, 64, 255)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '5px',
+                                cursor: 'pointer',
+                                width: '100%'
+                            }}
+                        >
+                            Confirm Withdrawal
                         </button>
                     </div>
                 )}
             </div>
         </>
     );
+
 
     const renderFileReturn = () => (
         <>

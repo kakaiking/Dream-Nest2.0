@@ -90,7 +90,8 @@ const AdminPage = () => {
 
   const filterUsers = () => {
     return users.filter(user => user.firmName.toLowerCase().includes(searchUser.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchUser.toLowerCase()));
+      user.email.toLowerCase().includes(searchUser.toLowerCase()) ||
+      user._id.toLowerCase().includes(searchUser.toLowerCase()));
   };
 
   const filterBids = () => {
