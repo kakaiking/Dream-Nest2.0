@@ -6,7 +6,7 @@ import { categories, types } from "../data";
 
 const RegisterPage = () => {
   const [category, setCategory] = useState("");
-  const [type, setType] = useState("");
+  const [type, setType] = useState("N/A");
   const [passwordMatch, setPasswordMatch] = useState(true);
   const navigate = useNavigate();
 
@@ -18,7 +18,7 @@ const RegisterPage = () => {
     profileImage: null,
     kraPin: null,
     businessCertificate: null,
-    firmName: "",
+    firmName: "_",
     yearStarted: "",
     cmaLicenseNumber: "",
     assetsUnderManagement: "",
@@ -73,47 +73,12 @@ const RegisterPage = () => {
   return (
     <div className="register">
       <div className="register_content">
-        <form className="register_content_form" onSubmit={handleSubmit}>
-          <input
-            placeholder="Owners"
-            name="owners"
-            value={formData.owners}
-            onChange={handleChange}
-            required
-          />
-          <input
-            placeholder="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          <input
-            placeholder="Password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            type="password"
-            required
-          />
-          <input
-            placeholder="Confirm Password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            type="password"
-            required
-          />
+        <form className="register_content_form" onSubmit={handleSubmit} >
 
-          {!passwordMatch && (
-            <p style={{ color: "red" }}>Passwords are not matched!</p>
-          )}
-          <div className="create-listing_step1">
-
+        <div className="create-listing_step1">
             <h3 >Which Of These Categories Best Describes Your Organization?</h3>
             <div className="category-list" style={{ color: '#fff' }}>
-              {categories?.slice(1, 5).map((item, index) => (
+              {categories?.slice(1, 4).map((item, index) => (
                 <div
                   className={`category ${category === item.label ? "selected" : ""
                     }`}
@@ -126,13 +91,15 @@ const RegisterPage = () => {
               ))}
             </div>
 
+            {formData.category !== "Investor" && (
+            <>
             <h3 >Are you Certified by the Capital Markets Authority(CMA) of Kenya?</h3>
             <div className="type-list" >
               {types?.map((item, index) => (
                 <div
                   className={`type ${type === item.name ? "selected" : ""}`}
                   key={index}
-                  onClick={() => setType(item.name)}
+                  onClick={() => setType(item?.name || '')}
                 >
                   <div className="type_text">
                     <h4>{item.name}</h4>
@@ -142,12 +109,51 @@ const RegisterPage = () => {
                 </div>
               ))}
             </div>
+            </>
+            )}
           </div>
 
-          
-
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>Email Address:</p>
+          </div>
           <input
-            placeholder="Firm Name"
+            placeholder="example@gmail.com"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>Enter Password:</p>
+          </div>
+          <input
+            placeholder="Password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            type="password"
+            required
+          />
+
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>Confirm Password:</p>
+          </div>
+          <input
+            placeholder="Re-write the above password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            type="password"
+            required
+          />
+
+<div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>{formData.category == "Investor" ? 'Your Username' : "Organization Username"}: </p>
+          </div>
+          <input
+            placeholder={`${formData.category == 'Investor' ? 'Your username' : "Organization's username"} `}
             name="firmName"
             type="text"
             value={formData.firmName}
@@ -155,30 +161,27 @@ const RegisterPage = () => {
             required
           />
 
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>Phone Number:</p>
+          </div>
           <input
-            placeholder="Year Started"
-            name="yearStarted"
             type="number"
-            value={formData.yearStarted}
-            onChange={handleChange}
-            required
-          />
-          <input
-            placeholder="CMA License"
-            name="cmaLicenseNumber"
-            value={formData.cmaLicenseNumber}
-            onChange={handleChange}
-            type="number"
-            required
-          />
-          <input
-            placeholder="Website"
-            name="website"
-            value={formData.website}
+            placeholder="07XX-XXX-XXX"
+            name="phoneNumber"
+            value={formData.phoneNumber}
             onChange={handleChange}
           />
 
-<input
+          {!passwordMatch && (
+            <p style={{ color: "red" }}>Passwords are not matched!</p>
+          )}
+
+          
+
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>Upload Your Profile Photo:</p>
+          </div>
+          <input
             id="image"
             type="file"
             name="profileImage"
@@ -187,11 +190,6 @@ const RegisterPage = () => {
             onChange={handleChange}
             required
           />
-          <label htmlFor="image">
-            <img src="/assets/addImage.png" alt="add profile pic" />
-            <p>Upload a Profile Photo</p>
-          </label>
-
           {formData.profileImage && (
             <img
               src={URL.createObjectURL(formData.profileImage)}
@@ -199,11 +197,82 @@ const RegisterPage = () => {
               style={{ maxWidth: "80px" }}
             />
           )}
+          <label htmlFor="image">
+            <img src="/assets/addImage.png" alt="add profile pic" />
+          </label>
 
+
+          
+
+{formData.category !== "Investor" && (
+            <>
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>Names Of Owner/s:</p>
+          </div>
+          <input
+            placeholder="Owners"
+            name="owners"
+            value={formData.owners}
+            onChange={handleChange}
+            
+          />
+          </>
+)}
+
+{formData.category !== "Investor" && (
+            <>
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>The Year Your Organization Started:</p>
+          </div>
+          <input
+            placeholder="Year Started"
+            name="yearStarted"
+            type="number"
+            value={formData.yearStarted}
+            onChange={handleChange}
+            
+          />
+          </>
+)}
+
+{formData.category !== "Investor" && (
+            <>
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>CMA License Number:</p>
+          </div>
+          <input
+            placeholder="CMA License No."
+            name="cmaLicenseNumber"
+            value={formData.cmaLicenseNumber}
+            onChange={handleChange}
+            type="number"
+          />
+          </>
+)}
+
+{formData.category !== "Investor" && (
+            <>
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>Organization Website:</p>
+          </div>
+          <input
+            placeholder="Website"
+            name="website"
+            value={formData.website}
+            onChange={handleChange}
+          />
+          </>
+)}
+
+
+
+
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>{formData.kraPin ? formData.kraPin.name : "Upload your KRA Pin"}:</p>
+          </div>
           <div className="document-upload">
             <label htmlFor="krapin">
               <AiFillFileText size={50} />
-              <p>{formData.kraPin ? formData.kraPin.name : "Upload your KRA Pin"}</p>
             </label>
             <input
               id="krapin"
@@ -215,10 +284,15 @@ const RegisterPage = () => {
             />
           </div>
 
+          {formData.category !== "Investor" && (
+            <>
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>{formData.businessCertificate ? formData.businessCertificate.name : "Upload your Business Certificate"}:</p>
+          </div>
+          
           <div className="document-upload">
             <label htmlFor="businessCert">
               <AiFillFileText size={50} />
-              <p>{formData.businessCertificate ? formData.businessCertificate.name : "Upload your Business Certificate"}</p>
             </label>
             <input
               id="businessCert"
@@ -226,10 +300,17 @@ const RegisterPage = () => {
               name="businessCertificate"
               style={{ display: "none" }}
               onChange={handleChange}
-              required
+              
             />
           </div>
-          
+          </>
+          )}
+
+{formData.category !== "Investor" && (
+            <>
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>Assets Under Management:</p>
+          </div>
           <input
             placeholder="Assets Under Management (ksh)"
             name="assetsUnderManagement"
@@ -237,6 +318,12 @@ const RegisterPage = () => {
             onChange={handleChange}
             type="number"
           />
+          </>
+          )}
+
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff' }}>Address Code:</p>
+          </div>
           <input
             type="text"
             placeholder="Address (P.O BOX 25749-00603, Nairobi)"
@@ -244,13 +331,7 @@ const RegisterPage = () => {
             value={formData.physical}
             onChange={handleChange}
           />
-          <input
-            type="number"
-            placeholder="Phone Number"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-          />
+
 
           <button type="submit" disabled={!passwordMatch}>
             REGISTER

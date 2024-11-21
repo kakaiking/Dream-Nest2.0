@@ -683,19 +683,19 @@ const MyDashboard = () => {
                 ...insightBookings.map(b => ({
                     date: b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-CA') : null,
                     amount: b.bookingPrice || 0,
-                    type: 'booking',
+                    type: 'New Bid',
                     customer: b.customerName
                 })),
                 ...insightTopups.map(t => ({
                     date: t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-CA') : null,
                     amount: t.totalPrice || 0,
-                    type: 'topup',
+                    type: 'Topup',
                     customer: t.customerName
                 })),
                 ...insightWithdrawals.map(w => ({
                     date: w.createdAt ? new Date(w.createdAt).toLocaleDateString('en-CA') : null,
                     amount: -(w.totalPrice || 0),
-                    type: 'withdrawal',
+                    type: 'Withdrawal',
                     customer: w.customerName
                 }))
             ].filter(transaction => transaction.date !== null); // Filter out invalid dates

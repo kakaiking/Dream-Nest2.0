@@ -52,17 +52,17 @@ export const categories = [
     icon: <IoBarChart style={{ color: '#6441a5' }} />, 
     description: "This property is close to the beach!",
   },
-  // {
-  //   img: "assets/tower2.jpg",
-  //   label: "Enterprise",
-  //   icon: <IoBusiness style={{ color: '#c33764' }} />, 
-  //   description: "This property has windmills!",
-  // },
   {
     img: "assets/unity.jpg",
     label: "Non-Profit",
     icon: <FaDonate style={{ color: '#0f9b0f' }}/>,
     description: "This property is in the countryside!",
+  },
+  {
+    img: "assets/tower2.jpg",
+    label: "Investor",
+    icon: <IoBusiness style={{ color: '#c33764' }} />, 
+    description: "This property has windmills!",
   },
 ];
 

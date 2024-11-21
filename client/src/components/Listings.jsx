@@ -43,7 +43,7 @@ const Listings = () => {
     <>
       <div className="category-listt">
         <div className="category-list">
-          {categories?.map((category, index) => (
+          {categories?.slice(0, 3).map((category, index) => (
             <div
               className={`category ${category.label === selectedCategory ? "selected" : ""}`}
               key={index}

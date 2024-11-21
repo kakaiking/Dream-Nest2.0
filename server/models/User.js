@@ -22,10 +22,12 @@ const UserSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
+      default: "",
     },
     type: {
       type: String,
       required: true,
+      default: "",
     },
     firmName: {
       type: String,

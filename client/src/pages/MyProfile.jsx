@@ -127,9 +127,11 @@ const MyProfile = () => {
                     <div className="infoCards">
                         <div className="shopPhoto_Descriptions">
                             <div className="shopProfileImages">
-                                <div className="shopimg">
-                                    <img src={`http://localhost:3001/${user.profileImagePath.replace("public", "")}`} alt="profile photo" />
-                                </div>
+                            <img
+          src={`http://localhost:3001/${getDocumentPath(user.profileImagePath)}`}
+          alt={`${user.firmName} Profile`}
+          className="user-image"
+        />
                                 {/* <p>{user.profileImagePath}</p> */}
                             </div>
 
@@ -303,7 +305,7 @@ const MyProfile = () => {
                                             <h2 className="country"> Hosted Funding Projects:</h2>
                                         </div>
                                         <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.propertyList.length || 'N/A'}</h3>
+                                            <h3 className="countryName">{user?.propertyList?.length || '0'}</h3>
                                         </div>
                                     </div>
                                     <div className="separator"></div>

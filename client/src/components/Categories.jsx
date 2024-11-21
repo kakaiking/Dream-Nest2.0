@@ -13,7 +13,7 @@ const Categories = () => {
       </p>
 
       <div className="categories_list">
-        {categories?.slice(1, 5).map((category, index) => (
+        {categories?.slice(1, 3).map((category, index) => (
           <Link 
             key={category.label}
             to={`/properties/category/${category.label}`}
