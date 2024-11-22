@@ -24,10 +24,14 @@ router.post(
   async (req, res) => {
     try {
       const { owners, email, password, category, type, firmName, yearStarted, cmaLicenseNumber, assetsUnderManagement, physical, website, phoneNumber } = req.body;
-      const { profileImage, kraPin, businessCertificate } = req.files;
+      let { profileImage, kraPin, businessCertificate } = req.files;
 
-      if (!profileImage || !kraPin || !businessCertificate) {
+      if (!profileImage ) {
         return res.status(400).send("All required files must be uploaded.");
+      }
+
+      if (!businessCertificate ) {
+        businessCertificate = 'client\public\assets\calendar.png';
       }
 
       const existingUser = await User.findOne({ email });

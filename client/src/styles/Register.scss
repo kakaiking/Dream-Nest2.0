@@ -16,9 +16,11 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-    width: 65%;
+    width: 90%;
     padding: 40px;
-    background-color: rgba(0, 0, 0, 0.8);
+    margin-top: 30px;
+    margin-bottom: 50px;
+    background-color: rgba(0, 0, 0, 0.9);
     border-radius: 20px;
 
     @include lg {

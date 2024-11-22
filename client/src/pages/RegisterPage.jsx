@@ -11,7 +11,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    owners: "",
+    owners: "N/A",
     email: "",
     password: "",
     confirmPassword: "",
@@ -19,11 +19,11 @@ const RegisterPage = () => {
     kraPin: null,
     businessCertificate: null,
     firmName: "_",
-    yearStarted: "",
-    cmaLicenseNumber: "",
-    assetsUnderManagement: "",
+    yearStarted: 0,
+    cmaLicenseNumber: 0,
+    assetsUnderManagement: 0,
     physical: "",
-    website: "",
+    website: "N/A",
     phoneNumber: "",
     category: "",
     type: "",
@@ -64,7 +64,7 @@ const RegisterPage = () => {
         navigate("/login");
       }
     } catch (err) {
-      console.error(err.message);
+      console.error(err);
     }
   };
 
@@ -75,7 +75,7 @@ const RegisterPage = () => {
       <div className="register_content">
         <form className="register_content_form" onSubmit={handleSubmit} >
 
-        <div className="create-listing_step1">
+          <div className="create-listing_step1">
             <h3 >Which Of These Categories Best Describes Your Organization?</h3>
             <div className="category-list" style={{ color: '#fff' }}>
               {categories?.slice(1, 4).map((item, index) => (
@@ -92,29 +92,29 @@ const RegisterPage = () => {
             </div>
 
             {formData.category !== "Investor" && (
-            <>
-            <h3 >Are you Certified by the Capital Markets Authority(CMA) of Kenya?</h3>
-            <div className="type-list" >
-              {types?.map((item, index) => (
-                <div
-                  className={`type ${type === item.name ? "selected" : ""}`}
-                  key={index}
-                  onClick={() => setType(item?.name || '')}
-                >
-                  <div className="type_text">
-                    <h4>{item.name}</h4>
-                    <p>{item.description}</p>
-                  </div>
-                  <div className="type_icon">{item.icon}</div>
+              <>
+                <h3 >Are you Certified by the Capital Markets Authority(CMA) of Kenya?</h3>
+                <div className="type-list" >
+                  {types?.map((item, index) => (
+                    <div
+                      className={`type ${type === item.name ? "selected" : ""}`}
+                      key={index}
+                      onClick={() => setType(item?.name || '')}
+                    >
+                      <div className="type_text">
+                        <h4>{item.name}</h4>
+                        <p>{item.description}</p>
+                      </div>
+                      <div className="type_icon">{item.icon}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            </>
+              </>
             )}
           </div>
 
           <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>Email Address:</p>
+            <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>Email Address:</p>
           </div>
           <input
             placeholder="example@gmail.com"
@@ -126,7 +126,7 @@ const RegisterPage = () => {
           />
 
           <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>Enter Password:</p>
+            <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>Enter Password:</p>
           </div>
           <input
             placeholder="Password"
@@ -137,8 +137,12 @@ const RegisterPage = () => {
             required
           />
 
+          {!passwordMatch && (
+            <p style={{ color: "red" }}>Passwords are not matching!</p>
+          )}
+
           <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>Confirm Password:</p>
+            <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>Confirm Password:</p>
           </div>
           <input
             placeholder="Re-write the above password"
@@ -149,8 +153,8 @@ const RegisterPage = () => {
             required
           />
 
-<div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>{formData.category == "Investor" ? 'Your Username' : "Organization Username"}: </p>
+          <div style={{ width: '100%', height: '22px' }}>
+            <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>{formData.category == "Investor" ? 'Your Username' : "Organization Username"}: </p>
           </div>
           <input
             placeholder={`${formData.category == 'Investor' ? 'Your username' : "Organization's username"} `}
@@ -162,7 +166,7 @@ const RegisterPage = () => {
           />
 
           <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>Phone Number:</p>
+            <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>Phone Number:</p>
           </div>
           <input
             type="number"
@@ -172,14 +176,9 @@ const RegisterPage = () => {
             onChange={handleChange}
           />
 
-          {!passwordMatch && (
-            <p style={{ color: "red" }}>Passwords are not matched!</p>
-          )}
-
-          
 
           <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>Upload Your Profile Photo:</p>
+            <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>Upload Your Profile Photo:</p>
           </div>
           <input
             id="image"
@@ -202,73 +201,73 @@ const RegisterPage = () => {
           </label>
 
 
-          
 
-{formData.category !== "Investor" && (
+
+          {formData.category !== "Investor" && (
             <>
-          <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>Names Of Owner/s:</p>
-          </div>
-          <input
-            placeholder="Owners"
-            name="owners"
-            value={formData.owners}
-            onChange={handleChange}
-            
-          />
-          </>
-)}
+              <div style={{ width: '100%', height: '22px' }}>
+                <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>Names Of Owner/s:</p>
+              </div>
+              <input
+                placeholder="Owners"
+                name="owners"
+                value={formData.owners}
+                onChange={handleChange}
 
-{formData.category !== "Investor" && (
+              />
+            </>
+          )}
+
+          {formData.category !== "Investor" && (
             <>
-          <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>The Year Your Organization Started:</p>
-          </div>
-          <input
-            placeholder="Year Started"
-            name="yearStarted"
-            type="number"
-            value={formData.yearStarted}
-            onChange={handleChange}
-            
-          />
-          </>
-)}
+              <div style={{ width: '100%', height: '22px' }}>
+                <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>The Year Your Organization Started:</p>
+              </div>
+              <input
+                placeholder="Year Started"
+                name="yearStarted"
+                type="number"
+                value={formData.yearStarted}
+                onChange={handleChange}
 
-{formData.category !== "Investor" && (
+              />
+            </>
+          )}
+
+          {formData.category !== "Investor" && formData.category !=='Non-Profit' && (
             <>
-          <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>CMA License Number:</p>
-          </div>
-          <input
-            placeholder="CMA License No."
-            name="cmaLicenseNumber"
-            value={formData.cmaLicenseNumber}
-            onChange={handleChange}
-            type="number"
-          />
-          </>
-)}
+              <div style={{ width: '100%', height: '22px' }}>
+                <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>CMA License Number:</p>
+              </div>
+              <input
+                placeholder="CMA License No."
+                name="cmaLicenseNumber"
+                value={formData.cmaLicenseNumber}
+                onChange={handleChange}
+                type="number"
+              />
+            </>
+          )}
 
-{formData.category !== "Investor" && (
+          {formData.category !== "Investor" && (
             <>
-          <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>Organization Website:</p>
-          </div>
-          <input
-            placeholder="Website"
-            name="website"
-            value={formData.website}
-            onChange={handleChange}
-          />
-          </>
-)}
+              <div style={{ width: '100%', height: '22px' }}>
+                <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>Organization Website:</p>
+              </div>
+              <input
+                placeholder="Website"
+                name="website"
+                value={formData.website}
+                onChange={handleChange}
+              />
+            </>
+          )}
 
 
 
 
           <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>{formData.kraPin ? formData.kraPin.name : "Upload your KRA Pin"}:</p>
+            <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>{formData.kraPin ? formData.kraPin.name : "Upload your KRA Pin ( pdf file* )"}:</p>
           </div>
           <div className="document-upload">
             <label htmlFor="krapin">
@@ -286,43 +285,43 @@ const RegisterPage = () => {
 
           {formData.category !== "Investor" && (
             <>
-          <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>{formData.businessCertificate ? formData.businessCertificate.name : "Upload your Business Certificate"}:</p>
-          </div>
-          
-          <div className="document-upload">
-            <label htmlFor="businessCert">
-              <AiFillFileText size={50} />
-            </label>
-            <input
-              id="businessCert"
-              type="file"
-              name="businessCertificate"
-              style={{ display: "none" }}
-              onChange={handleChange}
-              
-            />
-          </div>
-          </>
+              <div style={{ width: '100%', height: '22px' }}>
+                <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>{formData.businessCertificate ? formData.businessCertificate.name : "Upload your Business Certificate ( pdf file* )"}:</p>
+              </div>
+
+              <div className="document-upload">
+                <label htmlFor="businessCert">
+                  <AiFillFileText size={50} />
+                </label>
+                <input
+                  id="businessCert"
+                  type="file"
+                  name="businessCertificate"
+                  style={{ display: "none" }}
+                  onChange={handleChange}
+
+                />
+              </div>
+            </>
           )}
 
-{formData.category !== "Investor" && (
+          {formData.category !== "Investor" && formData.category !=='Non-Profit' && (
             <>
-          <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>Assets Under Management:</p>
-          </div>
-          <input
-            placeholder="Assets Under Management (ksh)"
-            name="assetsUnderManagement"
-            value={formData.assetsUnderManagement}
-            onChange={handleChange}
-            type="number"
-          />
-          </>
+              <div style={{ width: '100%', height: '22px' }}>
+                <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>Assets Under Management:</p>
+              </div>
+              <input
+                placeholder="Assets Under Management (ksh)"
+                name="assetsUnderManagement"
+                value={formData.assetsUnderManagement}
+                onChange={handleChange}
+                type="number"
+              />
+            </>
           )}
 
           <div style={{ width: '100%', height: '22px' }}>
-            <p style={{ textAlign: 'left', color: '#fff' }}>Address Code:</p>
+            <p style={{ textAlign: 'left', color: '#fff', fontSize: 'large' }}>Address Code:</p>
           </div>
           <input
             type="text"

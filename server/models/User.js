@@ -63,7 +63,7 @@ const UserSchema = new mongoose.Schema(
     },
     businessCertificatePath: {
       type: String,
-      default: "",
+      default: "N/A",
     },
     verified: {
       type: String,

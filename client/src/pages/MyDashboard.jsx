@@ -1621,7 +1621,6 @@ const MyDashboard = () => {
                                 <th className="text-center">Returns (%)</th>
                                 <th className="text-center">Payout</th>
                                 <th className="text-center">Status</th>
-                                <th className="text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody className="tbod">
@@ -1647,24 +1646,7 @@ const MyDashboard = () => {
                                                     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                             </td>
                                             <td className="border-slate-700 text-center">{reservation.status || "pending"}</td>
-                                            <td className="border-slate-700 text-center">
-                                                {(!reservation.status || reservation.status === "pending") ? (
-                                                    <button
-                                                        onClick={() => handleApprove(reservation._id)}
-                                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
-                                                        style={{ width: "70px", fontSize: "medium", fontWeight: "bold" }}
-                                                    >
-                                                        Approve
-                                                    </button>
-                                                ) : (
-                                                    <button
-                                                        disabled
-                                                        className="bg-gray-400 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed"
-                                                    >
-                                                        Approved
-                                                    </button>
-                                                )}
-                                            </td>
+                                            
                                         </tr>
                                     ))}
                         </tbody>

@@ -141,7 +141,7 @@ const CreateListing = () => {
       <Navbar />
 
       <div className="create-listing">
-        <h1>Create A Funding Proposal</h1>
+        <h1>Create A Funding Project</h1>
         <form onSubmit={handlePost}>
           <div className="create-listing_step1">
             <h2>Step 1: Tell Us About Your Funding Project</h2>
@@ -231,7 +231,7 @@ const CreateListing = () => {
           </div>
 
           <div className="create-listing_step2">
-            <h2>Step 2: Provide The Following Key Information About This Project</h2>
+            <h2>Step 2: Provide Your Intentions And Clear Guidlines For This Project</h2>
             <hr />
 
             <div className="description">

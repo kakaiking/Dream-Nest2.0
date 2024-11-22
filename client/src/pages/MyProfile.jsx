@@ -127,11 +127,11 @@ const MyProfile = () => {
                     <div className="infoCards">
                         <div className="shopPhoto_Descriptions">
                             <div className="shopProfileImages">
-                            <img
-          src={`http://localhost:3001/${getDocumentPath(user.profileImagePath)}`}
-          alt={`${user.firmName} Profile`}
-          className="user-image"
-        />
+                                <img
+                                    src={`http://localhost:3001/${getDocumentPath(user.profileImagePath)}`}
+                                    alt={`${user.firmName} Profile`}
+                                    className="user-image"
+                                />
                                 {/* <p>{user.profileImagePath}</p> */}
                             </div>
 
@@ -242,7 +242,7 @@ const MyProfile = () => {
                                 <div className="verifiedProfileData">
                                     <div className="verifiedDatum">
                                         <div className="verifiedDatumTitle">
-                                            <h2 className="country">Company / Firm Name</h2>
+                                            <h2 className="country">{user.category == "Investor" ? 'Your Username' : "Organization Username"}</h2>
                                         </div>
                                         <div className="verifiedDatumData">
                                             <h3 className="countryName">{user.firmName || 'N/A'}</h3>
@@ -260,45 +260,62 @@ const MyProfile = () => {
                                     </div>
                                     <div className="separator"></div>
 
-                                    <div className="verifiedDatum">
-                                        <div className="verifiedDatumTitle">
-                                            <h2 className="country">CMA Certified</h2>
-                                        </div>
-                                        <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.type || 'N/A'}</h3>
-                                        </div>
-                                    </div>
-                                    <div className="separator"></div>
+                                    {user.category !== "Investor" && user.category !=='Non-Profit' && (
+                                        <>
+                                            <div className="verifiedDatum">
+                                                <div className="verifiedDatumTitle">
+                                                    <h2 className="country">CMA Certified</h2>
+                                                </div>
+                                                <div className="verifiedDatumData">
+                                                    <h3 className="countryName">{user.type || 'N/A'}</h3>
+                                                </div>
+                                            </div>
+                                            <div className="separator"></div>
+                                        </>
+                                    )}
 
-                                    <div className="verifiedDatum">
-                                        <div className="verifiedDatumTitle">
-                                            <h2 className="country">Been A Fund Manager Since:</h2>
-                                        </div>
-                                        <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.yearStarted || 'N/A'}</h3>
-                                        </div>
-                                    </div>
-                                    <div className="separator"></div>
+                                    {user.category !== "Investor" && (
+                                        <>
+                                            <div className="verifiedDatum">
+                                                <div className="verifiedDatumTitle">
+                                                    <h2 className="country">Been A Fund Manager Since:</h2>
+                                                </div>
+                                                <div className="verifiedDatumData">
+                                                    <h3 className="countryName">{user.yearStarted || 'N/A'}</h3>
+                                                </div>
+                                            </div>
 
-                                    <div className="verifiedDatum">
-                                        <div className="verifiedDatumTitle">
-                                            <h2 className="country">CMA License Number:</h2>
-                                        </div>
-                                        <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.cmaLicenseNumber || 'N/A'}</h3>
-                                        </div>
-                                    </div>
-                                    <div className="separator"></div>
+                                            <div className="separator"></div>
+                                        </>
+                                    )}
 
-                                    <div className="verifiedDatum">
-                                        <div className="verifiedDatumTitle">
-                                            <h2 className="country">LinkedIn Profile / Professional Website:</h2>
-                                        </div>
-                                        <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.website || 'N/A'}</h3>
-                                        </div>
-                                    </div>
-                                    <div className="separator"></div>
+                                    {user.category !== "Investor" && user.category !=='Non-Profit' && (
+                                        <>
+                                            <div className="verifiedDatum">
+                                                <div className="verifiedDatumTitle">
+                                                    <h2 className="country">CMA License Number:</h2>
+                                                </div>
+                                                <div className="verifiedDatumData">
+                                                    <h3 className="countryName">{user.cmaLicenseNumber || 'N/A'}</h3>
+                                                </div>
+                                            </div>
+                                            <div className="separator"></div>
+                                        </>
+                                    )}
+
+                                    {user.category !== "Investor" && user.category !=='Non-Profit' && (
+                                        <>
+                                            <div className="verifiedDatum">
+                                                <div className="verifiedDatumTitle">
+                                                    <h2 className="country">LinkedIn Profile / Professional Website:</h2>
+                                                </div>
+                                                <div className="verifiedDatumData">
+                                                    <h3 className="countryName">{user.website || 'N/A'}</h3>
+                                                </div>
+                                            </div>
+                                            <div className="separator"></div>
+                                        </>
+                                    )}
 
                                     <div className="verifiedDatum">
                                         <div className="verifiedDatumTitle">
@@ -310,16 +327,19 @@ const MyProfile = () => {
                                     </div>
                                     <div className="separator"></div>
 
-
-                                    <div className="verifiedDatum">
-                                        <div className="verifiedDatumTitle">
-                                            <h2 className="country">Assets Under Management:</h2>
-                                        </div>
-                                        <div className="verifiedDatumData">
-                                            <h3 className="countryName">{user.assetsUnderManagement || 'N/A'}</h3>
-                                        </div>
-                                    </div>
-                                    <div className="separator"></div>
+                                    {user.category !== "Investor" && user.category !=='Non-Profit' && (
+                                        <>
+                                            <div className="verifiedDatum">
+                                                <div className="verifiedDatumTitle">
+                                                    <h2 className="country">Assets Under Management:</h2>
+                                                </div>
+                                                <div className="verifiedDatumData">
+                                                    <h3 className="countryName">{user.assetsUnderManagement || 'N/A'}</h3>
+                                                </div>
+                                            </div>
+                                            <div className="separator"></div>
+                                        </>
+                                    )}
 
                                     <div className="verifiedDatum">
                                         <div className="verifiedDatumTitle">
@@ -347,16 +367,20 @@ const MyProfile = () => {
                                                 <div className="doc-name">KRA PIN</div>
                                             </a>
                                         </div>
-                                        <div className="doc-card">
-                                            <a
-                                                href={`http://localhost:3001${getDocumentPath(user.businessCertificatePath)}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                <div className="doc-icon">📄</div>
-                                                <div className="doc-name">Business Certificate</div>
-                                            </a>
-                                        </div>
+                                        {user.category !== "Investor" &&  (
+                                            <>
+                                                <div className="doc-card">
+                                                    <a
+                                                        href={`http://localhost:3001${getDocumentPath(user.businessCertificatePath)}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <div className="doc-icon">📄</div>
+                                                        <div className="doc-name">Business Certificate</div>
+                                                    </a>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -381,7 +405,7 @@ const MyProfile = () => {
                                 booking = false
                             }) => (
                                 <ListingCard
-                                key={_id}
+                                    key={_id}
                                     listingId={_id}
                                     title={title}
                                     creator={creator}
@@ -395,6 +419,12 @@ const MyProfile = () => {
                                     booking={booking}
                                 />
                             )
+                        )}
+
+{!loading && localPropertyList.length === 0 && (
+                            <div className="no-listings" style={{ textAlign: "center", padding: "2rem" }}>
+                                <p style={{textAlign: 'center', fontSize: 'large', color: '#24355A', marginTop: '50px'}}>Sorry no funding projects have been initiated by this user yet.</p>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -438,7 +468,7 @@ const MyProfile = () => {
 
                         {!loading && followedListings.length === 0 && (
                             <div className="no-listings" style={{ textAlign: "center", padding: "2rem" }}>
-                                No Listings Followed Yet.
+                              <p style={{textAlign: 'center', fontSize: 'large', color: '#24355A', marginTop: '50px'}}> Sorry, no funding projects followed yet.</p>
                             </div>
                         )}
                     </div>

@@ -146,7 +146,7 @@ const NotificationsPage = () => {
             fontSize: 'medium',
           }}
         >
-          <h1 className="title-list">Followed Broadcasts</h1>
+          <h1 className="title-list">Followed Projects</h1>
         </div>
         <div
           className="search-input"
@@ -176,7 +176,7 @@ const NotificationsPage = () => {
         {loading ? (
           <Loader /> // Display loader while fetching data
         ) : updates.length === 0 ? (
-          <p>No notifications found for followed projects.</p>
+          <p style={{textAlign: 'center', fontSize: 'large', color: '#24355A', marginTop: '100px'}}>Sorry, No notifications found for followed projects yet.</p>
         ) : (
           <div className="notifications">
             <div className="notificationss">
