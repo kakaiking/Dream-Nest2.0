@@ -47,7 +47,7 @@ const CreateListing = () => {
   const [formLocation, setFormLocation] = useState({
     bidExpiry: "",
     financialInstruments: "",
-    returns: "",
+    returns: 0,
     paymentDates: "",
     target: "",
     shares: "",
@@ -191,7 +191,7 @@ const CreateListing = () => {
                 <p>Where Will This Money Be Used?</p>
                 <input
                   type="text"
-                  maxLength="21"
+                  maxLength="31"
                   placeholder="Stocks, Bonds, Building A Church..."
                   name="financialInstruments"
                   value={formLocation.financialInstruments}

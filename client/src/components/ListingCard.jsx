@@ -134,7 +134,7 @@ const ListingCard = ({
           <h2>{title}</h2>
 
           <h3>
-            {returns}%, {financialInstruments}
+          {category !== "Non-Profit" && `${returns}%`} {financialInstruments}
           </h3>
           <p>{creator ? creator.firmName : 'Loading...'}</p>
 

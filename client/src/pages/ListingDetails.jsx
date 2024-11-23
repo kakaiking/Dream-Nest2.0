@@ -520,10 +520,11 @@ const ListingDetails = () => {
               <br />
             </h2>
             <h4>Bid payout dates: {listing.paymentDates}</h4>
+            <h4> {listing.type}</h4>
           </>
         )}
         <h4>{listing.financialInstruments}</h4>
-        <h4> {listing.type}</h4>
+
         <h4>Status: {timeLeft}</h4>
       </div>
 
@@ -650,25 +651,34 @@ const ListingDetails = () => {
                 </div>
                 <div className="separator"></div>
 
-                <div className="verifiedDatum">
-                  <div className="verifiedDatumTitle">
-                    <h2 className="country">CMA License Number:</h2>
-                  </div>
-                  <div className="verifiedDatumData">
-                    <h3 className="countryName">{listing.creator.cmaLicenseNumber}</h3>
-                  </div>
-                </div>
-                <div className="separator"></div>
+                {listing.category !== "Investor" && listing.category !== 'Non-Profit' && (
+                  <>
+                    <div className="verifiedDatum">
+                      <div className="verifiedDatumTitle">
+                        <h2 className="country">CMA License Number:</h2>
+                      </div>
+                      <div className="verifiedDatumData">
+                        <h3 className="countryName">{listing.creator.cmaLicenseNumber}</h3>
+                      </div>
+                    </div>
+                    <div className="separator"></div>
+                  </>
+                )}
 
-                <div className="verifiedDatum">
-                  <div className="verifiedDatumTitle">
-                    <h2 className="country">LinkedIn Profile / Professional Website:</h2>
-                  </div>
-                  <div className="verifiedDatumData">
-                    <h3 className="countryName">{listing.creator.website}</h3>
-                  </div>
-                </div>
-                <div className="separator"></div>
+                {listing.category !== "Investor" && listing.category !== 'Non-Profit' && (
+                  <>
+                    <div className="verifiedDatum">
+                      <div className="verifiedDatumTitle">
+                        <h2 className="country">LinkedIn Profile / Professional Website:</h2>
+                      </div>
+                      <div className="verifiedDatumData">
+                        <h3 className="countryName">{listing.creator.website}</h3>
+                      </div>
+                    </div>
+                    <div className="separator"></div>
+                  </>
+                )}
+
 
                 <div className="verifiedDatum">
                   <div className="verifiedDatumTitle">
@@ -680,16 +690,19 @@ const ListingDetails = () => {
                 </div>
                 <div className="separator"></div>
 
-
-                <div className="verifiedDatum">
-                  <div className="verifiedDatumTitle">
-                    <h2 className="country">Assets Under Management:</h2>
-                  </div>
-                  <div className="verifiedDatumData">
-                    <h3 className="countryName">{listing.creator.assetsUnderManagement.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</h3>
-                  </div>
-                </div>
-                <div className="separator"></div>
+                {listing.category !== "Investor" && listing.category !== 'Non-Profit' && (
+                  <>
+                    <div className="verifiedDatum">
+                      <div className="verifiedDatumTitle">
+                        <h2 className="country">Assets Under Management:</h2>
+                      </div>
+                      <div className="verifiedDatumData">
+                        <h3 className="countryName">{listing.creator.assetsUnderManagement.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</h3>
+                      </div>
+                    </div>
+                    <div className="separator"></div>
+                  </>
+                )}
 
                 <div className="verifiedDatum">
                   <div className="verifiedDatumTitle">
@@ -745,7 +758,9 @@ const ListingDetails = () => {
               );
             })
           ) : (
-            <div>No updates available</div> // Fallback message when no updates are present
+            <div>
+              <p style={{ textAlign: 'center', fontSize: 'large', color: '#24355A', marginTop: '50px' }}>No updates available</p>
+            </div> // Fallback message when no updates are present
           )}
 
 

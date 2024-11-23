@@ -192,7 +192,7 @@ const MyDashboard = () => {
     };
 
     const filteredTopupList = useMemo(() => {
-        return topupList.filter((topup) => {
+        return topupList?.filter((topup) => {
             if (filter === "all") return true;
             return topup.status === filter;
         });
@@ -444,7 +444,7 @@ const MyDashboard = () => {
     }, [userId]);
 
     const filteredTopUps = useMemo(() => {
-        return topups.filter((topup) => {
+        return topups?.filter((topup) => {
             if (filter === "all") return true;
             return topup.status === filter;
         });
@@ -1407,7 +1407,7 @@ const MyDashboard = () => {
                                     <td className="border-slate-700 text-center">{index + 1}</td>
                                     <td className="border-slate-700 text-center">{topup.listingId.title}</td>
                                     <td className='border-slate-700 text-center'>{topup.customerName}</td>
-                                    <td className='border-slate-700 text-center'><Link to={`/${topup.customerId._id}/details`}>{topup.customerEmail}</Link> </td>
+                                    <td className='border-slate-700 text-center'><Link to={`/${topup.customerId}/details`}>{topup.customerEmail}</Link> </td>
                                     <td className='border-slate-700 text-center'>{topup.guestCount}</td>
                                     <td className="border-slate-700 text-center">ksh. {topup.totalPrice}</td>
                                     <td className="border-slate-700 text-center">{new Date(topup.createdAt).toLocaleDateString()}</td>
@@ -1504,7 +1504,7 @@ const MyDashboard = () => {
                                     <td className="border-slate-700 text-center">{index + 1}</td>
                                     <td className="border-slate-700 text-center">{withdrawal.listingId.title}</td>
                                     <td className='border-slate-700 text-center'>{withdrawal.customerName}</td>
-                                    <td className='border-slate-700 text-center'><Link to={`/${withdrawal.customerId._id}/details`}>{withdrawal.customerEmail}</Link> </td>
+                                    <td className='border-slate-700 text-center'><Link to={`/${withdrawal.customerId}/details`}>{withdrawal.customerEmail}</Link> </td>
                                     <td className='border-slate-700 text-center'>{withdrawal.guestCount}</td>
                                     <td className="border-slate-700 text-center">
                                         ksh. {withdrawal.totalPrice}
@@ -1615,7 +1615,6 @@ const MyDashboard = () => {
                                 <th className="text-center">No</th>
                                 <th className="text-center">Project Name</th>
                                 <th className="text-center">Bidder's Name</th>
-                                <th className="text-center">Email</th>
                                 <th className="text-center">Shares</th>
                                 <th className="text-center">Bid Price</th>
                                 <th className="text-center">Returns (%)</th>
@@ -1632,9 +1631,7 @@ const MyDashboard = () => {
                                             <td className="border-slate-700 text-center">{index + 1}</td>
                                             <td className="border-slate-700 text-center">{reservation.listingTitle}</td>
                                             <td className="border-slate-700 text-center">{reservation.customerName}</td>
-                                            <td className="border-slate-700 text-center">
-                                                <Link to={`/${reservation.customerId._id}/details`}>{reservation.customerEmail}</Link>
-                                            </td>
+                                            
                                             <td className="border-slate-700 text-center">{reservation.guestCount}</td>
                                             <td className="border-slate-700 text-center">
                                                 ksh. {reservation.totalPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}

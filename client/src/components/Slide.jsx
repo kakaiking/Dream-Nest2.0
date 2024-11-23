@@ -31,7 +31,7 @@ const Slide = () => {
       <div className="navbar_search">
         <input
           type="text"
-          placeholder="Search For A Listing"
+          placeholder="Search For A Funding Project"
           value={search}
           style={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
           onChange={(e) => setSearch(e.target.value)}
