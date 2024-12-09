@@ -78,7 +78,7 @@ const MyDashboard = () => {
     const dispatch = useDispatch();
 
     const [showApprovalOptions, setShowApprovalOptions] = useState(false);
-    const [isDashboardVisible, setIsDashboardVisible] = useState(true);
+    const [isDashboardVisible, setIsDashboardVisible] = useState(false);
 
     const toggleDashboard = () => setIsDashboardVisible(!isDashboardVisible);
 
