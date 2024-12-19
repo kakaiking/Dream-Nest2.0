@@ -78,7 +78,7 @@ const MyDashboard = () => {
     const dispatch = useDispatch();
 
     const [showApprovalOptions, setShowApprovalOptions] = useState(false);
-    const [isDashboardVisible, setIsDashboardVisible] = useState(false);
+    const [isDashboardVisible, setIsDashboardVisible] = useState(true);
 
     const toggleDashboard = () => setIsDashboardVisible(!isDashboardVisible);
 
@@ -776,7 +776,7 @@ const MyDashboard = () => {
     // Renders 
     const renderInsights = () => (
         <div className="w-full max-w-3xl mx-auto p-6">
-            {/* <h1 style={{ margin: "40px", textAlign: "center" }}>Project Insights</h1> */}
+            <h1 style={{ margin: "40px", textAlign: "center", color: "#333" }}>Project Analysis</h1>
 
             <div
                 style={{
@@ -789,7 +789,8 @@ const MyDashboard = () => {
                     boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)',
                 }}
             >
-                <h2>Analytics </h2><br />
+                
+                <h2 >Analytics </h2><br />
                 <p>
                     Choose a project from the dropdown below to view detailed funding performance metrics.
                 </p>
@@ -1150,10 +1151,9 @@ const MyDashboard = () => {
         </>
     );
 
-
     const renderWithdraw = () => (
         <>
-            <h1 style={{ margin: "40px" }}>Withdraw Shares</h1>
+            <h1 style={{ margin: "40px", textAlign: "center", color: "#333" }}>Withdraw Shares</h1>
             <div style={{
                 minWidth: '450px',
                 maxWidth: '700px', 
@@ -1263,12 +1263,11 @@ const MyDashboard = () => {
         </>
     );
 
-
     const renderFileReturn = () => (
         <>
-            <h1 style={{ margin: "40px" }}>File Return </h1>
+            <h1 style={{ margin: "40px", textAlign: "center", color: "#333" }}>File Returns </h1>
             <div style={{ maxWidth: '600px', height: 'auto', margin: '0 auto', padding: '20px', backgroundColor: '#fff', borderRadius: '7px', boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)' }}>
-                <h2>Filing Return</h2><br />
+                <h2>Filing </h2><br />
                 <p>To file returns for a funding project, select the listing from the dropdown below and follow through to complete the payment.</p>  <br /><hr /><br />
                 <select onChange={handleListingSelect} style={{ width: '100%', height: '30px', marginBottom: '20px', borderRadius: '5px' }}>
                     <option value="">Select the listing you want to file returns for</option>
@@ -1340,7 +1339,7 @@ const MyDashboard = () => {
     const renderMyProjectTopUps = () => (
         <>
             <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
-                <h1 className="title-list">My Project Top Ups</h1>
+                <h1 className="title-list" style={{ margin: "40px", textAlign: "center", color: "#333" }}>My Project Top Ups</h1>
             </div>
 
             {/* Project Name Dropdown Filter */}
@@ -1437,7 +1436,7 @@ const MyDashboard = () => {
     const renderMyProjectWithdrawals = () => (
         <>
             <div style={{ justifyContent: "center", width: "600px", textAlign: "center", margin: "20px auto" }}>
-                <h1 className="title-list">My Project Withdrawals</h1>
+                <h1 className="title-list" style={{ margin: "40px", textAlign: "center", color: "#333" }}>My Project Withdrawals</h1>
             </div>
 
             {/* Project Name Dropdown Filter */}
@@ -1553,7 +1552,7 @@ const MyDashboard = () => {
         return (
             <>
                 <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
-                    <h1 className="title-list">Your Bids</h1>
+                    <h1  style={{ margin: "40px", textAlign: "center", color: "#333" }}>My Bids</h1>
                 </div>
 
                 {/* Project Name Dropdown Filter */}
@@ -1656,7 +1655,7 @@ const MyDashboard = () => {
     const renderMyTopUps = () => (
         <>
             <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
-                <h1 className="title-list">My Top Ups</h1>
+                <h1 style={{ margin: "40px", textAlign: "center", color: "#333" }}>My Top Ups</h1>
             </div>
 
             {/* Project Name Dropdown Filter */}
@@ -1737,7 +1736,7 @@ const MyDashboard = () => {
     const renderMyWithdrawals = () => (
         <>
             <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
-                <h1 className="title-list">My Withdrawals</h1>
+                <h1 style={{ margin: "40px", textAlign: "center", color: "#333" }}>My Withdrawals</h1>
             </div>
 
             {/* Project Name Dropdown Filter */}
@@ -1828,7 +1827,7 @@ const MyDashboard = () => {
         return (
             <>
                 <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
-                    <h1 className="title-list">Your Projects' Bids</h1>
+                    <h1 style={{ margin: "40px", textAlign: "center", color: "#333" }}>My Projects' Bids</h1>
                 </div>
 
                 {/* Project Name Dropdown Filter */}
@@ -1947,7 +1946,7 @@ const MyDashboard = () => {
     const renderMyReturnLogs = () => (
         <div>
             <div style={{ justifyContent: "center", width: "500px", textAlign: "center", margin: "20px auto" }}>
-                <h1 className="title-list">My Returns Logs</h1>
+                <h1 style={{ margin: "40px", textAlign: "center", color: "#333" }}>My Returns Logs</h1>
             </div>
             {returnLogs.length > 0 ? (
                 <table className='table' style={{ width: '80%' }}>
@@ -2096,7 +2095,7 @@ const MyDashboard = () => {
 
                                 {/* Approvals Button with Dropdown */}
                                 <button onClick={toggleApprovalOptions} style={getButtonStyle('approvals')}>
-                                    <FaCheckCircle style={iconStyle} /> Approvals {showApprovalOptions ? <FaChevronUp style={{ marginLeft: '30px' }} /> : <FaChevronDown style={{ marginLeft: '30px' }} />}
+                                    <FaCheckCircle style={iconStyle} /> Project Approvals  {showApprovalOptions ? <FaChevronUp style={{ marginLeft: '30px' }} /> : <FaChevronDown style={{ marginLeft: '30px' }} />}
                                 </button>
 
                                 {showApprovalOptions && (
