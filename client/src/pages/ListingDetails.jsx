@@ -331,7 +331,7 @@ const ListingDetails = () => {
                   type="text"
                   value={url}
                   readOnly
-                  style={{ width: "80%" }}
+                  style={{ width: "80%", height: '50px', fontSize: 'large' }}
                 />
 
                 <div className="vertical-divider"></div> {/* Vertical Divider */}
@@ -447,7 +447,7 @@ const ListingDetails = () => {
       >
         {/* Follow Button */}
         {user?._id !== listing.creator._id && (
-          <div
+          <button
             className="btnnn"
             style={{
               display: 'flex',
@@ -462,7 +462,13 @@ const ListingDetails = () => {
               backgroundColor: '#fff',
               cursor: 'pointer'
             }}
-            onClick={toggleFollow}
+            onClick={() => {
+              if (!user) {
+                navigate('/login');
+              } else {
+                toggleFollow();
+              }
+            }}
           >
             <SlUserFollow
               className={`follow-btn ${isFollowing ? 'unfollow' : 'follow'}`}
@@ -474,11 +480,11 @@ const ListingDetails = () => {
             />
 
             <h3>{isFollowing ? 'Unfollow' : 'Follow'} [{followersCount}]</h3>
-          </div>
+          </button>
         )}
 
         {/* Share Button */}
-        <div
+        <button
           className="btnnn"
           style={{
             display: 'flex',
@@ -493,6 +499,7 @@ const ListingDetails = () => {
             cursor: 'pointer'
           }}
           onClick={() => setIsModalOpen(true)}
+
         >
           <FiShare2
             className="shareBtn"
@@ -503,14 +510,13 @@ const ListingDetails = () => {
             }}
           />
           <h3 style={{ margin: 0 }}>Share Listing</h3>
-        </div>
+        </button>
       </div>
 
 
-      <div className="listing-details">
-        <div className="title">
+      <div className="listing-detailz" style={{ paddingLeft: '40px', paddingTop: '20px' }}>
+        <div className="title" >
           <h1>{listing.title}</h1>
-          <div></div>
         </div>
 
         {listing.category != "Non-Profit" && (
@@ -523,9 +529,12 @@ const ListingDetails = () => {
             <h4> {listing.type}</h4>
           </>
         )}
-        <h4>{listing.financialInstruments}</h4>
 
-        <h4>Status: {timeLeft}</h4>
+        <div className="bod">
+          <h4>{listing.financialInstruments}</h4>
+          <h4>Status: {timeLeft}</h4>
+        </div>
+
       </div>
 
       {/* <!-- Toggle Shop nav --> */}
@@ -615,7 +624,17 @@ const ListingDetails = () => {
               </div>
 
 
-              <button className="button" type="submit" onClick={handleSubmit}>
+              <button
+                className="button"
+                type="submit"
+                onClick={() => {
+                  if (!user) {
+                    navigate('/login');
+                  } else {
+                    handleSubmit();
+                  }
+                }}
+              >
                 PLACE BID
               </button>
             </div>
@@ -717,7 +736,18 @@ const ListingDetails = () => {
 
             <div className="moreDetailsBtn">
               <div className="moreDetailsBt" style={{ width: '220px', margin: '0 auto' }}>
-                <Link to={`/${listing.creator._id}/details`} className="moreDetailsBtnn" style={{ textDecoration: 'none', color: 'white', height: '100%', width: '100%' }}> Show More Details</Link>
+                <button
+                  onClick={() => {
+                    if (user) {
+                      navigate(`/${listing.creator._id}/details`);
+                    }
+                  }}
+                  className="moreDetailsBtnn"
+                  style={{ textDecoration: 'none', color: 'white', height: '100%', width: '100%' }}
+                  disabled={!user}
+                >
+                  Show More Details
+                </button>
               </div>
             </div>
           </div>
@@ -726,7 +756,7 @@ const ListingDetails = () => {
 
       <div className={`tab ${activeTab === 'updates' ? 'updates' : 'hidden'}`}>
         <h2 style={{ paddingLeft: '40px' }}>Project Updates:</h2>
-        <div className="tabbU">
+        {/* <div className="tabbU">
 
           {Array.isArray(updates) && updates.length > 0 ? (
             updates.map((update, index) => {
@@ -775,7 +805,7 @@ const ListingDetails = () => {
               <AddCircle style={{ fontSize: '80px', color: '#24355A', width: '100%', }} />
             </button>
           )}
-        </div>
+        </div> */}
       </div>
 
       <Footer />

@@ -2,8 +2,8 @@
 @import "./breakpoints.scss";
 
 .listing-details {
-  padding: 40px;
-  height: 220px;
+  padding: 0 40px;
+  height: auto;
   cursor: default;
   // background-color: green;
 
@@ -857,11 +857,6 @@ margin-top: 50px;
   .tabbU {
     padding: 0 20px;
     width: 95%;
-  }
-
-  .listing-details {
-    height: 270px;
-    // background-color: red;
   }
 
   .tab {

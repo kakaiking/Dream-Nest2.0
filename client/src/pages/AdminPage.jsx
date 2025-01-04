@@ -389,7 +389,9 @@ const AdminPage = () => {
     filterComments().map(comment => (
       <div key={comment._id} className="comment-card" style={{ marginBottom: '40px' }}>
         <strong>Comment By:</strong> {comment.user.firmName} <br />
-        <strong>Content:</strong> {comment.content} <br />
+        <strong>Comment:</strong> {comment.content} <br />
+        <strong>Update:</strong> {comment.update.title} <br />
+        <strong>Listing:</strong> {comment.update.listing.title} <br />
         <strong>Created At:</strong> {new Date(comment.createdAt).toLocaleString()} <br />
         <strong>Updated At:</strong> {new Date(comment.updatedAt).toLocaleString()} <br />
       </div>
@@ -483,12 +485,13 @@ const AdminPage = () => {
     width: '100%',
     padding: '10px',
     marginBottom: '10px',
-    backgroundColor: activeView === view ? '#e9ecef' : 'transparent',
+    backgroundColor: activeView === view ? '#ccc' : 'transparent',
     color: '#333',
     border: 'none',
     cursor: 'pointer',
     fontSize: 'medium',
     fontWeight: 'bold',
+    borderRadius: '5px'
   });
 
   const iconStyle = {
@@ -863,7 +866,8 @@ const AdminPage = () => {
 
           {/* Sidebar Content */}
           {isSidebarVisible && (
-            <div style={{ height: "100%", background: "#f8f9fa", padding: "20px", overflow: "hidden" }}>
+            <div style={{ height: "100%", background: "#f8f9fa", padding: "20px", overflow: "hidden", boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)'
+            }}>
               <h2 style={{ textAlign: "center", color: "#333", borderBottom: "1px solid black" }}>Admin Dashboard</h2>
               <br />
               <button onClick={() => setActiveView("users")} style={getButtonStyle('users')}>

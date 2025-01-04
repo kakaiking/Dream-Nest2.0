@@ -7,6 +7,8 @@ import AddCircleOutline from '@mui/icons-material/AddCircleOutline';
 import '../styles/TopUpPage.scss';
 import '../styles/MyDashboard.scss';
 import { setListingStatus } from '../redux/state';
+import { MdPersonAddAlt1, MdPersonRemoveAlt1 } from "react-icons/md";
+import { IoIosPeople } from "react-icons/io";
 import { FaMoneyCheckAlt, FaPiggyBank, FaCheckCircle, FaFileInvoiceDollar, FaChartLine, FaChartPie, FaChevronDown, FaChevronRight, FaChevronUp, FaChevronLeft } from 'react-icons/fa';
 import { Line, LineChart, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { FaClipboardList } from 'react-icons/fa'; // Import icon from React Icons
@@ -94,16 +96,18 @@ const MyDashboard = () => {
         width: '100%',
         padding: '10px',
         marginBottom: '10px',
-        backgroundColor: activeView === view ? '#e9ecef' : 'transparent',
+        backgroundColor: activeView === view ? '#ccc' : 'transparent',
         color: '#333',
         border: 'none',
+        borderRadius: '5px',
         cursor: 'pointer',
-        fontSize: 'medium',
+        fontSize: 'large',
         fontWeight: 'bold',
     });
 
     const iconStyle = {
-        marginRight: '10px'
+        marginRight: '10px',
+
     };
 
     // ---------------------------- My Project Topups --------------------------------------------------------------------
@@ -833,7 +837,7 @@ const MyDashboard = () => {
                                         borderRadius: '7px',
                                     }}
                                 >
-                                    <FaClipboardList color="white" size={24} />
+                                    <IoIosPeople color="white" size={54} />
                                 </div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
                                     <div className="value" style={{ height: '40%', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -859,7 +863,7 @@ const MyDashboard = () => {
                                         borderRadius: '7px',
                                     }}
                                 >
-                                    <FaClipboardList color="white" size={24} />
+                                    <FaClipboardList color="white" size={54} />
                                 </div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
                                     <div className="value" style={{ height: '40%', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -885,7 +889,7 @@ const MyDashboard = () => {
                                         borderRadius: '7px',
                                     }}
                                 >
-                                    <FaClipboardList color="white" size={24} />
+                                    <MdPersonAddAlt1 color="white" size={54} />
                                 </div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
                                     <div className="value" style={{ height: '40%', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -911,7 +915,7 @@ const MyDashboard = () => {
                                         borderRadius: '7px',
                                     }}
                                 >
-                                    <FaClipboardList color="white" size={24} />
+                                    <MdPersonRemoveAlt1 color="white" size={54} />
                                 </div>
                                 <div className="info" style={{ display: 'flex', flexDirection: 'column', width: '60%' }}>
                                     <div className="value" style={{ height: '40%', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -2057,6 +2061,7 @@ const MyDashboard = () => {
                         height: '100%',
                         overflow: 'hidden',
                         background: '#f8f9fa',
+                        boxShadow: '0 3px 10px 2px rgba(0, 0, 0, 0.2)',
                         padding: isDashboardVisible ? '20px' : '0',
                     }}>
                         {isDashboardVisible && (
@@ -2069,16 +2074,16 @@ const MyDashboard = () => {
                                     <FaChartLine style={iconStyle} /> Analytics
                                 </button>
                                 <button onClick={() => setActiveView('myBids')} style={getButtonStyle('myBids')}>
-                                    <FaChartPie style={iconStyle} /> My Bids
+                                    <FaClipboardList style={iconStyle} /> My Bids
                                 </button>
                                 <button onClick={() => setActiveView('myProjectBids')} style={getButtonStyle('myProjectBids')}>
                                     <FaChartPie style={iconStyle} /> My Projects Bids
                                 </button>
                                 <button onClick={() => setActiveView('myTopups')} style={getButtonStyle('myTopups')}>
-                                    <FaMoneyCheckAlt style={iconStyle} /> My Top-Ups
+                                    <MdPersonAddAlt1 style={iconStyle} /> My Top-Ups
                                 </button>
                                 <button onClick={() => setActiveView('myWithdrawals')} style={getButtonStyle('myWithdrawals')}>
-                                    <FaPiggyBank style={iconStyle} /> My Withdrawals
+                                    <MdPersonRemoveAlt1 style={iconStyle} /> My Withdrawals
                                 </button>
                                 <button onClick={() => setActiveView('myReturnLogs')} style={getButtonStyle('myReturnLogs')}>
                                     <FaFileInvoiceDollar style={iconStyle} /> My Returns Logs
@@ -2101,10 +2106,10 @@ const MyDashboard = () => {
                                 {showApprovalOptions && (
                                     <div style={{ marginLeft: '20px' }}>
                                         <button onClick={() => setActiveView('myProjectTopups')} style={getButtonStyle('myProjectTopups')}>
-                                            <FaCheckCircle style={iconStyle} /> Top Ups
+                                            <MdPersonAddAlt1 style={iconStyle} /> Top Ups
                                         </button>
                                         <button onClick={() => setActiveView('myProjectWithdrawals')} style={getButtonStyle('myProjectWithdrawals')}>
-                                            <FaCheckCircle style={iconStyle} /> Withdrawals
+                                            <MdPersonRemoveAlt1 style={iconStyle} /> Withdrawals
                                         </button>
                                     </div>
                                 )}

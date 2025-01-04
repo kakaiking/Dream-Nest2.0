@@ -106,12 +106,14 @@
 
 .follow-button {
   padding: 0.5rem 1rem;
+  width: 100%;
   border-radius: 4px;
+  font-size: medium;
   background: #c33764;
   color: white;
   border: none;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: 0.1s ease;
 
   &:disabled {
     opacity: 0.5;
