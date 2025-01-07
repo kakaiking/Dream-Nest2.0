@@ -114,6 +114,8 @@
   border: none;
   cursor: pointer;
   transition: 0.1s ease;
+  font-size: large;
+  font-weight: bold;
 
   &:disabled {
     opacity: 0.5;

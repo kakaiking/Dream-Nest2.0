@@ -570,14 +570,14 @@ const ListingDetails = () => {
             <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(listing.description) }} />
           </div>
 
-          <div className='bidInfo'>
-            <h2 style={{ textAlign: 'center' }}>Select The Number Of <u>Shares Of Interest</u> You Want For This Project </h2><br /><hr /> <br />
+          <div className='bidInfoz'>
+            <h2 style={{ textAlign: 'center' }}> Select Bid Shares! </h2><br /><hr /> <br />
             <div className="date-range-calendar">
               <h3>
-                {'Target: ksh. ' + listing.target.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                {'Target: ' + listing.target.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' ksh.'}
               </h3>
               <h3>Total Listing Shares: {listing.totalShares}</h3>
-              <h3>Remaining Shares Of Interest: {listing.shares - guestCount}</h3>
+              <h3>Remaining Shares: {listing.shares - guestCount}</h3>
               <h3 style={{ marginTop: '10px' }}>
                 Price Per Share: {pricePerShare.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
               </h3>
@@ -619,7 +619,7 @@ const ListingDetails = () => {
                   </h2>
                 )}
                 <h2>
-                  Total Bid Price: ksh.{(pricePerShare * guestCount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                  Total Bid: ksh.{(pricePerShare * guestCount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 </h2>
               </div>
 

@@ -109,7 +109,7 @@ const ListingCard = ({
         return "linear-gradient(330deg, #c33764, #1d2671)"; // Default gradient
     }
   };
-  
+
 
   return (
     <div
@@ -134,7 +134,7 @@ const ListingCard = ({
           <h2>{title}</h2>
 
           <h3>
-          {category !== "Non-Profit" && `${returns}%`} {financialInstruments}
+            {category !== "Non-Profit" && `${returns}%`} {financialInstruments}
           </h3>
           <p>{creator ? creator.firmName : 'Loading...'}</p>
 
@@ -144,7 +144,7 @@ const ListingCard = ({
             <span>
               Target:{" "}
               <span style={{ color: "#c33764" }}>
-                {target}
+                {target.toLocaleString()}
               </span>
             </span>
           </p>
@@ -176,6 +176,7 @@ const ListingCard = ({
         {user?._id !== creator?._id && (
           <button
             className="follow-button"
+            style={{ backgroundColor: isFollowing ? 'white' : '', border: isFollowing ? '1px solid black' : '', color: isFollowing ? 'black' : '' }}
             onClick={toggleFollow}
             disabled={!user}
           >
